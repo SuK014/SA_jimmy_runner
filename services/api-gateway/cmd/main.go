@@ -1,25 +1,21 @@
 package main
 
 import (
-	"log"
-
 	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/configuration"
 	httpHandler "github.com/SuK014/SA_jimmy_runner/services/api-gateway/handlers"
 	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/middlewares"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-
-	"google.golang.org/grpc"
 )
 
 func main() {
 	// Connect to server
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	defer conn.Close()
+	// conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	// if err != nil {
+	// 	log.Fatalf("did not connect: %v", err)
+	// }
+	// defer conn.Close()
 
 	// c := pb.NewUserServiceClient(conn)
 
