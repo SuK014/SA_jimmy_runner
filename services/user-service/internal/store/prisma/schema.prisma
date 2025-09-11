@@ -1,0 +1,18 @@
+datasource db {
+    provider = "postgresql"
+    // url = env("DATABASE_URL")
+    url = "postgresql://postgres.nyehvpubgddlksoppqvn:SuK014%40Supa@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres"
+}
+
+generator db {
+    provider = "go run github.com/steebchen/prisma-client-go"
+}
+
+model User {
+    userId String @id @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid @map("user_id")
+    createdAt DateTime? @default(now()) @map("created_at")
+    updatedAt DateTime? @updatedAt @map("updated_at")
+    name String
+    email String @unique
+    password String
+}

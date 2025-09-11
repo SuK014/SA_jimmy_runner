@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "shared/proto/user";
+
+// User service definition
+service UserService {
+  // Get a single user by ID
+//   rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  
+  // Create a new user
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+
+}
+
+// Request message to get a user
+// message GetUserRequest {
+//   string id = 1;
+// }
+
+// // Response message for GetUser
+// message GetUserResponse {
+//   User user = 1;
+// }
+
+// Request message to create a user
+message CreateUserRequest {
+  string email = 1;
+  string display_name = 2;
+  string password = 3; 
+}
+
+// Response message for CreateUser
+message CreateUserResponse {
+  bool success = 1;
+}
+
+// User message
+// message User {
+//   string id = 1;
+//   string email = 2;
+//   string display_name = 3;
+//   string created_at = 4; // ISO8601 string, or you can use google.protobuf.Timestamp
+// }
