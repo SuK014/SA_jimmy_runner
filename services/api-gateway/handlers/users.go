@@ -30,7 +30,7 @@ func (h *HTTPHandler) CreateUser(ctx *fiber.Ctx) error {
 		Password:    bodyData.Password,
 	}
 
-	_, err := h.Client.CreateUser(context.Background(), req)
+	_, err := h.userClient.CreateUser(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot insert new user account: " + err.Error()},

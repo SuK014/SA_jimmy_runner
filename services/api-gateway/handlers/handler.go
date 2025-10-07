@@ -3,14 +3,16 @@ package handlers
 import (
 	"log"
 
-	pb "github.com/SuK014/SA_jimmy_runner/shared/proto/user"
+	pbPlan "github.com/SuK014/SA_jimmy_runner/shared/proto/plan"
+	pbUser "github.com/SuK014/SA_jimmy_runner/shared/proto/user"
 	"github.com/gofiber/fiber/v2"
 	"google.golang.org/grpc"
 )
 
 // HTTPHandler holds the gRPC client
 type HTTPHandler struct {
-	Client pb.UserServiceClient
+	userClient pbUser.UserServiceClient
+	planClient pbPlan.PlansServiceClient
 }
 
 // NewHTTPHandler initializes the gRPC client and returns the handler
@@ -20,8 +22,16 @@ func NewHTTPHandler(app *fiber.App, grpcAddress string) *HTTPHandler {
 		log.Fatalf("failed to connect to gRPC server: %v", err)
 	}
 
-	client := pb.NewUserServiceClient(conn)
-	handler := &HTTPHandler{Client: client}
+	user_client := pbUser.NewUserServiceClient(conn)
+	plan_client := pbPlan.NewPlansServiceClient(conn)
+	handler := &HTTPHandler{
+		userClient: user_client,
+		planClient: plan_client,
+	}
 	HandlerUsers(*handler, app)
-	return &HTTPHandler{Client: client}
+	HandlerPlans(*handler, app)
+	return &HTTPHandler{
+		userClient: user_client,
+		planClient: plan_client,
+	}
 }
