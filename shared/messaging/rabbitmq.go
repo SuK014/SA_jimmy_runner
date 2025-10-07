@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	TripExchange       = "trip"
+	UserExchange       = "user"
 	DeadLetterExchange = "dlx"
 )
 
@@ -135,7 +135,7 @@ func (r *RabbitMQ) PublishMessage(ctx context.Context, routingKey string, messag
 		Body:         jsonMsg,
 	}
 
-	return tracing.TracedPublisher(ctx, TripExchange, routingKey, msg, r.publish)
+	return tracing.TracedPublisher(ctx, UserExchange, routingKey, msg, r.publish)
 }
 
 func (r *RabbitMQ) publish(ctx context.Context, exchange, routingKey string, msg amqp.Publishing) error {
@@ -198,7 +198,7 @@ func (r *RabbitMQ) setupExchangesAndQueues() error {
 	}
 
 	err := r.Channel.ExchangeDeclare(
-		TripExchange, // name
+		UserExchange, // name
 		"topic",      // type
 		true,         // durable
 		false,        // auto-deleted
@@ -207,71 +207,15 @@ func (r *RabbitMQ) setupExchangesAndQueues() error {
 		nil,          // arguments
 	)
 	if err != nil {
-		return fmt.Errorf("failed to declare exchange: %s: %v", TripExchange, err)
+		return fmt.Errorf("failed to declare exchange: %s: %v", UserExchange, err)
 	}
 
 	if err := r.declareAndBindQueue(
-		FindAvailableDriversQueue,
+		RegisterNotiQueue,
 		[]string{
-			contracts.TripEventCreated, contracts.TripEventDriverNotInterested,
+			contracts.UserEventCreated,
 		},
-		TripExchange,
-	); err != nil {
-		return err
-	}
-
-	if err := r.declareAndBindQueue(
-		DriverCmdTripRequestQueue,
-		[]string{contracts.DriverCmdTripRequest},
-		TripExchange,
-	); err != nil {
-		return err
-	}
-
-	if err := r.declareAndBindQueue(
-		DriverTripResponseQueue,
-		[]string{contracts.DriverCmdTripAccept, contracts.DriverCmdTripDecline},
-		TripExchange,
-	); err != nil {
-		return err
-	}
-
-	if err := r.declareAndBindQueue(
-		NotifyDriverNoDriversFoundQueue,
-		[]string{contracts.TripEventNoDriversFound},
-		TripExchange,
-	); err != nil {
-		return err
-	}
-
-	if err := r.declareAndBindQueue(
-		NotifyDriverAssignQueue,
-		[]string{contracts.TripEventDriverAssigned},
-		TripExchange,
-	); err != nil {
-		return err
-	}
-
-	if err := r.declareAndBindQueue(
-		PaymentTripResponseQueue,
-		[]string{contracts.PaymentCmdCreateSession},
-		TripExchange,
-	); err != nil {
-		return err
-	}
-
-	if err := r.declareAndBindQueue(
-		NotifyPaymentSessionCreatedQueue,
-		[]string{contracts.PaymentEventSessionCreated},
-		TripExchange,
-	); err != nil {
-		return err
-	}
-
-	if err := r.declareAndBindQueue(
-		NotifyPaymentSuccessQueue,
-		[]string{contracts.PaymentEventSuccess},
-		TripExchange,
+		UserExchange,
 	); err != nil {
 		return err
 	}

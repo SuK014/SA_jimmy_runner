@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package plan;
+
+option go_package = "shared/proto/plan";
+
+// User service definition
+service PlansService {
+  // Get a single user by ID
+//   rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  
+  // Create a new user
+  rpc CreatePin(CreatePinRequest) returns (CreatePinResponse);
+  rpc GetPinByID(GetPinByIDRequest) returns (GetPinByIDResponse);
+  rpc GetPinByParticipant(GetPinByParticipantRequest) returns (GetPinsResponse);
+}
+
+// Request message to get a user
+// message GetUserRequest {
+//   string id = 1;
+// }
+
+// // Response message for GetUser
+// message GetUserResponse {
+//   User user = 1;
+// }
+
+// Request message to create a user
+message CreatePinRequest {
+    bytes image = 1;
+    string description = 2;
+    string expense = 3; //JSON AS a string
+    float location = 4;
+    repeated string participant = 5;
+}
+
+// Response message for CreateUser
+message CreatePinResponse {
+    bool success = 1;
+}
+
+// Request message to create a user
+message GetPinByIDRequest {
+  string pinId = 1; //uuid AS a string
+
+  // ไว้เช้ค access ?
+//   string display_name = 2;
+//   string password = 3;
+}
+
+// Response message for CreateUser
+message GetPinByIDResponse {
+    bytes image = 1;
+    string description = 2; //JSON AS a string
+    string expense = 3;
+    float location = 4;
+    repeated string participant = 5;
+}
+
+// Request message to create a user
+message GetPinByParticipantRequest {
+  string userId = 1;
+
+  // ไว้เช้ค access ?
+//   string display_name = 2;
+//   string password = 3; 
+}
+
+// Response message for CreateUser
+message GetPinsResponse {
+  repeated GetPinByIDResponse pins = 1;
+}
+
+// User message
+// message User {
+//   string id = 1;
+//   string email = 2;
+//   string display_name = 3;
+//   string created_at = 4; // ISO8601 string, or you can use google.protobuf.Timestamp
+// }
