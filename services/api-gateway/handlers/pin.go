@@ -48,7 +48,7 @@ func (h *HTTPHandler) GetPinByID(ctx *fiber.Ctx) error {
 	res, err := h.planClient.GetPinByID(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot insert new user account: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot get pin by id: " + err.Error()},
 		)
 	}
 
@@ -71,7 +71,7 @@ func (h *HTTPHandler) GetPinByParticipant(ctx *fiber.Ctx) error {
 	res, err := h.planClient.GetPinByParticipant(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot insert new user account: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot get pin by participants: " + err.Error()},
 		)
 	}
 
