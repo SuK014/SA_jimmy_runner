@@ -42,7 +42,7 @@ func (repo *pinsRepository) InsertPin(data entities.CreatedPinModel) error {
 
 func (repo *pinsRepository) FindByID(pinID primitive.ObjectID) (*entities.PinDataModel, error) {
 	var user entities.PinDataModel
-	filter := bson.M{"pin_id": pinID}
+	filter := bson.M{"_id": pinID}
 	err := repo.Collection.FindOne(repo.Context, filter).Decode(&user)
 	// if err != nil || user == (entities.PinDataModel{}) {
 	if err != nil {
@@ -53,7 +53,6 @@ func (repo *pinsRepository) FindByID(pinID primitive.ObjectID) (*entities.PinDat
 
 func (repo *pinsRepository) FindByParticipant(userID primitive.ObjectID) (*[]entities.PinDataModel, error) {
 	filter := bson.M{"participants": userID}
-
 	cursor, err := repo.Collection.Find(repo.Context, filter)
 	if err != nil {
 		return nil, err

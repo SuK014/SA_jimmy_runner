@@ -24,5 +24,5 @@ func HandlerPlans(handler HTTPHandler, app *fiber.App) {
 	plan := app.Group("/plan")
 	plan.Post("/pin", middlewares.SetJWtHeaderHandler(), handler.CreatePin)
 	plan.Get("/pin/:id", middlewares.SetJWtHeaderHandler(), handler.GetPinByID)
-	plan.Get("/pin/:user_id", middlewares.SetJWtHeaderHandler(), handler.GetPinByParticipant)
+	plan.Get("/pin/participants/:user_id", middlewares.SetJWtHeaderHandler(), handler.GetPinByParticipant)
 }

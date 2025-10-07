@@ -58,7 +58,7 @@ func (h *gRPCHandler) GetPinByID(ctx context.Context, req *pb.GetPinByIDRequest)
 	}, nil
 }
 
-func (h *gRPCHandler) GetPinByParticipantRequest(ctx context.Context, req *pb.GetPinByParticipantRequest) (*pb.GetPinsResponse, error) {
+func (h *gRPCHandler) GetPinByParticipant(ctx context.Context, req *pb.GetPinByParticipantRequest) (*pb.GetPinsResponse, error) {
 
 	pin := req.UserId
 
