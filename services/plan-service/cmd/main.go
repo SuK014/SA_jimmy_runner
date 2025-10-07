@@ -9,6 +9,7 @@ import (
 	sv "github.com/SuK014/SA_jimmy_runner/services/plan-service/internal/service"
 	ds "github.com/SuK014/SA_jimmy_runner/services/plan-service/internal/store/datasource"
 	pb "github.com/SuK014/SA_jimmy_runner/shared/proto/plan"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
 
@@ -23,13 +24,14 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	// err = godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// }
+	// remove this before deployed
+	err = godotenv.Load("../.env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	s := grpc.NewServer()
-	pb.RegisterPlansServiceServer(s, &pinServer{})
+	// pb.RegisterPlansServiceServer(s, &pinServer{})
 
 	mongodb := ds.NewMongoDB(10)
 

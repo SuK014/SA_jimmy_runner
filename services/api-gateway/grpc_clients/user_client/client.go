@@ -2,11 +2,11 @@ package userclient
 
 import (
 	"context"
-	"os"
+	// "os"
 
 	pb "github.com/SuK014/SA_jimmy_runner/shared/proto/user"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	// "google.golang.org/grpc/credentials/insecure"
 )
 
 type UserServiceClient struct {
@@ -14,23 +14,23 @@ type UserServiceClient struct {
 	conn   *grpc.ClientConn
 }
 
-func NewUserServiceClient() (*UserServiceClient, error) {
-	userServiceURL := os.Getenv("USER_SERVICE_URL")
-	if userServiceURL == "" {
-		userServiceURL = "localhost:8080"
-	}
+// func NewUserServiceClient() (*UserServiceClient, error) {
+// 	userServiceURL := os.Getenv("USER_SERVICE_URL")
+// 	if userServiceURL == "" {
+// 		userServiceURL = "localhost:8080"
+// 	}
 
-	conn, err := grpc.NewClient(userServiceURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return nil, err
-	}
+// 	conn, err := grpc.NewClient(userServiceURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	client := pb.NewUserServiceClient(conn)
-	return &UserServiceClient{
-		Client: client,
-		conn:   conn,
-	}, nil
-}
+// 	client := pb.NewUserServiceClient(conn)
+// 	return &UserServiceClient{
+// 		Client: client,
+// 		conn:   conn,
+// 	}, nil
+// }
 
 func (ds *UserServiceClient) Close() {
 	if ds.conn != nil {

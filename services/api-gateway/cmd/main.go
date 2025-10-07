@@ -43,7 +43,10 @@ func main() {
 	app.Use(recover.New())
 	app.Use(cors.New())
 
+	//user
 	// userClient, err := userclient.NewUserServiceClient()
+	// httpHandler.NewHTTPHandler(app, "localhost:50051")
+	//plan
 	httpHandler.NewHTTPHandler(app, "localhost:50051")
 
 	// PORT := os.Getenv("PORT")
