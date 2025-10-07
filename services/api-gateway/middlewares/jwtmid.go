@@ -31,9 +31,7 @@ func SetJWtHeaderHandler() fiber.Handler {
 type TokenDetails struct {
 	Token     *string `json:"token"`
 	UserID    string  `json:"user_id"`
-	UID       string  `json:"uid"`
 	ExpiresIn *int64  `json:"exp"`
-	Username  string  `json:"username"` // added for JWT tutorial
 }
 
 func DecodeJWTToken(ctx *fiber.Ctx) (*TokenDetails, error) {
@@ -59,18 +57,12 @@ func DecodeJWTToken(ctx *fiber.Ctx) (*TokenDetails, error) {
 		if key == "user_id" || key == "sub" {
 			td.UserID = value.(string)
 		}
-		if key == "uid" {
-			td.UID = value.(string)
-		}
-		if key == "username" { // added for JWT tutorial
-			td.Username = value.(string)
-		}
 	}
 	*td.Token = token.Raw
 	return td, nil
 }
 
-func GenerateJWTToken(userID string, uuID string, username string) (*TokenDetails, error) {
+func GenerateJWTToken(userID string) (*TokenDetails, error) {
 	now := time.Now().UTC()
 
 	// สร้าง td มาเก็บ token ที่กำลังจะสร้าง
@@ -84,8 +76,6 @@ func GenerateJWTToken(userID string, uuID string, username string) (*TokenDetail
 
 	//กำหนดค่าของส่วน payload ใน token
 	td.UserID = userID
-	td.UID = uuID
-	td.Username = username // add
 
 	//ส่วนของ signature
 	SigningKey := []byte(os.Getenv("JWT_SECRET_KEY"))
@@ -93,8 +83,6 @@ func GenerateJWTToken(userID string, uuID string, username string) (*TokenDetail
 	//สร้าง payload
 	atClaims := make(jwt.MapClaims)
 	atClaims["user_id"] = userID
-	atClaims["username"] = username // added for JWT tutorial
-	atClaims["uid"] = uuID
 	atClaims["exp"] = time.Now().Add(time.Hour * 6).Unix()
 	atClaims["iat"] = time.Now().Unix()
 	atClaims["nbf"] = time.Now().Unix()

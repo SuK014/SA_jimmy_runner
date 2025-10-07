@@ -23,7 +23,7 @@ func NewGRPCHandler(server *grpc.Server, pinService services.IPinsService) (*gRP
 	return handler, nil
 }
 
-func (h *gRPCHandler) CreateUser(ctx context.Context, req *pb.CreatePinRequest) (*pb.CreatePinResponse, error) {
+func (h *gRPCHandler) CreatePin(ctx context.Context, req *pb.CreatePinRequest) (*pb.CreatePinResponse, error) {
 
 	pin := entities.CreatedPinGRPCModel{
 		Image:        req.GetImage(),
@@ -39,4 +39,47 @@ func (h *gRPCHandler) CreateUser(ctx context.Context, req *pb.CreatePinRequest) 
 	}
 
 	return &pb.CreatePinResponse{Success: true}, nil
+}
+
+func (h *gRPCHandler) GetPinByID(ctx context.Context, req *pb.GetPinByIDRequest) (*pb.GetPinByIDResponse, error) {
+
+	pin := req.PinId
+
+	res, err := h.PinService.FindByID(pin)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GetPinByIDResponse{
+		Image:       res.Image,
+		Description: res.Description,
+		Expense:     res.Expense,
+		Location:    res.Location,
+		Participant: res.Participants,
+	}, nil
+}
+
+func (h *gRPCHandler) GetPinByParticipantRequest(ctx context.Context, req *pb.GetPinByParticipantRequest) (*pb.GetPinsResponse, error) {
+
+	pin := req.UserId
+
+	res, err := h.PinService.FindByParticipant(pin)
+	if err != nil {
+		return nil, err
+	}
+
+	var pins []*pb.GetPinByIDResponse
+	for _, pinData := range *res {
+		pins = append(pins, &pb.GetPinByIDResponse{
+			Image:       pinData.Image,
+			Description: pinData.Description,
+			Expense:     pinData.Expense,
+			Location:    pinData.Location,
+			Participant: pinData.Participants,
+		})
+	}
+
+	return &pb.GetPinsResponse{
+		Pins: pins,
+	}, nil
 }

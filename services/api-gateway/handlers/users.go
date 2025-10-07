@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"context"
+	"fmt"
+	"time"
 
+	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/middlewares"
 	"github.com/SuK014/SA_jimmy_runner/shared/entities"
 	pb "github.com/SuK014/SA_jimmy_runner/shared/proto/user"
 
@@ -11,6 +14,7 @@ import (
 
 // CreateUser handles REST requests and forwards them to gRPC
 func (h *HTTPHandler) CreateUser(ctx *fiber.Ctx) error {
+	fmt.Println("access gateway func")
 	bodyData := entities.CreatedUserModel{}
 	if err := ctx.BodyParser(&bodyData); err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(
@@ -36,6 +40,24 @@ func (h *HTTPHandler) CreateUser(ctx *fiber.Ctx) error {
 			entities.ResponseMessage{Message: "cannot insert new user account: " + err.Error()},
 		)
 	}
+
+	//tmp: have to change to user_id
+	tokenDetail, err := middlewares.GenerateJWTToken(bodyData.Name)
+	if err != nil {
+		return fmt.Errorf("failed to generate token: %w", err)
+	}
+
+	//tmp: change config later
+	ctx.Cookie(&fiber.Cookie{
+		Name:     "username",
+		Value:    *tokenDetail.Token,
+		Expires:  time.Now().Add(24 * time.Hour), // expires in 1 day
+		HTTPOnly: true,                           // not accessible via JavaScript
+		Secure:   true,                           // only sent over HTTPS
+		Path:     "/",
+	})
+
+	fmt.Println("set cookies success")
 
 	return ctx.Status(fiber.StatusOK).JSON(
 		entities.ResponseMessage{Message: "success"},

@@ -29,7 +29,7 @@ func main() {
 	// }
 
 	s := grpc.NewServer()
-	pb.RegisterUserServiceServer(s, &userServer{})
+	// pb.RegisterUserServiceServer(s, &userServer{})
 
 	prismadb := ds.ConnectPrisma()
 	defer prismadb.PrismaDB.Prisma.Disconnect()
