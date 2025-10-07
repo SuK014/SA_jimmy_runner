@@ -10,6 +10,7 @@ import (
 	fiberlog "github.com/gofiber/fiber/v2/log"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -20,8 +21,8 @@ type pinsRepository struct {
 
 type IPinsRepository interface {
 	InsertPin(data entities.CreatedPinModel) error
-	FindByID(pinID string) (*entities.PinDataModel, error)
-	FindByParticipant(userID string) (*[]entities.PinDataModel, error)
+	FindByID(pinID primitive.ObjectID) (*entities.PinDataModel, error)
+	FindByParticipant(userID primitive.ObjectID) (*[]entities.PinDataModel, error)
 }
 
 func NewPinsRepository(db *MongoDB) IPinsRepository {
@@ -39,7 +40,7 @@ func (repo *pinsRepository) InsertPin(data entities.CreatedPinModel) error {
 	return nil
 }
 
-func (repo *pinsRepository) FindByID(pinID string) (*entities.PinDataModel, error) {
+func (repo *pinsRepository) FindByID(pinID primitive.ObjectID) (*entities.PinDataModel, error) {
 	var user entities.PinDataModel
 	filter := bson.M{"pin_id": pinID}
 	err := repo.Collection.FindOne(repo.Context, filter).Decode(&user)
@@ -50,7 +51,7 @@ func (repo *pinsRepository) FindByID(pinID string) (*entities.PinDataModel, erro
 	return &user, nil
 }
 
-func (repo *pinsRepository) FindByParticipant(userID string) (*[]entities.PinDataModel, error) {
+func (repo *pinsRepository) FindByParticipant(userID primitive.ObjectID) (*[]entities.PinDataModel, error) {
 	filter := bson.M{"participants": userID}
 
 	cursor, err := repo.Collection.Find(repo.Context, filter)

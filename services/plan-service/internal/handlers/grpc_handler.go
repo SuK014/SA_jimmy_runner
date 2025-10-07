@@ -42,7 +42,6 @@ func (h *gRPCHandler) CreatePin(ctx context.Context, req *pb.CreatePinRequest) (
 }
 
 func (h *gRPCHandler) GetPinByID(ctx context.Context, req *pb.GetPinByIDRequest) (*pb.GetPinByIDResponse, error) {
-
 	pin := req.PinId
 
 	res, err := h.PinService.FindByID(pin)

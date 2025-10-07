@@ -26,17 +26,24 @@ func NewPinsService(repo0 repository.IPinsRepository) IPinsService {
 }
 
 func (sv *pinsService) FindByParticipant(userID string) (*[]entities.PinDataModel, error) {
-	data, err := sv.PinsRepository.FindByParticipant(userID)
+	mongoUserID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid userID: %v", err)
+	}
+	data, err := sv.PinsRepository.FindByParticipant(mongoUserID)
 	if err != nil {
 		return nil, err
 	}
 
 	return data, nil
-
 }
 
 func (sv *pinsService) FindByID(pinID string) (*entities.PinDataModel, error) {
-	data, err := sv.PinsRepository.FindByID(pinID)
+	mongoPinID, err := primitive.ObjectIDFromHex(pinID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid userID: %v", err)
+	}
+	data, err := sv.PinsRepository.FindByID(mongoPinID)
 	if err != nil {
 		return nil, err
 	}
