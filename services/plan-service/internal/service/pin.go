@@ -26,11 +26,7 @@ func NewPinsService(repo0 repository.IPinsRepository) IPinsService {
 }
 
 func (sv *pinsService) FindByParticipant(userID string) (*[]entities.PinDataModel, error) {
-	mongoUserID, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid userID: %v", err)
-	}
-	data, err := sv.PinsRepository.FindByParticipant(mongoUserID)
+	data, err := sv.PinsRepository.FindByParticipant(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,21 +50,12 @@ func (sv *pinsService) FindByID(pinID string) (*entities.PinDataModel, error) {
 func (sv *pinsService) InsertPin(data entities.CreatedPinGRPCModel) error {
 	expense := json.RawMessage(data.Expense)
 
-	var participants []primitive.ObjectID
-	for _, idStr := range data.Participants {
-		objID, err := primitive.ObjectIDFromHex(idStr)
-		if err != nil {
-			return fmt.Errorf("invalid participant id: %s", idStr)
-		}
-		participants = append(participants, objID)
-	}
-
 	insertData := entities.CreatedPinModel{
 		Image:        data.Image,
 		Description:  data.Description,
 		Expense:      expense,
 		Location:     data.Location,
-		Participants: participants,
+		Participants: data.Participants,
 	}
 	return sv.PinsRepository.InsertPin(insertData)
 }

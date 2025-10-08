@@ -31,10 +31,15 @@ func (h *gRPCHandler) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		Password: req.GetPassword(),
 	}
 
-	_, err := h.service.InsertNewUser(user)
+	res, err := h.service.InsertNewUser(user)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.CreateUserResponse{Success: true}, nil
+	return &pb.CreateUserResponse{
+		Success:     true,
+		UserId:      res.UserID,
+		DisplayName: res.Name,
+		Email:       res.Email,
+	}, nil
 }

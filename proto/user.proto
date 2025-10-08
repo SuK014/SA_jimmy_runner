@@ -34,8 +34,9 @@ message CreateUserRequest {
 // Response message for CreateUser
 message CreateUserResponse {
   bool success = 1;
-  string display_name = 2;
-  string email = 3; 
+  string user_id = 2;
+  string display_name = 3;
+  string email = 4; 
 }
 
 // User message

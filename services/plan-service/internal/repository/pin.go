@@ -22,7 +22,7 @@ type pinsRepository struct {
 type IPinsRepository interface {
 	InsertPin(data entities.CreatedPinModel) error
 	FindByID(pinID primitive.ObjectID) (*entities.PinDataModel, error)
-	FindByParticipant(userID primitive.ObjectID) (*[]entities.PinDataModel, error)
+	FindByParticipant(userID string) (*[]entities.PinDataModel, error)
 }
 
 func NewPinsRepository(db *MongoDB) IPinsRepository {
@@ -51,7 +51,7 @@ func (repo *pinsRepository) FindByID(pinID primitive.ObjectID) (*entities.PinDat
 	return &user, nil
 }
 
-func (repo *pinsRepository) FindByParticipant(userID primitive.ObjectID) (*[]entities.PinDataModel, error) {
+func (repo *pinsRepository) FindByParticipant(userID string) (*[]entities.PinDataModel, error) {
 	filter := bson.M{"participants": userID}
 	cursor, err := repo.Collection.Find(repo.Context, filter)
 	if err != nil {

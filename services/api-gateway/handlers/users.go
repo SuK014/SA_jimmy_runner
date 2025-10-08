@@ -34,22 +34,21 @@ func (h *HTTPHandler) CreateUser(ctx *fiber.Ctx) error {
 		Password:    bodyData.Password,
 	}
 
-	_, err := h.userClient.CreateUser(context.Background(), req)
+	res, err := h.userClient.CreateUser(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot insert new user account: " + err.Error()},
 		)
 	}
 
-	//tmp: have to change to user_id
-	tokenDetail, err := middlewares.GenerateJWTToken(bodyData.Name)
+	tokenDetail, err := middlewares.GenerateJWTToken(res.UserId)
 	if err != nil {
 		return fmt.Errorf("failed to generate token: %w", err)
 	}
 
 	//tmp: change config later
 	ctx.Cookie(&fiber.Cookie{
-		Name:     "username",
+		Name:     "cookies",
 		Value:    *tokenDetail.Token,
 		Expires:  time.Now().Add(24 * time.Hour), // expires in 1 day
 		HTTPOnly: true,                           // not accessible via JavaScript
@@ -60,6 +59,6 @@ func (h *HTTPHandler) CreateUser(ctx *fiber.Ctx) error {
 	fmt.Println("set cookies success")
 
 	return ctx.Status(fiber.StatusOK).JSON(
-		entities.ResponseMessage{Message: "success"},
+		entities.ResponseModel{Message: "success"},
 	)
 }
