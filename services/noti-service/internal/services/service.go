@@ -2,50 +2,54 @@
 package services
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"gopkg.in/gomail.v2"
 	"log"
+	"os"
+
+	"github.com/SuK014/SA_jimmy_runner/shared/messaging"
 )
 
-type NotificationService struct {
-	repo NotificationRepository
-}
-
-func NewNotificationService(r NotificationRepository) *NotificationService {
-	return &NotificationService{repo: r}
-}
-
-type VerificationEmail struct {
-	To   string `json:"to"`
-	OTP  string `json:"otp"`
-	Type string `json:"type"`
-}
-
-func (n *NotificationService) HandleMessage(data []byte) {
-	var msg VerificationEmail
-	if err := json.Unmarshal(data, &msg); err != nil {
-		log.Printf("❌ Failed to parse message: %v", err)
-		return
+func SendEmail() {
+	// rb, err := messaging.NewRabbitMQ(os.Getenv("RABBITMQ_URL"))
+	rb, err := messaging.NewRabbitMQ("amqps://frqwrbeu:2r8iEMSWuuGsR5aKbR2Jx3fUWygENs8D@gorilla.lmq.cloudamqp.com/frqwrbeu")
+	if err != nil {
+		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
 	}
-
-	if msg.Type == "verification" {
-		subject := "Verify your account"
-		body := fmt.Sprintf("Your OTP code is: %s", msg.OTP)
-		if err := n.SendEmail(msg.To, subject, body); err != nil {
-			log.Printf("❌ Failed to send email: %v", err)
-		}
+	fmt.Println("checkpoint 1")
+	event := messaging.EmailEvent{
+		To:      "methasith33@gmail.com", // change to user email
+		Subject: "Welcome!",
+		Body:    "Hi there, thanks for signing up, fuq u!",
+	}
+	if err := rb.PublishMessage(context.Background(), "notification.exchange", "notification.email", event); err != nil {
+		log.Printf("Failed to publish email event: %v", err)
 	}
 }
 
-func (n *NotificationService) SendEmail(to, subject, body string) error {
-	m := gomail.NewMessage()
-	m.SetHeader("From", "yourapp@gmail.com")
-	m.SetHeader("To", to)
-	m.SetHeader("Subject", subject)
-	m.SetBody("text/plain", body)
+func StartEmailConsumers() {
+	// rb, err := messaging.NewRabbitMQ(os.Getenv("RABBITMQ_URL"))
+	rb, err := messaging.NewRabbitMQ("amqps://frqwrbeu:2r8iEMSWuuGsR5aKbR2Jx3fUWygENs8D@gorilla.lmq.cloudamqp.com/frqwrbeu")
+	if err != nil {
+		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+	}
+	defer rb.Close()
 
-	d := gomail.NewDialer("smtp.gmail.com", 587, "yourapp@gmail.com", "app-password")
+	queueName, err := rb.SetupQueue(
+		"email_queue",           // queue name
+		"notification.exchange", // exchange
+		"direct",                // exchange type
+		"notification.email",    // routing key
+		true,                    // durable
+		nil,                     // args
+	)
+	if err != nil {
+		log.Fatalf("Failed to setup email queue: %v", err)
+	}
 
-	return d.DialAndSend(m)
+	emailConsumer := messaging.NewEmailConsumer(rb, queueName, os.Getenv("GMAIL_USER"), os.Getenv("GMAIL_PASSWORD"))
+	if err := emailConsumer.Start(); err != nil {
+		log.Fatalf("Failed to start email consumer: %v", err)
+	}
+	select {} // Block forever
 }

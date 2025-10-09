@@ -14,3 +14,9 @@ type RegisterData struct {
 	User    user.CreateUserResponse `json:"user"`
 	Context string                  `json:"ctx"`
 }
+
+type EmailEvent struct {
+	To      string `json:"to"`
+	Subject string `json:"subject"`
+	Body    string `json:"body"`
+}
