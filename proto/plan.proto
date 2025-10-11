@@ -27,16 +27,17 @@ service PlansService {
 
 // Request message to create a user
 message CreatePinRequest {
-    bytes image = 1;
-    string description = 2;
-    string expense = 3; //JSON AS a string
-    float location = 4;
-    repeated string participant = 5;
+  bytes image = 1;
+  string description = 2;
+  string expense = 3; //JSON AS a string
+  float location = 4;
+  repeated string participant = 5;
 }
 
 // Response message for CreateUser
 message CreatePinResponse {
-    bool success = 1;
+  bool success = 1;
+  string pinId = 2; //uuid AS a string
 }
 
 // Request message to create a user

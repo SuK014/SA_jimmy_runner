@@ -28,7 +28,7 @@ func (h *HTTPHandler) CreatePin(ctx *fiber.Ctx) error {
 		Participant: bodyData.Participants,
 	}
 
-	_, err := h.planClient.CreatePin(context.Background(), req)
+	res, err := h.planClient.CreatePin(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot insert new user account: " + err.Error()},
@@ -36,7 +36,11 @@ func (h *HTTPHandler) CreatePin(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(
-		entities.ResponseMessage{Message: "success"},
+		entities.ResponseModel{
+			Message: "success",
+			Data:    res,
+			Status:  fiber.StatusOK,
+		},
 	)
 }
 

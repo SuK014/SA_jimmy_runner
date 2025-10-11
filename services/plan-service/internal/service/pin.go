@@ -14,7 +14,7 @@ type pinsService struct {
 }
 
 type IPinsService interface {
-	InsertPin(data entities.CreatedPinGRPCModel) error
+	InsertPin(data entities.CreatedPinGRPCModel) (string, error)
 	FindByID(pinID string) (*entities.PinDataModel, error)
 	FindByParticipant(userID string) (*[]entities.PinDataModel, error)
 }
@@ -47,7 +47,7 @@ func (sv *pinsService) FindByID(pinID string) (*entities.PinDataModel, error) {
 	return data, nil
 }
 
-func (sv *pinsService) InsertPin(data entities.CreatedPinGRPCModel) error {
+func (sv *pinsService) InsertPin(data entities.CreatedPinGRPCModel) (string, error) {
 	expense := json.RawMessage(data.Expense)
 
 	insertData := entities.CreatedPinModel{

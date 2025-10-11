@@ -20,7 +20,7 @@ type pinsRepository struct {
 }
 
 type IPinsRepository interface {
-	InsertPin(data entities.CreatedPinModel) error
+	InsertPin(data entities.CreatedPinModel) (string, error)
 	FindByID(pinID primitive.ObjectID) (*entities.PinDataModel, error)
 	FindByParticipant(userID string) (*[]entities.PinDataModel, error)
 }
@@ -32,12 +32,13 @@ func NewPinsRepository(db *MongoDB) IPinsRepository {
 	}
 }
 
-func (repo *pinsRepository) InsertPin(data entities.CreatedPinModel) error {
-	if _, err := repo.Collection.InsertOne(repo.Context, data); err != nil {
+func (repo *pinsRepository) InsertPin(data entities.CreatedPinModel) (string, error) {
+	insertData, err := repo.Collection.InsertOne(repo.Context, data)
+	if err != nil {
 		fiberlog.Errorf("Users -> InsertNewUser: %s \n", err)
-		return err
+		return "", err
 	}
-	return nil
+	return insertData.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
 func (repo *pinsRepository) FindByID(pinID primitive.ObjectID) (*entities.PinDataModel, error) {

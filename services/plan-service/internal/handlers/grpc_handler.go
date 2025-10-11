@@ -33,12 +33,15 @@ func (h *gRPCHandler) CreatePin(ctx context.Context, req *pb.CreatePinRequest) (
 		Participants: req.GetParticipant(),
 	}
 
-	err := h.PinService.InsertPin(pin)
+	res, err := h.PinService.InsertPin(pin)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.CreatePinResponse{Success: true}, nil
+	return &pb.CreatePinResponse{
+		Success: true,
+		PinId:   res,
+	}, nil
 }
 
 func (h *gRPCHandler) GetPinByID(ctx context.Context, req *pb.GetPinByIDRequest) (*pb.GetPinByIDResponse, error) {
