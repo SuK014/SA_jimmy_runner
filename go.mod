@@ -24,6 +24,8 @@ require (
 	google.golang.org/protobuf v1.36.9
 )
 
+require gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
+
 require (
 	github.com/steebchen/prisma-client-go v0.47.0
 	go.mongodb.org/mongo-driver/v2 v2.0.1 // indirect
@@ -71,5 +73,6 @@ require (
 	golang.org/x/text v0.28.0 // indirect
 	golang.org/x/tools v0.35.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250825161204-c5933d9347a5 // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb // indirect
 )

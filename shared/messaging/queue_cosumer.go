@@ -11,6 +11,7 @@ type QueueConsumer struct {
 	rb        *RabbitMQ
 	connMgr   *ConnectionManager
 	queueName string
+	// svc       *services.NotificationService
 }
 
 func NewQueueConsumer(rb *RabbitMQ, connMgr *ConnectionManager, queueName string) *QueueConsumer {

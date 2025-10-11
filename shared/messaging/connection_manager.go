@@ -34,10 +34,13 @@ var upgrader = websocket.Upgrader{
 }
 
 // Note that on multiple instances of the API gateway, the connection manager needs to store the connections on a separate shared storage.
-func NewConnectionManager() *ConnectionManager {
-	return &ConnectionManager{
+func NewConnectionManager() (*ConnectionManager, error) {
+	cm := &ConnectionManager{
 		connections: make(map[string]*connWrapper),
 	}
+
+	// Nothing can fail yet, so return nil for error
+	return cm, nil
 }
 
 func (cm *ConnectionManager) Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
@@ -88,4 +91,11 @@ func (cm *ConnectionManager) SendMessage(id string, message contracts.WSMessage)
 	defer wrapper.mutex.Unlock()
 
 	return wrapper.conn.WriteJSON(message)
+}
+func (cm *ConnectionManager) Close() {
+	for _, wrapper := range cm.connections {
+		if wrapper.conn != nil {
+			wrapper.conn.Close() // assuming wrapper.conn has Close()
+		}
+	}
 }
