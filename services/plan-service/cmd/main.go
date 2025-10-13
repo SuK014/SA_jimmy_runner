@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	"path/filepath"
 
 	"github.com/SuK014/SA_jimmy_runner/services/plan-service/internal/handlers"
 	repo "github.com/SuK014/SA_jimmy_runner/services/plan-service/internal/repository"
@@ -25,8 +26,8 @@ func main() {
 	}
 
 	// remove this before deployed
-	err = godotenv.Load("../.env")
-	if err != nil {
+	envPath := filepath.Join("../../../shared/env", ".env") // relative to cmd/main.go
+	if err := godotenv.Load(envPath); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
