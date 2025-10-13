@@ -16,14 +16,20 @@ type HTTPHandler struct {
 }
 
 // NewHTTPHandler initializes the gRPC client and returns the handler
-func NewHTTPHandler(app *fiber.App, grpcAddress string) *HTTPHandler {
-	conn, err := grpc.Dial(grpcAddress, grpc.WithInsecure()) // use WithTransportCredentials for TLS in production
+func NewHTTPHandler(app *fiber.App, userGrpcAddress string, planGrpcAddress string) *HTTPHandler {
+	userConn, err := grpc.Dial(userGrpcAddress, grpc.WithInsecure()) // use WithTransportCredentials for TLS in production
 	if err != nil {
 		log.Fatalf("failed to connect to gRPC server: %v", err)
 	}
 
-	user_client := pbUser.NewUserServiceClient(conn)
-	plan_client := pbPlan.NewPlansServiceClient(conn)
+	user_client := pbUser.NewUserServiceClient(userConn)
+
+	planConn, err := grpc.Dial(planGrpcAddress, grpc.WithInsecure()) // use WithTransportCredentials for TLS in production
+	if err != nil {
+		log.Fatalf("failed to connect to gRPC server: %v", err)
+	}
+
+	plan_client := pbPlan.NewPlansServiceClient(planConn)
 	handler := &HTTPHandler{
 		userClient: user_client,
 		planClient: plan_client,

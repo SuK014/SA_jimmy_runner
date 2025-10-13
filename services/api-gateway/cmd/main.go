@@ -47,7 +47,7 @@ func main() {
 	// userClient, err := userclient.NewUserServiceClient()
 	// httpHandler.NewHTTPHandler(app, "localhost:50051")
 	//plan
-	httpHandler.NewHTTPHandler(app, "localhost:50051")
+	httpHandler.NewHTTPHandler(app, "localhost:50052", "localhost:50051")
 
 	// PORT := os.Getenv("PORT")
 	PORT := "8080"
