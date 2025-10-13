@@ -8,6 +8,7 @@ import (
 	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/middlewares"
 	"github.com/SuK014/SA_jimmy_runner/shared/entities"
 	pb "github.com/SuK014/SA_jimmy_runner/shared/proto/user"
+	"github.com/SuK014/SA_jimmy_runner/shared/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -28,10 +29,17 @@ func (h *HTTPHandler) CreateUser(ctx *fiber.Ctx) error {
 		)
 	}
 
+	hashPassword, err := utils.HashPassword(bodyData.Password)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(
+			entities.ResponseMessage{Message: "error hashing password: " + err.Error()},
+		)
+	}
+
 	req := &pb.CreateUserRequest{
 		Email:       bodyData.Email,
 		DisplayName: bodyData.Name,
-		Password:    bodyData.Password,
+		Password:    hashPassword,
 	}
 
 	res, err := h.userClient.CreateUser(context.Background(), req)
