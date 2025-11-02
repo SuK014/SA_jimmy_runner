@@ -70,13 +70,11 @@ func (h *gRPCHandler) GetPinByParticipant(ctx context.Context, req *pb.GetPinByP
 		return nil, err
 	}
 
-	var pins []*pb.GetPinByIDResponse
+	var pins []*pb.GetPinResponse
 	for _, pinData := range *res {
-		pins = append(pins, &pb.GetPinByIDResponse{
+		pins = append(pins, &pb.GetPinResponse{
+			PinId:       pinData.PinID,
 			Image:       pinData.Image,
-			Description: pinData.Description,
-			Expense:     pinData.Expense,
-			Location:    pinData.Location,
 			Participant: pinData.Participants,
 		})
 	}

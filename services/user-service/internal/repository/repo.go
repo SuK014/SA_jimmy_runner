@@ -20,7 +20,7 @@ type IUsersRepository interface {
 	FindAll() (*[]entities.UserDataModel, error)
 	FindByID(userID string) (*entities.UserDataModel, error)
 	FindByEmail(email string) (*entities.UserDataModel, error)
-	UpdateUser(data entities.UserDataModel) (*entities.UserDataModel, error)
+	UpdateUser(data entities.UpdateUserModel) (*entities.UserDataModel, error)
 	DeleteUser(userID string) error
 }
 
@@ -42,22 +42,7 @@ func (repo *usersRepository) InsertUser(data entities.CreatedUserModel) (*entiti
 		return nil, fmt.Errorf("users -> InsertUser: %v", err)
 	}
 
-	createdAt, ok := createdData.CreatedAt()
-	if !ok {
-		return nil, fmt.Errorf("users -> FindAll: createdAt not ok")
-	}
-	updatedAt, ok := createdData.UpdatedAt()
-	if !ok {
-		return nil, fmt.Errorf("users -> FindAll: updatedAt not ok")
-	}
-	return &entities.UserDataModel{
-		UserID:    createdData.UserID,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
-		Name:      createdData.Name,
-		Email:     createdData.Email,
-		Password:  createdData.Password,
-	}, nil
+	return mapToUserDataModel(createdData)
 }
 
 func (repo *usersRepository) FindAll() (*[]entities.UserDataModel, error) {
@@ -66,27 +51,16 @@ func (repo *usersRepository) FindAll() (*[]entities.UserDataModel, error) {
 		return nil, fmt.Errorf("users -> FindAll: %v", err)
 	}
 
-	var result []entities.UserDataModel
+	var results []entities.UserDataModel
 	for _, u := range users {
-		createdAt, ok := u.CreatedAt()
-		if !ok {
-			return nil, fmt.Errorf("users -> FindAll: createdAt not ok")
+		result, err := mapToUserDataModel(&u)
+		if err != nil {
+			return nil, err
 		}
-		updatedAt, ok := u.UpdatedAt()
-		if !ok {
-			return nil, fmt.Errorf("users -> FindAll: updatedAt not ok")
-		}
-		result = append(result, entities.UserDataModel{
-			UserID:    u.UserID,
-			CreatedAt: createdAt,
-			UpdatedAt: updatedAt,
-			Name:      u.Name,
-			Email:     u.Email,
-			Password:  u.Password,
-		})
+		results = append(results, *result)
 	}
 
-	return &result, nil
+	return &results, nil
 }
 
 func (repo *usersRepository) FindByID(userID string) (*entities.UserDataModel, error) {
@@ -99,22 +73,8 @@ func (repo *usersRepository) FindByID(userID string) (*entities.UserDataModel, e
 	if user == nil {
 		return nil, fmt.Errorf("users -> FindByID: user data is nil")
 	}
-	createdAt, ok := user.CreatedAt()
-	if !ok {
-		return nil, fmt.Errorf("users -> FindByID: createdAt not ok")
-	}
-	updatedAt, ok := user.UpdatedAt()
-	if !ok {
-		return nil, fmt.Errorf("users -> FindByID: updatedAt not ok")
-	}
-	return &entities.UserDataModel{
-		UserID:    user.UserID,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
-		Name:      user.Name,
-		Email:     user.Email,
-		Password:  user.Password,
-	}, nil
+
+	return mapToUserDataModel(user)
 }
 
 func (repo *usersRepository) FindByEmail(email string) (*entities.UserDataModel, error) {
@@ -127,44 +87,23 @@ func (repo *usersRepository) FindByEmail(email string) (*entities.UserDataModel,
 	if user == nil {
 		return nil, fmt.Errorf("users -> FindByID: user data is nil")
 	}
-	return &entities.UserDataModel{
-		UserID:   user.UserID,
-		Name:     user.Name,
-		Email:    user.Email,
-		Password: user.Password,
-	}, nil
+
+	return mapToUserDataModel(user)
 }
 
-func (repo *usersRepository) UpdateUser(data entities.UserDataModel) (*entities.UserDataModel, error) {
+func (repo *usersRepository) UpdateUser(data entities.UpdateUserModel) (*entities.UserDataModel, error) {
 	updatedUser, err := repo.Collection.User.
-		FindUnique(db.User.UserID.Equals(data.UserID)).
+		FindUnique(db.User.UserID.Equals(data.ID)).
 		Update(
 			db.User.Name.Set(data.Name),
-			db.User.Email.Set(data.Email),
-			db.User.Password.Set(data.Password),
+			db.User.ProfileURL.Set(data.Profile),
 		).
 		Exec(repo.Context)
 	if err != nil {
 		return nil, fmt.Errorf("users -> UpdateUser: %v", err)
 	}
 
-	createdAt, ok := updatedUser.CreatedAt()
-	if !ok {
-		return nil, fmt.Errorf("users -> UpdateUser: createdAt not ok")
-	}
-	updatedAt, ok := updatedUser.UpdatedAt()
-	if !ok {
-		return nil, fmt.Errorf("users -> UpdateUser: updatedAt not ok")
-	}
-
-	return &entities.UserDataModel{
-		UserID:    updatedUser.UserID,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
-		Name:      updatedUser.Name,
-		Email:     updatedUser.Email,
-		Password:  updatedUser.Password,
-	}, nil
+	return mapToUserDataModel(updatedUser)
 }
 
 func (repo *usersRepository) DeleteUser(userID string) error {
@@ -176,4 +115,17 @@ func (repo *usersRepository) DeleteUser(userID string) error {
 		return fmt.Errorf("users -> DeleteUser: %v", err)
 	}
 	return nil
+}
+
+func mapToUserDataModel(data *db.UserModel) (*entities.UserDataModel, error) {
+	profileURL, _ := data.ProfileURL()
+	return &entities.UserDataModel{
+		UserID:    data.UserID,
+		CreatedAt: data.CreatedAt,
+		UpdatedAt: data.UpdatedAt,
+		Name:      data.Name,
+		Email:     data.Email,
+		Password:  data.Password,
+		Profile:   profileURL,
+	}, nil
 }

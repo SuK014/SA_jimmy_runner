@@ -10,8 +10,11 @@ service UserService {
 //   rpc GetUser(GetUserRequest) returns (GetUserResponse);
   
   // Create a new user
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
-
+  rpc CreateUser(CreateUserRequest) returns (UserResponse);
+  rpc LoginUser(LoginUserRequest) returns (UserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
+  rpc GetUser(UserIDRequest) returns (UserResponse);
+  rpc DeleteUser(UserIDRequest) returns (UserResponse);
 }
 
 // Request message to get a user
@@ -32,11 +35,12 @@ message CreateUserRequest {
 }
 
 // Response message for CreateUser
-message CreateUserResponse {
+message UserResponse {
   bool success = 1;
   string user_id = 2;
   string display_name = 3;
-  string email = 4; 
+  string email = 4;
+  string profile = 5;
 }
 
 // User message
@@ -46,3 +50,24 @@ message CreateUserResponse {
 //   string display_name = 3;
 //   string created_at = 4; // ISO8601 string, or you can use google.protobuf.Timestamp
 // }
+
+message LoginUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message UpdateUserRequest {
+  string user_id = 1;
+  string name = 2;
+  UploadFileRequest profile = 3;
+}
+
+message UploadFileRequest {
+  string filename = 1;
+  string content_type = 2;
+  bytes file_data = 3;
+}
+
+message UserIDRequest {
+  string user_id = 1;
+}

@@ -321,7 +321,7 @@ func (x *GetPinByParticipantRequest) GetUserId() string {
 // Response message for CreateUser
 type GetPinsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Pins          []*GetPinByIDResponse  `protobuf:"bytes,1,rep,name=pins,proto3" json:"pins,omitempty"`
+	Pins          []*GetPinResponse      `protobuf:"bytes,1,rep,name=pins,proto3" json:"pins,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -356,9 +356,69 @@ func (*GetPinsResponse) Descriptor() ([]byte, []int) {
 	return file_plan_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *GetPinsResponse) GetPins() []*GetPinByIDResponse {
+func (x *GetPinsResponse) GetPins() []*GetPinResponse {
 	if x != nil {
 		return x.Pins
+	}
+	return nil
+}
+
+type GetPinResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PinId         string                 `protobuf:"bytes,1,opt,name=pinId,proto3" json:"pinId,omitempty"`
+	Image         []byte                 `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
+	Participant   []string               `protobuf:"bytes,3,rep,name=participant,proto3" json:"participant,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPinResponse) Reset() {
+	*x = GetPinResponse{}
+	mi := &file_plan_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPinResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPinResponse) ProtoMessage() {}
+
+func (x *GetPinResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPinResponse.ProtoReflect.Descriptor instead.
+func (*GetPinResponse) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetPinResponse) GetPinId() string {
+	if x != nil {
+		return x.PinId
+	}
+	return ""
+}
+
+func (x *GetPinResponse) GetImage() []byte {
+	if x != nil {
+		return x.Image
+	}
+	return nil
+}
+
+func (x *GetPinResponse) GetParticipant() []string {
+	if x != nil {
+		return x.Participant
 	}
 	return nil
 }
@@ -387,9 +447,13 @@ const file_plan_proto_rawDesc = "" +
 	"\blocation\x18\x04 \x01(\x02R\blocation\x12 \n" +
 	"\vparticipant\x18\x05 \x03(\tR\vparticipant\"4\n" +
 	"\x1aGetPinByParticipantRequest\x12\x16\n" +
-	"\x06userId\x18\x01 \x01(\tR\x06userId\"?\n" +
-	"\x0fGetPinsResponse\x12,\n" +
-	"\x04pins\x18\x01 \x03(\v2\x18.plan.GetPinByIDResponseR\x04pins2\xdd\x01\n" +
+	"\x06userId\x18\x01 \x01(\tR\x06userId\";\n" +
+	"\x0fGetPinsResponse\x12(\n" +
+	"\x04pins\x18\x01 \x03(\v2\x14.plan.GetPinResponseR\x04pins\"^\n" +
+	"\x0eGetPinResponse\x12\x14\n" +
+	"\x05pinId\x18\x01 \x01(\tR\x05pinId\x12\x14\n" +
+	"\x05image\x18\x02 \x01(\fR\x05image\x12 \n" +
+	"\vparticipant\x18\x03 \x03(\tR\vparticipant2\xdd\x01\n" +
 	"\fPlansService\x12<\n" +
 	"\tCreatePin\x12\x16.plan.CreatePinRequest\x1a\x17.plan.CreatePinResponse\x12?\n" +
 	"\n" +
@@ -408,7 +472,7 @@ func file_plan_proto_rawDescGZIP() []byte {
 	return file_plan_proto_rawDescData
 }
 
-var file_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_plan_proto_goTypes = []any{
 	(*CreatePinRequest)(nil),           // 0: plan.CreatePinRequest
 	(*CreatePinResponse)(nil),          // 1: plan.CreatePinResponse
@@ -416,9 +480,10 @@ var file_plan_proto_goTypes = []any{
 	(*GetPinByIDResponse)(nil),         // 3: plan.GetPinByIDResponse
 	(*GetPinByParticipantRequest)(nil), // 4: plan.GetPinByParticipantRequest
 	(*GetPinsResponse)(nil),            // 5: plan.GetPinsResponse
+	(*GetPinResponse)(nil),             // 6: plan.GetPinResponse
 }
 var file_plan_proto_depIdxs = []int32{
-	3, // 0: plan.GetPinsResponse.pins:type_name -> plan.GetPinByIDResponse
+	6, // 0: plan.GetPinsResponse.pins:type_name -> plan.GetPinResponse
 	0, // 1: plan.PlansService.CreatePin:input_type -> plan.CreatePinRequest
 	2, // 2: plan.PlansService.GetPinByID:input_type -> plan.GetPinByIDRequest
 	4, // 3: plan.PlansService.GetPinByParticipant:input_type -> plan.GetPinByParticipantRequest
@@ -443,7 +508,7 @@ func file_plan_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_plan_proto_rawDesc), len(file_plan_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
