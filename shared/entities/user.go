@@ -34,3 +34,14 @@ type UpdateUserModel struct {
 	Name    string `json:"name,omitempty"`
 	Profile string `json:"profile,omitempty"`
 }
+
+type AvatarUserModel struct {
+	ID      string `json:"user_id,omitempty"`
+	Name    string `json:"name,omitempty"`
+	Profile string `json:"profile,omitempty"`
+}
+
+type AvatarResponse struct {
+	TripID string   `json:"trip_id"`
+	UserID []string `json:"user_id"`
+}

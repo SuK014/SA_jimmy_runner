@@ -15,6 +15,7 @@ service UserService {
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc GetUser(UserIDRequest) returns (UserResponse);
   rpc DeleteUser(UserIDRequest) returns (UserResponse);
+  rpc GetUsersAvatar(UsersAvatarRequest) returns (UsersAvatarResponse);
 }
 
 // Request message to get a user
@@ -70,4 +71,20 @@ message UploadFileRequest {
 
 message UserIDRequest {
   string user_id = 1;
+}
+
+message UsersAvatarRequest {
+  string trip_id = 1;
+  repeated string user_id = 2;
+}
+
+message Avatar {
+  string user_id = 1;
+  string display_name = 2;
+  string profile = 3;
+}
+
+message UsersAvatarResponse {
+  bool success = 1;
+  repeated Avatar users = 2;
 }

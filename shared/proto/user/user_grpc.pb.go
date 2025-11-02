@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_CreateUser_FullMethodName = "/user.UserService/CreateUser"
-	UserService_LoginUser_FullMethodName  = "/user.UserService/LoginUser"
-	UserService_UpdateUser_FullMethodName = "/user.UserService/UpdateUser"
-	UserService_GetUser_FullMethodName    = "/user.UserService/GetUser"
-	UserService_DeleteUser_FullMethodName = "/user.UserService/DeleteUser"
+	UserService_CreateUser_FullMethodName     = "/user.UserService/CreateUser"
+	UserService_LoginUser_FullMethodName      = "/user.UserService/LoginUser"
+	UserService_UpdateUser_FullMethodName     = "/user.UserService/UpdateUser"
+	UserService_GetUser_FullMethodName        = "/user.UserService/GetUser"
+	UserService_DeleteUser_FullMethodName     = "/user.UserService/DeleteUser"
+	UserService_GetUsersAvatar_FullMethodName = "/user.UserService/GetUsersAvatar"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -38,6 +39,7 @@ type UserServiceClient interface {
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetUser(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	DeleteUser(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	GetUsersAvatar(ctx context.Context, in *UsersAvatarRequest, opts ...grpc.CallOption) (*UsersAvatarResponse, error)
 }
 
 type userServiceClient struct {
@@ -98,6 +100,16 @@ func (c *userServiceClient) DeleteUser(ctx context.Context, in *UserIDRequest, o
 	return out, nil
 }
 
+func (c *userServiceClient) GetUsersAvatar(ctx context.Context, in *UsersAvatarRequest, opts ...grpc.CallOption) (*UsersAvatarResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UsersAvatarResponse)
+	err := c.cc.Invoke(ctx, UserService_GetUsersAvatar_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -110,6 +122,7 @@ type UserServiceServer interface {
 	UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error)
 	GetUser(context.Context, *UserIDRequest) (*UserResponse, error)
 	DeleteUser(context.Context, *UserIDRequest) (*UserResponse, error)
+	GetUsersAvatar(context.Context, *UsersAvatarRequest) (*UsersAvatarResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -134,6 +147,9 @@ func (UnimplementedUserServiceServer) GetUser(context.Context, *UserIDRequest) (
 }
 func (UnimplementedUserServiceServer) DeleteUser(context.Context, *UserIDRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedUserServiceServer) GetUsersAvatar(context.Context, *UsersAvatarRequest) (*UsersAvatarResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUsersAvatar not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -246,6 +262,24 @@ func _UserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetUsersAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UsersAvatarRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUsersAvatar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetUsersAvatar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUsersAvatar(ctx, req.(*UsersAvatarRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -272,6 +306,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteUser",
 			Handler:    _UserService_DeleteUser_Handler,
+		},
+		{
+			MethodName: "GetUsersAvatar",
+			Handler:    _UserService_GetUsersAvatar_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

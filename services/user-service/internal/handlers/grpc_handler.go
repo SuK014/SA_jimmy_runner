@@ -117,6 +117,28 @@ func (h *gRPCHandler) GetUser(ctx context.Context, req *pb.UserIDRequest) (*pb.U
 	}, nil
 }
 
+func (h *gRPCHandler) GetUsersAvatar(ctx context.Context, req *pb.UsersAvatarRequest) (*pb.UsersAvatarResponse, error) {
+
+	res, err := h.service.GetAvatars(req.GetTripId(), req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+
+	var results []*pb.Avatar
+	for _, r := range *res {
+		results = append(results, &pb.Avatar{
+			UserId:      r.ID,
+			DisplayName: r.Name,
+			Profile:     r.Profile,
+		})
+	}
+
+	return &pb.UsersAvatarResponse{
+		Success: true,
+		Users:   results,
+	}, nil
+}
+
 func (h *gRPCHandler) DeleteUser(ctx context.Context, req *pb.UserIDRequest) (*pb.UserResponse, error) {
 
 	err := h.service.DeleteUser(req.GetUserId())

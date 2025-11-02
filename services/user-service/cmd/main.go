@@ -38,7 +38,8 @@ func main() {
 	defer prismadb.PrismaDB.Prisma.Disconnect()
 
 	userRepo := repo.NewUsersRepository(prismadb)
-	sv := sv.NewUsersService(userRepo)
+	userTripRepo := repo.NewUserTripRepository(prismadb)
+	sv := sv.NewUsersService(userRepo, userTripRepo)
 
 	handlers.NewGRPCHandler(s, sv)
 
