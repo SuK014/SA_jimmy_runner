@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"os"
 
 	. "github.com/SuK014/SA_jimmy_runner/services/plan-service/internal/store/datasource"
@@ -23,6 +24,7 @@ type IPinsRepository interface {
 	InsertPin(data entities.CreatedPinModel) (string, error)
 	FindByID(pinID primitive.ObjectID) (*entities.PinDataModel, error)
 	FindByParticipant(userID string) (*[]entities.PinDataModel, error)
+	UpdatePin(pinID string, data entities.UpdatedPinModel) error
 }
 
 func NewPinsRepository(db *MongoDB) IPinsRepository {
@@ -70,4 +72,30 @@ func (repo *pinsRepository) FindByParticipant(userID string) (*[]entities.PinDat
 	}
 
 	return &pins, nil
+}
+
+func (repo *pinsRepository) UpdatePin(pinID string, data entities.UpdatedPinModel) error {
+	objectID, err := primitive.ObjectIDFromHex(pinID)
+	if err != nil {
+		fiberlog.Errorf("Users -> UpdateUserFields: Invalid ObjectID format: %s \n", err)
+		return err
+	}
+
+	filter := bson.M{"_id": objectID}
+	update := bson.M{"$set": data}
+
+	// Perform the update operation
+	result, err := repo.Collection.UpdateOne(repo.Context, filter, update)
+	if err != nil {
+		fiberlog.Errorf("Users -> UpdateUser: %s \n", err)
+		return err
+	}
+
+	// Check if any document was modified
+	if result.MatchedCount == 0 {
+		fiberlog.Warnf("Users -> UpdateUser: No document found with ID: %s \n", pinID)
+		return errors.New("user not found")
+	}
+
+	return nil
 }

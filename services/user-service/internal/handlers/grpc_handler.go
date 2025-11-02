@@ -71,7 +71,7 @@ func (h *gRPCHandler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 
 	profile := req.GetProfile()
 	user_id := req.GetUserId()
-	publicURL, err := utils.UploadToSupabase(
+	publicURL, err := utils.UploadToSupabaseProfile(
 		profile.GetFileData(),
 		profile.GetFilename(),
 		profile.GetContentType(),

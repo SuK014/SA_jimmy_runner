@@ -43,7 +43,7 @@ func main() {
 
 	handlers.NewGRPCHandler(s, sv)
 
-	log.Println("Server listening on :50052")
+	log.Println("Server listening on :50051")
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

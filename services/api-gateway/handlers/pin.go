@@ -13,17 +13,26 @@ import (
 
 // CreateUser handles REST requests and forwards them to gRPC
 func (h *HTTPHandler) CreatePin(ctx *fiber.Ctx) error {
-	bodyData := entities.CreatedPinGRPCModel{}
+	bodyData := entities.CreatedPinModel{}
 	if err := ctx.BodyParser(&bodyData); err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(
 			entities.ResponseMessage{Message: "invalid json body"},
 		)
 	}
 
+	expenses := []*pb.Expenses{}
+	for _, e := range bodyData.Expenses {
+		expenses = append(expenses, &pb.Expenses{
+			Id:      e.ID,
+			Name:    e.Name,
+			Expense: e.Expense,
+		})
+	}
+
 	req := &pb.CreatePinRequest{
-		Image:       bodyData.Image,
+		Name:        bodyData.Name,
 		Description: bodyData.Description,
-		Expense:     bodyData.Expense,
+		Expense:     expenses,
 		Location:    bodyData.Location,
 		Participant: bodyData.Participants,
 	}
@@ -35,13 +44,7 @@ func (h *HTTPHandler) CreatePin(ctx *fiber.Ctx) error {
 		)
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(
-		entities.ResponseModel{
-			Message: "success",
-			Data:    res,
-			Status:  fiber.StatusOK,
-		},
-	)
+	return ctx.Status(fiber.StatusOK).JSON(res)
 }
 
 func (h *HTTPHandler) GetPinByID(ctx *fiber.Ctx) error {
@@ -97,4 +100,47 @@ func (h *HTTPHandler) GetPinByParticipant(ctx *fiber.Ctx) error {
 			Status:  fiber.StatusOK,
 		},
 	)
+}
+
+func (h *HTTPHandler) UpdatePinByID(ctx *fiber.Ctx) error {
+	id := ctx.Query("id")
+	if id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'id' query parameter"},
+		)
+	}
+
+	bodyData := entities.UpdatedPinModel{}
+	if err := ctx.BodyParser(&bodyData); err != nil {
+		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(
+			entities.ResponseMessage{Message: "invalid json body"},
+		)
+	}
+
+	expenses := []*pb.Expenses{}
+	for _, e := range bodyData.Expenses {
+		expenses = append(expenses, &pb.Expenses{
+			Id:      e.ID,
+			Name:    e.Name,
+			Expense: e.Expense,
+		})
+	}
+
+	req := &pb.UpdatePinRequest{
+		Id:          id,
+		Name:        bodyData.Name,
+		Description: bodyData.Description,
+		Expense:     expenses,
+		Location:    bodyData.Location,
+		Participant: bodyData.Participants,
+	}
+
+	res, err := h.planClient.UpdatePin(context.Background(), req)
+	if err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot update pin: " + err.Error()},
+		)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(res)
 }

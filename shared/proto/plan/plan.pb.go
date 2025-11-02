@@ -24,9 +24,9 @@ const (
 // Request message to create a user
 type CreatePinRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Image         []byte                 `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Expense       string                 `protobuf:"bytes,3,opt,name=expense,proto3" json:"expense,omitempty"` //JSON AS a string
+	Expense       []*Expenses            `protobuf:"bytes,3,rep,name=expense,proto3" json:"expense,omitempty"` //JSON
 	Location      float32                `protobuf:"fixed32,4,opt,name=location,proto3" json:"location,omitempty"`
 	Participant   []string               `protobuf:"bytes,5,rep,name=participant,proto3" json:"participant,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -63,11 +63,11 @@ func (*CreatePinRequest) Descriptor() ([]byte, []int) {
 	return file_plan_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CreatePinRequest) GetImage() []byte {
+func (x *CreatePinRequest) GetName() string {
 	if x != nil {
-		return x.Image
+		return x.Name
 	}
-	return nil
+	return ""
 }
 
 func (x *CreatePinRequest) GetDescription() string {
@@ -77,11 +77,11 @@ func (x *CreatePinRequest) GetDescription() string {
 	return ""
 }
 
-func (x *CreatePinRequest) GetExpense() string {
+func (x *CreatePinRequest) GetExpense() []*Expenses {
 	if x != nil {
 		return x.Expense
 	}
-	return ""
+	return nil
 }
 
 func (x *CreatePinRequest) GetLocation() float32 {
@@ -199,11 +199,13 @@ func (x *GetPinByIDRequest) GetPinId() string {
 // Response message for CreateUser
 type GetPinByIDResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Image         []byte                 `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
-	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"` //JSON AS a string
-	Expense       string                 `protobuf:"bytes,3,opt,name=expense,proto3" json:"expense,omitempty"`
-	Location      float32                `protobuf:"fixed32,4,opt,name=location,proto3" json:"location,omitempty"`
-	Participant   []string               `protobuf:"bytes,5,rep,name=participant,proto3" json:"participant,omitempty"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Image         []byte                 `protobuf:"bytes,3,opt,name=image,proto3" json:"image,omitempty"`
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	Expense       []*Expenses            `protobuf:"bytes,5,rep,name=expense,proto3" json:"expense,omitempty"` //JSON
+	Location      float32                `protobuf:"fixed32,6,opt,name=location,proto3" json:"location,omitempty"`
+	Participant   []string               `protobuf:"bytes,7,rep,name=participant,proto3" json:"participant,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -238,6 +240,20 @@ func (*GetPinByIDResponse) Descriptor() ([]byte, []int) {
 	return file_plan_proto_rawDescGZIP(), []int{3}
 }
 
+func (x *GetPinByIDResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetPinByIDResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 func (x *GetPinByIDResponse) GetImage() []byte {
 	if x != nil {
 		return x.Image
@@ -252,11 +268,11 @@ func (x *GetPinByIDResponse) GetDescription() string {
 	return ""
 }
 
-func (x *GetPinByIDResponse) GetExpense() string {
+func (x *GetPinByIDResponse) GetExpense() []*Expenses {
 	if x != nil {
 		return x.Expense
 	}
-	return ""
+	return nil
 }
 
 func (x *GetPinByIDResponse) GetLocation() float32 {
@@ -366,8 +382,9 @@ func (x *GetPinsResponse) GetPins() []*GetPinResponse {
 type GetPinResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PinId         string                 `protobuf:"bytes,1,opt,name=pinId,proto3" json:"pinId,omitempty"`
-	Image         []byte                 `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
-	Participant   []string               `protobuf:"bytes,3,rep,name=participant,proto3" json:"participant,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Image         []byte                 `protobuf:"bytes,3,opt,name=image,proto3" json:"image,omitempty"`
+	Participant   []string               `protobuf:"bytes,4,rep,name=participant,proto3" json:"participant,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -409,6 +426,13 @@ func (x *GetPinResponse) GetPinId() string {
 	return ""
 }
 
+func (x *GetPinResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 func (x *GetPinResponse) GetImage() []byte {
 	if x != nil {
 		return x.Image
@@ -423,42 +447,247 @@ func (x *GetPinResponse) GetParticipant() []string {
 	return nil
 }
 
+type UpdatePinRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Expense       []*Expenses            `protobuf:"bytes,4,rep,name=expense,proto3" json:"expense,omitempty"` //JSON
+	Location      float32                `protobuf:"fixed32,5,opt,name=location,proto3" json:"location,omitempty"`
+	Participant   []string               `protobuf:"bytes,6,rep,name=participant,proto3" json:"participant,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePinRequest) Reset() {
+	*x = UpdatePinRequest{}
+	mi := &file_plan_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePinRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePinRequest) ProtoMessage() {}
+
+func (x *UpdatePinRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePinRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePinRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UpdatePinRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdatePinRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdatePinRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdatePinRequest) GetExpense() []*Expenses {
+	if x != nil {
+		return x.Expense
+	}
+	return nil
+}
+
+func (x *UpdatePinRequest) GetLocation() float32 {
+	if x != nil {
+		return x.Location
+	}
+	return 0
+}
+
+func (x *UpdatePinRequest) GetParticipant() []string {
+	if x != nil {
+		return x.Participant
+	}
+	return nil
+}
+
+type Expenses struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Expense       float32                `protobuf:"fixed32,3,opt,name=expense,proto3" json:"expense,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Expenses) Reset() {
+	*x = Expenses{}
+	mi := &file_plan_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Expenses) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Expenses) ProtoMessage() {}
+
+func (x *Expenses) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Expenses.ProtoReflect.Descriptor instead.
+func (*Expenses) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *Expenses) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Expenses) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Expenses) GetExpense() float32 {
+	if x != nil {
+		return x.Expense
+	}
+	return 0
+}
+
+type SuccessResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SuccessResponse) Reset() {
+	*x = SuccessResponse{}
+	mi := &file_plan_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SuccessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SuccessResponse) ProtoMessage() {}
+
+func (x *SuccessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SuccessResponse.ProtoReflect.Descriptor instead.
+func (*SuccessResponse) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SuccessResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_plan_proto protoreflect.FileDescriptor
 
 const file_plan_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"plan.proto\x12\x04plan\"\xa2\x01\n" +
-	"\x10CreatePinRequest\x12\x14\n" +
-	"\x05image\x18\x01 \x01(\fR\x05image\x12 \n" +
-	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x18\n" +
-	"\aexpense\x18\x03 \x01(\tR\aexpense\x12\x1a\n" +
+	"plan.proto\x12\x04plan\"\xb0\x01\n" +
+	"\x10CreatePinRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12(\n" +
+	"\aexpense\x18\x03 \x03(\v2\x0e.plan.ExpensesR\aexpense\x12\x1a\n" +
 	"\blocation\x18\x04 \x01(\x02R\blocation\x12 \n" +
 	"\vparticipant\x18\x05 \x03(\tR\vparticipant\"C\n" +
 	"\x11CreatePinResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
 	"\x05pinId\x18\x02 \x01(\tR\x05pinId\")\n" +
 	"\x11GetPinByIDRequest\x12\x14\n" +
-	"\x05pinId\x18\x01 \x01(\tR\x05pinId\"\xa4\x01\n" +
-	"\x12GetPinByIDResponse\x12\x14\n" +
-	"\x05image\x18\x01 \x01(\fR\x05image\x12 \n" +
-	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x18\n" +
-	"\aexpense\x18\x03 \x01(\tR\aexpense\x12\x1a\n" +
-	"\blocation\x18\x04 \x01(\x02R\blocation\x12 \n" +
-	"\vparticipant\x18\x05 \x03(\tR\vparticipant\"4\n" +
+	"\x05pinId\x18\x01 \x01(\tR\x05pinId\"\xe2\x01\n" +
+	"\x12GetPinByIDResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05image\x18\x03 \x01(\fR\x05image\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12(\n" +
+	"\aexpense\x18\x05 \x03(\v2\x0e.plan.ExpensesR\aexpense\x12\x1a\n" +
+	"\blocation\x18\x06 \x01(\x02R\blocation\x12 \n" +
+	"\vparticipant\x18\a \x03(\tR\vparticipant\"4\n" +
 	"\x1aGetPinByParticipantRequest\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\tR\x06userId\";\n" +
 	"\x0fGetPinsResponse\x12(\n" +
-	"\x04pins\x18\x01 \x03(\v2\x14.plan.GetPinResponseR\x04pins\"^\n" +
+	"\x04pins\x18\x01 \x03(\v2\x14.plan.GetPinResponseR\x04pins\"r\n" +
 	"\x0eGetPinResponse\x12\x14\n" +
-	"\x05pinId\x18\x01 \x01(\tR\x05pinId\x12\x14\n" +
-	"\x05image\x18\x02 \x01(\fR\x05image\x12 \n" +
-	"\vparticipant\x18\x03 \x03(\tR\vparticipant2\xdd\x01\n" +
+	"\x05pinId\x18\x01 \x01(\tR\x05pinId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05image\x18\x03 \x01(\fR\x05image\x12 \n" +
+	"\vparticipant\x18\x04 \x03(\tR\vparticipant\"\xc0\x01\n" +
+	"\x10UpdatePinRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12(\n" +
+	"\aexpense\x18\x04 \x03(\v2\x0e.plan.ExpensesR\aexpense\x12\x1a\n" +
+	"\blocation\x18\x05 \x01(\x02R\blocation\x12 \n" +
+	"\vparticipant\x18\x06 \x03(\tR\vparticipant\"H\n" +
+	"\bExpenses\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
+	"\aexpense\x18\x03 \x01(\x02R\aexpense\"+\n" +
+	"\x0fSuccessResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\x99\x02\n" +
 	"\fPlansService\x12<\n" +
 	"\tCreatePin\x12\x16.plan.CreatePinRequest\x1a\x17.plan.CreatePinResponse\x12?\n" +
 	"\n" +
 	"GetPinByID\x12\x17.plan.GetPinByIDRequest\x1a\x18.plan.GetPinByIDResponse\x12N\n" +
-	"\x13GetPinByParticipant\x12 .plan.GetPinByParticipantRequest\x1a\x15.plan.GetPinsResponseB\x13Z\x11shared/proto/planb\x06proto3"
+	"\x13GetPinByParticipant\x12 .plan.GetPinByParticipantRequest\x1a\x15.plan.GetPinsResponse\x12:\n" +
+	"\tUpdatePin\x12\x16.plan.UpdatePinRequest\x1a\x15.plan.SuccessResponseB\x13Z\x11shared/proto/planb\x06proto3"
 
 var (
 	file_plan_proto_rawDescOnce sync.Once
@@ -472,7 +701,7 @@ func file_plan_proto_rawDescGZIP() []byte {
 	return file_plan_proto_rawDescData
 }
 
-var file_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_plan_proto_goTypes = []any{
 	(*CreatePinRequest)(nil),           // 0: plan.CreatePinRequest
 	(*CreatePinResponse)(nil),          // 1: plan.CreatePinResponse
@@ -481,20 +710,28 @@ var file_plan_proto_goTypes = []any{
 	(*GetPinByParticipantRequest)(nil), // 4: plan.GetPinByParticipantRequest
 	(*GetPinsResponse)(nil),            // 5: plan.GetPinsResponse
 	(*GetPinResponse)(nil),             // 6: plan.GetPinResponse
+	(*UpdatePinRequest)(nil),           // 7: plan.UpdatePinRequest
+	(*Expenses)(nil),                   // 8: plan.Expenses
+	(*SuccessResponse)(nil),            // 9: plan.SuccessResponse
 }
 var file_plan_proto_depIdxs = []int32{
-	6, // 0: plan.GetPinsResponse.pins:type_name -> plan.GetPinResponse
-	0, // 1: plan.PlansService.CreatePin:input_type -> plan.CreatePinRequest
-	2, // 2: plan.PlansService.GetPinByID:input_type -> plan.GetPinByIDRequest
-	4, // 3: plan.PlansService.GetPinByParticipant:input_type -> plan.GetPinByParticipantRequest
-	1, // 4: plan.PlansService.CreatePin:output_type -> plan.CreatePinResponse
-	3, // 5: plan.PlansService.GetPinByID:output_type -> plan.GetPinByIDResponse
-	5, // 6: plan.PlansService.GetPinByParticipant:output_type -> plan.GetPinsResponse
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	8, // 0: plan.CreatePinRequest.expense:type_name -> plan.Expenses
+	8, // 1: plan.GetPinByIDResponse.expense:type_name -> plan.Expenses
+	6, // 2: plan.GetPinsResponse.pins:type_name -> plan.GetPinResponse
+	8, // 3: plan.UpdatePinRequest.expense:type_name -> plan.Expenses
+	0, // 4: plan.PlansService.CreatePin:input_type -> plan.CreatePinRequest
+	2, // 5: plan.PlansService.GetPinByID:input_type -> plan.GetPinByIDRequest
+	4, // 6: plan.PlansService.GetPinByParticipant:input_type -> plan.GetPinByParticipantRequest
+	7, // 7: plan.PlansService.UpdatePin:input_type -> plan.UpdatePinRequest
+	1, // 8: plan.PlansService.CreatePin:output_type -> plan.CreatePinResponse
+	3, // 9: plan.PlansService.GetPinByID:output_type -> plan.GetPinByIDResponse
+	5, // 10: plan.PlansService.GetPinByParticipant:output_type -> plan.GetPinsResponse
+	9, // 11: plan.PlansService.UpdatePin:output_type -> plan.SuccessResponse
+	8, // [8:12] is the sub-list for method output_type
+	4, // [4:8] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_plan_proto_init() }
@@ -508,7 +745,7 @@ func file_plan_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_plan_proto_rawDesc), len(file_plan_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
