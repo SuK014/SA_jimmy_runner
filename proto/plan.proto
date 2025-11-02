@@ -69,7 +69,13 @@ message GetPinByParticipantRequest {
 
 // Response message for CreateUser
 message GetPinsResponse {
-  repeated GetPinByIDResponse pins = 1;
+  repeated GetPinResponse pins = 1;
+}
+
+message GetPinResponse {
+  string pinId = 1;
+  bytes image = 2;
+  repeated string participant = 3;
 }
 
 // User message

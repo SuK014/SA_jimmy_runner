@@ -2,15 +2,18 @@ package entities
 
 import (
 	"encoding/json"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type PinDataModel struct {
-	PinID        string   `json:"pin_id" bson:"pin_id"`
-	Image        []byte   `json:"image,omitempty" bson:"image,omitempty"` // for binary data (e.g. uploaded image)
-	Description  string   `json:"description,omitempty" bson:"description,omitempty"`
-	Expense      string   `json:"expense,omitempty" bson:"expense,omitempty"` // for arbitrary JSON (e.g. map or array)
-	Location     float32  `json:"location,omitempty" bson:"location,omitempty"`
-	Participants []string `json:"participants,omitempty" bson:"participants,omitempty"` // capitalized to export
+	ID           primitive.ObjectID `json:"_id,omitempty" bson:"_id"`
+	PinID        string             `json:"pin_id"`
+	Image        []byte             `json:"image,omitempty" bson:"image,omitempty"` // for binary data (e.g. uploaded image)
+	Description  string             `json:"description,omitempty" bson:"description,omitempty"`
+	Expense      string             `json:"expense,omitempty" bson:"expense,omitempty"` // for arbitrary JSON (e.g. map or array)
+	Location     float32            `json:"location,omitempty" bson:"location,omitempty"`
+	Participants []string           `json:"participants,omitempty" bson:"participants,omitempty"` // capitalized to export
 }
 
 type CreatedPinGRPCModel struct {
