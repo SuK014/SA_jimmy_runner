@@ -13,6 +13,7 @@ service UserService {
   rpc CreateUser(CreateUserRequest) returns (UserResponse);
   rpc LoginUser(LoginUserRequest) returns (UserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
+  rpc GetUser(GetUserRequest) returns (UserResponse);
 }
 
 // Request message to get a user
@@ -64,4 +65,8 @@ message UploadFileRequest {
   string filename = 1;
   string content_type = 2;
   bytes file_data = 3;
+}
+
+message GetUserRequest {
+  string user_id = 1;
 }

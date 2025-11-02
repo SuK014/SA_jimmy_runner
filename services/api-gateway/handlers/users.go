@@ -166,3 +166,23 @@ func (h *HTTPHandler) UpdateUser(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(res)
 }
+
+func (h *HTTPHandler) GetUser(ctx *fiber.Ctx) error {
+	token, err := middlewares.DecodeJWTToken(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
+	}
+
+	req := &pb.GetUserRequest{
+		UserId: token.UserID,
+	}
+
+	res, err := h.userClient.GetUser(context.Background(), req)
+	if err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot update user: " + err.Error()},
+		)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(res)
+}

@@ -100,3 +100,19 @@ func (h *gRPCHandler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 		Profile:     res.Profile,
 	}, nil
 }
+
+func (h *gRPCHandler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.UserResponse, error) {
+
+	res, err := h.service.GetByID(req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.UserResponse{
+		Success:     true,
+		UserId:      res.UserID,
+		DisplayName: res.Name,
+		Email:       res.Email,
+		Profile:     res.Profile,
+	}, nil
+}

@@ -52,3 +52,7 @@ func (ds *UserServiceClient) LoginUser(ctx context.Context, req *pb.LoginUserReq
 func (ds *UserServiceClient) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UserResponse, error) {
 	return ds.Client.UpdateUser(ctx, req)
 }
+
+func (ds *UserServiceClient) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.UserResponse, error) {
+	return ds.Client.GetUser(ctx, req)
+}

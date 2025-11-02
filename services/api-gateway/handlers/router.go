@@ -11,6 +11,7 @@ func HandlerUsers(handler HTTPHandler, app *fiber.App) {
 	// user.Get("/get_all", gateway.GetAllUserData)
 	// user.Get("/get", gateway.GetByID)
 	user.Put("/update", middlewares.SetJWtHeaderHandler(), handler.UpdateUser)
+	user.Get("/", middlewares.SetJWtHeaderHandler(), handler.GetUser)
 	// user.Delete("/delete", gateway.DeleteUser)
 
 	// auth := app.Group("/auth")
