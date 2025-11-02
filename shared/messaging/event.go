@@ -11,8 +11,8 @@ const (
 )
 
 type RegisterData struct {
-	User    user.CreateUserResponse `json:"user"`
-	Context string                  `json:"ctx"`
+	User    user.UserResponse `json:"user"`
+	Context string            `json:"ctx"`
 }
 
 type EmailEvent struct {

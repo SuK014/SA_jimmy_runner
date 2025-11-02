@@ -65,5 +65,9 @@ func (repo *pinsRepository) FindByParticipant(userID string) (*[]entities.PinDat
 		return nil, err
 	}
 
+	for i := range pins {
+		pins[i].PinID = pins[i].ID.Hex()
+	}
+
 	return &pins, nil
 }

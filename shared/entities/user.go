@@ -11,6 +11,7 @@ type UserDataModel struct {
 	Name      string    `json:"name,omitempty"`
 	Email     string    `json:"email,omitempty"`
 	Password  string    `json:"password,omitempty"`
+	Profile   string    `json:"profile"`
 }
 
 type UserIDModel struct {
@@ -21,4 +22,15 @@ type CreatedUserModel struct {
 	Name     string `json:"name,omitempty"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type LoginUserModel struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type UpdateUserModel struct {
+	ID      string `json:"user_id,omitempty"`
+	Name    string `json:"name,omitempty"`
+	Profile string `json:"profile,omitempty"`
 }
