@@ -118,19 +118,11 @@ func (repo *usersRepository) DeleteUser(userID string) error {
 }
 
 func mapToUserDataModel(data *db.UserModel) (*entities.UserDataModel, error) {
-	createdAt, ok := data.CreatedAt()
-	if !ok {
-		return nil, fmt.Errorf("users -> createdAt not ok")
-	}
-	updatedAt, ok := data.UpdatedAt()
-	if !ok {
-		return nil, fmt.Errorf("users -> updatedAt not ok")
-	}
 	profileURL, _ := data.ProfileURL()
 	return &entities.UserDataModel{
 		UserID:    data.UserID,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
+		CreatedAt: data.CreatedAt,
+		UpdatedAt: data.UpdatedAt,
 		Name:      data.Name,
 		Email:     data.Email,
 		Password:  data.Password,

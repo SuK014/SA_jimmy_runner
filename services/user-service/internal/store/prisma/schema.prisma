@@ -10,8 +10,8 @@ generator db {
 
 model User {
     userId String @id @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid @map("user_id")
-    createdAt DateTime? @default(now()) @map("created_at")
-    updatedAt DateTime? @updatedAt @map("updated_at")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
     name String
     email String @unique
     password String
