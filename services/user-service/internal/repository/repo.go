@@ -155,7 +155,7 @@ func (repo *usersRepository) UpdateUser(data entities.UpdateUserModel) (*entitie
 	if !ok {
 		return nil, fmt.Errorf("users -> UpdateUser: updatedAt not ok")
 	}
-
+	profileURL, _ := updatedUser.ProfileURL()
 	return &entities.UserDataModel{
 		UserID:    updatedUser.UserID,
 		CreatedAt: createdAt,
@@ -163,6 +163,7 @@ func (repo *usersRepository) UpdateUser(data entities.UpdateUserModel) (*entitie
 		Name:      updatedUser.Name,
 		Email:     updatedUser.Email,
 		Password:  updatedUser.Password,
+		Profile:   profileURL,
 	}, nil
 }
 

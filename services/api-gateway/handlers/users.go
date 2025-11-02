@@ -91,7 +91,7 @@ func (h *HTTPHandler) Login(ctx *fiber.Ctx) error {
 	res, err := h.userClient.LoginUser(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot insert new user account: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot login: " + err.Error()},
 		)
 	}
 
