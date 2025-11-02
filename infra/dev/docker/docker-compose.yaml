@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  user-service:
+    build:
+      context: ../../..
+      dockerfile: ./infra/dev/docker/Dockerfile.user-service
+    ports:
+      - "50051:50051"
+    environment:
+      - DATABASE_URL=postgresql://postgres.nyehvpubgddlksoppqvn:SuK014%40Supa@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connect_timeout=10
+      - RABBITMQ_URL=amqps://frqwrbeu:2r8iEMSWuuGsR5aKbR2Jx3fUWygENs8D@gorilla.lmq.cloudamqp.com/frqwrbeu
+      - GMAIL_USER=auming.itkit@gmail.com
+      - GMAIL_PASSWORD=ghua kypm safy lhxw
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  plan-service:
+    build:
+      context: ../../..
+      dockerfile: ./infra/dev/docker/Dockerfile.plan-service
+    ports:
+      - "50052:50052"
+    environment:
+      - MONGODB_URI=mongodb+srv://Sukon:SuK014mongodb@cluster0.h0b2by2.mongodb.net/
+      - DATABASE_NAME=test
+      - RABBITMQ_URL=amqps://frqwrbeu:2r8iEMSWuuGsR5aKbR2Jx3fUWygENs8D@gorilla.lmq.cloudamqp.com/frqwrbeu
+      - GMAIL_USER=auming.itkit@gmail.com
+      - GMAIL_PASSWORD=ghua kypm safy lhxw
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  noti-service:
+    build:
+      context: ../../..
+      dockerfile: ./infra/dev/docker/Dockerfile.noti-service
+    environment:
+      - RABBITMQ_URL=amqps://frqwrbeu:2r8iEMSWuuGsR5aKbR2Jx3fUWygENs8D@gorilla.lmq.cloudamqp.com/frqwrbeu
+      - GMAIL_USER=auming.itkit@gmail.com
+      - GMAIL_PASSWORD=ghua kypm safy lhxw
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: ../../..
+      dockerfile: ./infra/dev/docker/Dockerfile.api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - USER_SERVICE_URL=user-service:50051
+      - PLAN_SERVICE_URL=plan-service:50052
+    depends_on:
+      - user-service
+      - plan-service
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge

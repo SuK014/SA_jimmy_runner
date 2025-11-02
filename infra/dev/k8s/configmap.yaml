@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: default
+data:
+  DATABASE_NAME: "test"
+  MONGODB_URI: "mongodb+srv://Sukon:SuK014mongodb@cluster0.h0b2by2.mongodb.net/"
+  PORT: "8080"
+  USER_SERVICE_URL: "user-service:50051"
+  PLAN_SERVICE_URL: "plan-service:50052"
+  RABBITMQ_URL: "amqps://frqwrbeu:2r8iEMSWuuGsR5aKbR2Jx3fUWygENs8D@gorilla.lmq.cloudamqp.com/frqwrbeu"
+  SUPABASE_URL: "https://nyehvpubgddlksoppqvn.supabase.co"

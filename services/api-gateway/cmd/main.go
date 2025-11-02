@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/configuration"
 	httpHandler "github.com/SuK014/SA_jimmy_runner/services/api-gateway/handlers"
 	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/middlewares"
@@ -10,48 +12,27 @@ import (
 )
 
 func main() {
-	// Connect to server
-	// conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
-	// if err != nil {
-	// 	log.Fatalf("did not connect: %v", err)
-	// }
-	// defer conn.Close()
-
-	// c := pb.NewUserServiceClient(conn)
-
-	// Call RPC
-	// ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	// defer cancel()
-
-	// // r, err := c.SayHello(ctx, &pb.HelloRequest{Name: "Wutthichod"})
-
-	// r ,err := c.CreateUser(ctx,)
-	// if err != nil {
-	// 	log.Fatalf("could not greet: %v", err)
-	// }
-	// log.Printf("Greeting: %s", r.GetMessage())
-
-	// // // remove this before deploy ###################
-	// err = godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// }
-	// /// ############################################
-
 	app := fiber.New(configuration.NewFiberConfiguration())
 	middlewares.Logger(app)
 	app.Use(recover.New())
 	app.Use(cors.New())
 
-	//user
-	// userClient, err := userclient.NewUserServiceClient()
-	// httpHandler.NewHTTPHandler(app, "localhost:50051")
-	//plan
-	httpHandler.NewHTTPHandler(app, "localhost:50052", "localhost:50051")
+	// Get service URLs from environment variables or use defaults for local development
+	userServiceURL := os.Getenv("USER_SERVICE_URL")
+	if userServiceURL == "" {
+		userServiceURL = "localhost:50051"
+	}
 
-	// PORT := os.Getenv("PORT")
-	PORT := "8080"
+	planServiceURL := os.Getenv("PLAN_SERVICE_URL")
+	if planServiceURL == "" {
+		planServiceURL = "localhost:50052"
+	}
 
+	// Initialize HTTP handler with service URLs
+	httpHandler.NewHTTPHandler(app, userServiceURL, planServiceURL)
+
+	// Get port from environment variable or use default
+	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "8080"
 	}
