@@ -20,15 +20,15 @@ type pinServer struct {
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", ":50052")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	// remove this before deployed
-	envPath := filepath.Join("../../../shared/env", ".env") // relative to cmd/main.go
+	// Load .env file for local development (optional in Kubernetes)
+	envPath := filepath.Join("../../../shared/env", ".env")
 	if err := godotenv.Load(envPath); err != nil {
-		log.Fatal("Error loading .env file")
+		log.Printf("Warning: .env file not found (using environment variables): %v", err)
 	}
 
 	s := grpc.NewServer()
@@ -41,7 +41,7 @@ func main() {
 
 	handlers.NewGRPCHandler(s, pinSv)
 
-	log.Println("Server listening on :50051")
+	log.Println("Server listening on :50052")
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
