@@ -173,11 +173,31 @@ func (h *HTTPHandler) GetUser(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
 	}
 
-	req := &pb.GetUserRequest{
+	req := &pb.UserIDRequest{
 		UserId: token.UserID,
 	}
 
 	res, err := h.userClient.GetUser(context.Background(), req)
+	if err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot update user: " + err.Error()},
+		)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(res)
+}
+
+func (h *HTTPHandler) DeleteUser(ctx *fiber.Ctx) error {
+	token, err := middlewares.DecodeJWTToken(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
+	}
+
+	req := &pb.UserIDRequest{
+		UserId: token.UserID,
+	}
+
+	res, err := h.userClient.DeleteUser(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot update user: " + err.Error()},

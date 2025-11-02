@@ -331,27 +331,27 @@ func (x *UploadFileRequest) GetFileData() []byte {
 	return nil
 }
 
-type GetUserRequest struct {
+type UserIDRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetUserRequest) Reset() {
-	*x = GetUserRequest{}
+func (x *UserIDRequest) Reset() {
+	*x = UserIDRequest{}
 	mi := &file_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetUserRequest) String() string {
+func (x *UserIDRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetUserRequest) ProtoMessage() {}
+func (*UserIDRequest) ProtoMessage() {}
 
-func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
+func (x *UserIDRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -363,12 +363,12 @@ func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
-func (*GetUserRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use UserIDRequest.ProtoReflect.Descriptor instead.
+func (*UserIDRequest) Descriptor() ([]byte, []int) {
 	return file_user_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *GetUserRequest) GetUserId() string {
+func (x *UserIDRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
@@ -401,16 +401,18 @@ const file_user_proto_rawDesc = "" +
 	"\x11UploadFileRequest\x12\x1a\n" +
 	"\bfilename\x18\x01 \x01(\tR\bfilename\x12!\n" +
 	"\fcontent_type\x18\x02 \x01(\tR\vcontentType\x12\x1b\n" +
-	"\tfile_data\x18\x03 \x01(\fR\bfileData\")\n" +
-	"\x0eGetUserRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId2\xf1\x01\n" +
+	"\tfile_data\x18\x03 \x01(\fR\bfileData\"(\n" +
+	"\rUserIDRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId2\xa7\x02\n" +
 	"\vUserService\x129\n" +
 	"\n" +
 	"CreateUser\x12\x17.user.CreateUserRequest\x1a\x12.user.UserResponse\x127\n" +
 	"\tLoginUser\x12\x16.user.LoginUserRequest\x1a\x12.user.UserResponse\x129\n" +
 	"\n" +
-	"UpdateUser\x12\x17.user.UpdateUserRequest\x1a\x12.user.UserResponse\x123\n" +
-	"\aGetUser\x12\x14.user.GetUserRequest\x1a\x12.user.UserResponseB\x13Z\x11shared/proto/userb\x06proto3"
+	"UpdateUser\x12\x17.user.UpdateUserRequest\x1a\x12.user.UserResponse\x122\n" +
+	"\aGetUser\x12\x13.user.UserIDRequest\x1a\x12.user.UserResponse\x125\n" +
+	"\n" +
+	"DeleteUser\x12\x13.user.UserIDRequest\x1a\x12.user.UserResponseB\x13Z\x11shared/proto/userb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -431,20 +433,22 @@ var file_user_proto_goTypes = []any{
 	(*LoginUserRequest)(nil),  // 2: user.LoginUserRequest
 	(*UpdateUserRequest)(nil), // 3: user.UpdateUserRequest
 	(*UploadFileRequest)(nil), // 4: user.UploadFileRequest
-	(*GetUserRequest)(nil),    // 5: user.GetUserRequest
+	(*UserIDRequest)(nil),     // 5: user.UserIDRequest
 }
 var file_user_proto_depIdxs = []int32{
 	4, // 0: user.UpdateUserRequest.profile:type_name -> user.UploadFileRequest
 	0, // 1: user.UserService.CreateUser:input_type -> user.CreateUserRequest
 	2, // 2: user.UserService.LoginUser:input_type -> user.LoginUserRequest
 	3, // 3: user.UserService.UpdateUser:input_type -> user.UpdateUserRequest
-	5, // 4: user.UserService.GetUser:input_type -> user.GetUserRequest
-	1, // 5: user.UserService.CreateUser:output_type -> user.UserResponse
-	1, // 6: user.UserService.LoginUser:output_type -> user.UserResponse
-	1, // 7: user.UserService.UpdateUser:output_type -> user.UserResponse
-	1, // 8: user.UserService.GetUser:output_type -> user.UserResponse
-	5, // [5:9] is the sub-list for method output_type
-	1, // [1:5] is the sub-list for method input_type
+	5, // 4: user.UserService.GetUser:input_type -> user.UserIDRequest
+	5, // 5: user.UserService.DeleteUser:input_type -> user.UserIDRequest
+	1, // 6: user.UserService.CreateUser:output_type -> user.UserResponse
+	1, // 7: user.UserService.LoginUser:output_type -> user.UserResponse
+	1, // 8: user.UserService.UpdateUser:output_type -> user.UserResponse
+	1, // 9: user.UserService.GetUser:output_type -> user.UserResponse
+	1, // 10: user.UserService.DeleteUser:output_type -> user.UserResponse
+	6, // [6:11] is the sub-list for method output_type
+	1, // [1:6] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name

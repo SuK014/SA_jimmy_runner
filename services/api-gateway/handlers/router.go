@@ -8,18 +8,18 @@ import (
 func HandlerUsers(handler HTTPHandler, app *fiber.App) {
 	user := app.Group("/users")
 	user.Post("/register", handler.CreateUser)
-	// user.Get("/get_all", gateway.GetAllUserData)
-	// user.Get("/get", gateway.GetByID)
+	// user.Get("/get_all", handler.GetAllUserData)
+	// user.Get("/get", handler.GetByID)
 	user.Put("/update", middlewares.SetJWtHeaderHandler(), handler.UpdateUser)
 	user.Get("/", middlewares.SetJWtHeaderHandler(), handler.GetUser)
-	// user.Delete("/delete", gateway.DeleteUser)
+	user.Delete("/", middlewares.SetJWtHeaderHandler(), handler.DeleteUser)
 
 	// auth := app.Group("/auth")
 	// // check to login with token if not pass go to login with password
-	// auth.Get("/check_token", middlewares.SetJWtHeaderHandler(), gateway.checkToken)
-	// auth.Post("/register", gateway.Register)
+	// auth.Get("/check_token", middlewares.SetJWtHeaderHandler(), handler.checkToken)
+	// auth.Post("/register", handler.Register)
 	user.Post("/login", handler.Login)
-	// auth.Post("/logout", middlewares.SetJWtHeaderHandler(), gateway.Logout)
+	// auth.Post("/logout", middlewares.SetJWtHeaderHandler(), handler.Logout)
 }
 func HandlerPlans(handler HTTPHandler, app *fiber.App) {
 	plan := app.Group("/plan")

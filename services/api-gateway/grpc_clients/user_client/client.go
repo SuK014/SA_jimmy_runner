@@ -53,6 +53,10 @@ func (ds *UserServiceClient) UpdateUser(ctx context.Context, req *pb.UpdateUserR
 	return ds.Client.UpdateUser(ctx, req)
 }
 
-func (ds *UserServiceClient) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.UserResponse, error) {
+func (ds *UserServiceClient) GetUser(ctx context.Context, req *pb.UserIDRequest) (*pb.UserResponse, error) {
 	return ds.Client.GetUser(ctx, req)
+}
+
+func (ds *UserServiceClient) DeleteUser(ctx context.Context, req *pb.UserIDRequest) (*pb.UserResponse, error) {
+	return ds.Client.DeleteUser(ctx, req)
 }
