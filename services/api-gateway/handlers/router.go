@@ -10,14 +10,14 @@ func HandlerUsers(handler HTTPHandler, app *fiber.App) {
 	user.Post("/register", handler.CreateUser)
 	// user.Get("/get_all", gateway.GetAllUserData)
 	// user.Get("/get", gateway.GetByID)
-	// user.Put("/update", gateway.UpdateUser)
+	user.Put("/update", handler.UpdateUser)
 	// user.Delete("/delete", gateway.DeleteUser)
 
 	// auth := app.Group("/auth")
 	// // check to login with token if not pass go to login with password
 	// auth.Get("/check_token", middlewares.SetJWtHeaderHandler(), gateway.checkToken)
 	// auth.Post("/register", gateway.Register)
-	// auth.Post("/login", gateway.Login)
+	user.Post("/login", handler.Login)
 	// auth.Post("/logout", middlewares.SetJWtHeaderHandler(), gateway.Logout)
 }
 func HandlerPlans(handler HTTPHandler, app *fiber.App) {

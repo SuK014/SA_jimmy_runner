@@ -7,6 +7,7 @@ import (
 
 	"context"
 
+	"github.com/SuK014/SA_jimmy_runner/shared/utils"
 	"google.golang.org/grpc"
 )
 
@@ -23,7 +24,7 @@ func NewGRPCHandler(server *grpc.Server, service services.IUsersService) (*gRPCH
 	return handler, nil
 }
 
-func (h *gRPCHandler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+func (h *gRPCHandler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.UserResponse, error) {
 
 	user := entities.CreatedUserModel{
 		Name:     req.GetDisplayName(),
@@ -36,10 +37,66 @@ func (h *gRPCHandler) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, err
 	}
 
-	return &pb.CreateUserResponse{
+	return &pb.UserResponse{
 		Success:     true,
 		UserId:      res.UserID,
 		DisplayName: res.Name,
 		Email:       res.Email,
+		Profile:     res.Profile,
+	}, nil
+}
+
+func (h *gRPCHandler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.UserResponse, error) {
+
+	user := entities.LoginUserModel{
+		Email:    req.GetEmail(),
+		Password: req.GetPassword(),
+	}
+
+	res, err := h.service.Login(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.UserResponse{
+		Success:     true,
+		UserId:      res.UserID,
+		DisplayName: res.Name,
+		Email:       res.Email,
+		Profile:     res.Profile,
+	}, nil
+}
+
+func (h *gRPCHandler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UserResponse, error) {
+
+	profile := req.GetProfile()
+	user_id := req.GetUserId()
+	publicURL, err := utils.UploadToSupabase(
+		profile.GetFileData(),
+		profile.GetFilename(),
+		profile.GetContentType(),
+		user_id,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	user := entities.UpdateUserModel{
+		ID:      user_id,
+		Name:    req.GetName(),
+		Profile: publicURL,
+	}
+
+	res, err := h.service.UpdateUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.UserResponse{
+		Success:     true,
+		UserId:      res.UserID,
+		DisplayName: res.Name,
+		Email:       res.Email,
+		Profile:     res.Profile,
 	}, nil
 }

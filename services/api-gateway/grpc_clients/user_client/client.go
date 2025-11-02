@@ -41,6 +41,14 @@ func (ds *UserServiceClient) Close() {
 	}
 }
 
-func (ds *UserServiceClient) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+func (ds *UserServiceClient) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.UserResponse, error) {
 	return ds.Client.CreateUser(ctx, req)
+}
+
+func (ds *UserServiceClient) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.UserResponse, error) {
+	return ds.Client.LoginUser(ctx, req)
+}
+
+func (ds *UserServiceClient) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UserResponse, error) {
+	return ds.Client.UpdateUser(ctx, req)
 }

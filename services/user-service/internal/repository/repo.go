@@ -20,7 +20,7 @@ type IUsersRepository interface {
 	FindAll() (*[]entities.UserDataModel, error)
 	FindByID(userID string) (*entities.UserDataModel, error)
 	FindByEmail(email string) (*entities.UserDataModel, error)
-	UpdateUser(data entities.UserDataModel) (*entities.UserDataModel, error)
+	UpdateUser(data entities.UpdateUserModel) (*entities.UserDataModel, error)
 	DeleteUser(userID string) error
 }
 
@@ -135,13 +135,12 @@ func (repo *usersRepository) FindByEmail(email string) (*entities.UserDataModel,
 	}, nil
 }
 
-func (repo *usersRepository) UpdateUser(data entities.UserDataModel) (*entities.UserDataModel, error) {
+func (repo *usersRepository) UpdateUser(data entities.UpdateUserModel) (*entities.UserDataModel, error) {
 	updatedUser, err := repo.Collection.User.
-		FindUnique(db.User.UserID.Equals(data.UserID)).
+		FindUnique(db.User.UserID.Equals(data.ID)).
 		Update(
 			db.User.Name.Set(data.Name),
-			db.User.Email.Set(data.Email),
-			db.User.Password.Set(data.Password),
+			db.User.ProfileURL.Set(data.Profile),
 		).
 		Exec(repo.Context)
 	if err != nil {
