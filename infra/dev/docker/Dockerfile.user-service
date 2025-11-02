@@ -1,0 +1,39 @@
+# User Service Dockerfile
+FROM golang:1.25-alpine AS builder
+
+WORKDIR /app
+
+# Copy go mod files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the entire project (needed for shared dependencies)
+COPY . .
+
+# Generate Prisma client and download query engine
+WORKDIR /app/services/user-service
+RUN go run github.com/steebchen/prisma-client-go generate --schema=./internal/store/prisma/schema.prisma
+
+# Build the user service
+WORKDIR /app/services/user-service/cmd
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /user-service .
+
+# Final stage
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates openssl
+
+WORKDIR /root/
+
+# Copy the binary from builder
+COPY --from=builder /user-service .
+
+# Copy Prisma query engine
+COPY --from=builder /root/.cache/prisma/binaries /root/.cache/prisma/binaries
+
+# Copy shared env (optional, better to use ConfigMap/Secrets)
+COPY --from=builder /app/shared/env/.env ./shared/env/.env
+
+EXPOSE 50051
+
+CMD ["./user-service"]

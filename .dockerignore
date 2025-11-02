@@ -1,16 +1,42 @@
-# Exclude directories
+# Git
 .git/
+.gitignore
+
+# Dependencies
 node_modules/
-web/
+
+# Build outputs
 dist/
+tmp/
 *.log
 
-# Exclude editor and OS files
+# Editor and OS files
 .idea/
 .vscode/
 .DS_Store
+*.swp
+*.swo
 
-# Include shared code
-!shared/
+# Test files
+*_test.go
+**/*_test.go
 
+# Documentation
+*.md
+!README.md
+
+# Scripts
+*.bat
+*.sh
+
+# Kubernetes and Docker
+infra/
+k8s/
+docker-compose*.yaml
+Tiltfile
+
+# Proto files (already compiled)
 proto/
+
+# Important: Include shared code
+!shared/
