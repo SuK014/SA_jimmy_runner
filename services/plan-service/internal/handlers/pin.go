@@ -22,7 +22,7 @@ func (h *gRPCHandler) CreatePin(ctx context.Context, req *pb.CreatePinRequest) (
 		Description:  req.GetDescription(),
 		Expenses:     expenseEntities,
 		Location:     req.GetLocation(),
-		Parents:      req.GetParticipant(),
+		Parents:      req.GetParents(),
 		Participants: req.GetParticipant(),
 	}
 
@@ -91,6 +91,29 @@ func (h *gRPCHandler) GetPinByParticipant(ctx context.Context, req *pb.GetPinByP
 	}, nil
 }
 
+func (h *gRPCHandler) GetPinsByWhiteboard(ctx context.Context, req *pb.ManyPinIDRequest) (*pb.GetPinsResponse, error) {
+
+	res, err := h.PinService.FindManyByID(req.GetPins())
+	if err != nil {
+		return nil, err
+	}
+
+	var pins []*pb.GetPinResponse
+	for _, pinData := range *res {
+		pins = append(pins, &pb.GetPinResponse{
+			Name:        pinData.Name,
+			PinId:       pinData.PinID,
+			Image:       pinData.Image,
+			Parents:     pinData.Parents,
+			Participant: pinData.Participants,
+		})
+	}
+
+	return &pb.GetPinsResponse{
+		Pins: pins,
+	}, nil
+}
+
 func (h *gRPCHandler) UpdatePin(ctx context.Context, req *pb.UpdatePinRequest) (*pb.SuccessResponse, error) {
 	expense := req.GetExpense()
 	var expenseEntities []entities.Expense
@@ -132,6 +155,16 @@ func (h *gRPCHandler) UpdatePinImage(ctx context.Context, req *pb.UpdatePinImage
 
 func (h *gRPCHandler) DeletePinByID(ctx context.Context, req *pb.PinIDRequest) (*pb.SuccessResponse, error) {
 	if err := h.PinService.DeletePinByID(req.GetPinId()); err != nil {
+		return nil, err
+	}
+
+	return &pb.SuccessResponse{
+		Success: true,
+	}, nil
+}
+
+func (h *gRPCHandler) DeletePinByWhiteboard(ctx context.Context, req *pb.ManyPinIDRequest) (*pb.SuccessResponse, error) {
+	if err := h.PinService.DeleteManyByID(req.GetPins()); err != nil {
 		return nil, err
 	}
 

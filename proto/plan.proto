@@ -12,10 +12,12 @@ service PlansService {
   // Create a new user
   rpc CreatePin(CreatePinRequest) returns (CreatePinResponse);
   rpc GetPinByID(PinIDRequest) returns (GetPinByIDResponse);
+  rpc GetPinsByWhiteboard(ManyPinIDRequest) returns (GetPinsResponse);
   rpc GetPinByParticipant(GetPinByParticipantRequest) returns (GetPinsResponse);
   rpc UpdatePin(UpdatePinRequest) returns (SuccessResponse);
   rpc UpdatePinImage(UpdatePinImageRequest) returns (SuccessResponse);
   rpc DeletePinByID(PinIDRequest) returns (SuccessResponse);
+  rpc DeletePinByWhiteboard(ManyPinIDRequest) returns (SuccessResponse);
 
   rpc CreateWhiteboard(CreateWhiteboardRequest) returns (CreateWhiteboardResponse);
   rpc GetWhiteboardByID(WhiteboardIDRequest) returns (GetWhiteboardByIDResponse);
@@ -56,6 +58,10 @@ message GetPinByIDResponse {
     float location = 6;
     repeated string parents = 7;
     repeated string participant = 8;
+}
+
+message ManyPinIDRequest { // for getPinByID and DeletePinByID
+  repeated string pins = 1;
 }
 
 message GetPinByParticipantRequest {
@@ -120,6 +126,6 @@ message GetWhiteboardByIDResponse {
 message UpdateWhiteboardRequest {
   string id = 1;
   repeated string pins = 2;
-  string pinChangeType = 3;
+  string pinChangeType = 3; // add, remove, set
   int32 day = 4;
 }

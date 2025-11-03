@@ -14,6 +14,12 @@ import (
 
 // CreateUser handles REST requests and forwards them to gRPC
 func (h *HTTPHandler) CreatePin(ctx *fiber.Ctx) error {
+	whiteboardID := ctx.Query("whiteboard_id")
+	if whiteboardID == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'id' query parameter"},
+		)
+	}
 	bodyData := entities.CreatedPinModel{}
 	if err := ctx.BodyParser(&bodyData); err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(
@@ -42,7 +48,18 @@ func (h *HTTPHandler) CreatePin(ctx *fiber.Ctx) error {
 	res, err := h.planClient.CreatePin(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot insert new user account: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot create new pin: " + err.Error()},
+		)
+	}
+
+	whiteboardReq := &pb.UpdateWhiteboardRequest{
+		Id:            whiteboardID,
+		Pins:          []string{res.GetPinId()},
+		PinChangeType: "add",
+	}
+	if _, err = h.planClient.UpdateWhiteboard(context.Background(), whiteboardReq); err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot auto update whiteboard: " + err.Error()},
 		)
 	}
 
@@ -198,6 +215,12 @@ func (h *HTTPHandler) DeletePinByID(ctx *fiber.Ctx) error {
 			entities.ResponseMessage{Message: "missing or empty 'id' query parameter"},
 		)
 	}
+	whiteboardID := ctx.Query("whiteboard_id")
+	if whiteboardID == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'id' query parameter"},
+		)
+	}
 
 	req := &pb.PinIDRequest{
 		PinId: id,
@@ -207,6 +230,17 @@ func (h *HTTPHandler) DeletePinByID(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot get pin by id: " + err.Error()},
+		)
+	}
+
+	whiteboardReq := &pb.UpdateWhiteboardRequest{
+		Id:            whiteboardID,
+		Pins:          []string{id},
+		PinChangeType: "remove",
+	}
+	if _, err = h.planClient.UpdateWhiteboard(context.Background(), whiteboardReq); err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot auto update whiteboard: " + err.Error()},
 		)
 	}
 

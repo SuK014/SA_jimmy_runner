@@ -24,9 +24,11 @@ type IPinsRepository interface {
 	InsertPin(data entities.CreatedPinModel) (string, error)
 	FindByID(pinID primitive.ObjectID) (*entities.PinDataModel, error)
 	FindByParticipant(userID string) (*[]entities.PinDataModel, error)
+	FindManyByID(pinIDs []primitive.ObjectID) (*[]entities.PinDataModel, error)
 	UpdatePin(pinID primitive.ObjectID, data entities.UpdatedPinModel) error
 	UpdatePinImage(pinID primitive.ObjectID, image []byte) error
 	DeletePinByID(pinID primitive.ObjectID) error
+	DeleteManyByID(pinIDs []primitive.ObjectID) error
 }
 
 func NewPinsRepository(db *MongoDB) IPinsRepository {
@@ -58,6 +60,26 @@ func (repo *pinsRepository) FindByID(pinID primitive.ObjectID) (*entities.PinDat
 
 func (repo *pinsRepository) FindByParticipant(userID string) (*[]entities.PinDataModel, error) {
 	filter := bson.M{"participants": userID}
+	cursor, err := repo.Collection.Find(repo.Context, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(repo.Context)
+
+	var pins []entities.PinDataModel
+	if err := cursor.All(repo.Context, &pins); err != nil {
+		return nil, err
+	}
+
+	for i := range pins {
+		pins[i].PinID = pins[i].ID.Hex()
+	}
+
+	return &pins, nil
+}
+
+func (repo *pinsRepository) FindManyByID(pinIDs []primitive.ObjectID) (*[]entities.PinDataModel, error) {
+	filter := bson.M{"_id": bson.M{"$in": pinIDs}}
 	cursor, err := repo.Collection.Find(repo.Context, filter)
 	if err != nil {
 		return nil, err
@@ -128,6 +150,21 @@ func (repo *pinsRepository) DeletePinByID(pinID primitive.ObjectID) error {
 
 	if result.DeletedCount == 0 {
 		fiberlog.Warnf("Pins -> DeletePinByID: No document found with ID: %s \n", pinID.Hex())
+		return errors.New("pin not found")
+	}
+	return nil
+}
+
+func (repo *pinsRepository) DeleteManyByID(pinIDs []primitive.ObjectID) error {
+	filter := bson.M{"_id": bson.M{"$in": pinIDs}}
+	result, err := repo.Collection.DeleteMany(repo.Context, filter)
+	if err != nil {
+		fiberlog.Errorf("Pins -> DeleteManyByID: %s \n", err)
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		fiberlog.Warnf("Pins -> DeleteManyByID: No document found with ID: %s \n", pinIDs)
 		return errors.New("pin not found")
 	}
 	return nil

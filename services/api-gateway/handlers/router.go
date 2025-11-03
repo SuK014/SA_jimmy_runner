@@ -23,7 +23,7 @@ func HandlerUsers(handler HTTPHandler, app *fiber.App) {
 }
 func HandlerPlans(handler HTTPHandler, app *fiber.App) {
 	plan := app.Group("/plan")
-	plan.Get("/participants", middlewares.SetJWtHeaderHandler(), handler.GetParticipantsByPinID)
+	plan.Get("/participants/pin", middlewares.SetJWtHeaderHandler(), handler.GetParticipantsByPinID)
 
 	pin := plan.Group("/pin")
 	pin.Post("/", middlewares.SetJWtHeaderHandler(), handler.CreatePin)
@@ -32,4 +32,10 @@ func HandlerPlans(handler HTTPHandler, app *fiber.App) {
 	pin.Put("/", middlewares.SetJWtHeaderHandler(), handler.UpdatePinByID)
 	pin.Put("/image", middlewares.SetJWtHeaderHandler(), handler.UpdatePinImageByID)
 	pin.Delete("/", middlewares.SetJWtHeaderHandler(), handler.DeletePinByID)
+
+	whiteboard := plan.Group("/whiteboard")
+	whiteboard.Post("/", middlewares.SetJWtHeaderHandler(), handler.CreateWhiteboard) // create whiteboard and one default pin
+	whiteboard.Get("/", middlewares.SetJWtHeaderHandler(), handler.GetWhiteboardByID)
+	whiteboard.Put("/", middlewares.SetJWtHeaderHandler(), handler.UpdateWhiteboardByID)
+	whiteboard.Delete("/", middlewares.SetJWtHeaderHandler(), handler.DeleteWhiteboardByID)
 }

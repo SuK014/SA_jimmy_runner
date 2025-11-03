@@ -19,16 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PlansService_CreatePin_FullMethodName            = "/plan.PlansService/CreatePin"
-	PlansService_GetPinByID_FullMethodName           = "/plan.PlansService/GetPinByID"
-	PlansService_GetPinByParticipant_FullMethodName  = "/plan.PlansService/GetPinByParticipant"
-	PlansService_UpdatePin_FullMethodName            = "/plan.PlansService/UpdatePin"
-	PlansService_UpdatePinImage_FullMethodName       = "/plan.PlansService/UpdatePinImage"
-	PlansService_DeletePinByID_FullMethodName        = "/plan.PlansService/DeletePinByID"
-	PlansService_CreateWhiteboard_FullMethodName     = "/plan.PlansService/CreateWhiteboard"
-	PlansService_GetWhiteboardByID_FullMethodName    = "/plan.PlansService/GetWhiteboardByID"
-	PlansService_UpdateWhiteboard_FullMethodName     = "/plan.PlansService/UpdateWhiteboard"
-	PlansService_DeleteWhiteboardByID_FullMethodName = "/plan.PlansService/DeleteWhiteboardByID"
+	PlansService_CreatePin_FullMethodName             = "/plan.PlansService/CreatePin"
+	PlansService_GetPinByID_FullMethodName            = "/plan.PlansService/GetPinByID"
+	PlansService_GetPinsByWhiteboard_FullMethodName   = "/plan.PlansService/GetPinsByWhiteboard"
+	PlansService_GetPinByParticipant_FullMethodName   = "/plan.PlansService/GetPinByParticipant"
+	PlansService_UpdatePin_FullMethodName             = "/plan.PlansService/UpdatePin"
+	PlansService_UpdatePinImage_FullMethodName        = "/plan.PlansService/UpdatePinImage"
+	PlansService_DeletePinByID_FullMethodName         = "/plan.PlansService/DeletePinByID"
+	PlansService_DeletePinByWhiteboard_FullMethodName = "/plan.PlansService/DeletePinByWhiteboard"
+	PlansService_CreateWhiteboard_FullMethodName      = "/plan.PlansService/CreateWhiteboard"
+	PlansService_GetWhiteboardByID_FullMethodName     = "/plan.PlansService/GetWhiteboardByID"
+	PlansService_UpdateWhiteboard_FullMethodName      = "/plan.PlansService/UpdateWhiteboard"
+	PlansService_DeleteWhiteboardByID_FullMethodName  = "/plan.PlansService/DeleteWhiteboardByID"
 )
 
 // PlansServiceClient is the client API for PlansService service.
@@ -40,10 +42,12 @@ type PlansServiceClient interface {
 	// Create a new user
 	CreatePin(ctx context.Context, in *CreatePinRequest, opts ...grpc.CallOption) (*CreatePinResponse, error)
 	GetPinByID(ctx context.Context, in *PinIDRequest, opts ...grpc.CallOption) (*GetPinByIDResponse, error)
+	GetPinsByWhiteboard(ctx context.Context, in *ManyPinIDRequest, opts ...grpc.CallOption) (*GetPinsResponse, error)
 	GetPinByParticipant(ctx context.Context, in *GetPinByParticipantRequest, opts ...grpc.CallOption) (*GetPinsResponse, error)
 	UpdatePin(ctx context.Context, in *UpdatePinRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	UpdatePinImage(ctx context.Context, in *UpdatePinImageRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	DeletePinByID(ctx context.Context, in *PinIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	DeletePinByWhiteboard(ctx context.Context, in *ManyPinIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	CreateWhiteboard(ctx context.Context, in *CreateWhiteboardRequest, opts ...grpc.CallOption) (*CreateWhiteboardResponse, error)
 	GetWhiteboardByID(ctx context.Context, in *WhiteboardIDRequest, opts ...grpc.CallOption) (*GetWhiteboardByIDResponse, error)
 	UpdateWhiteboard(ctx context.Context, in *UpdateWhiteboardRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
@@ -72,6 +76,16 @@ func (c *plansServiceClient) GetPinByID(ctx context.Context, in *PinIDRequest, o
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetPinByIDResponse)
 	err := c.cc.Invoke(ctx, PlansService_GetPinByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *plansServiceClient) GetPinsByWhiteboard(ctx context.Context, in *ManyPinIDRequest, opts ...grpc.CallOption) (*GetPinsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPinsResponse)
+	err := c.cc.Invoke(ctx, PlansService_GetPinsByWhiteboard_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +126,16 @@ func (c *plansServiceClient) DeletePinByID(ctx context.Context, in *PinIDRequest
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SuccessResponse)
 	err := c.cc.Invoke(ctx, PlansService_DeletePinByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *plansServiceClient) DeletePinByWhiteboard(ctx context.Context, in *ManyPinIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SuccessResponse)
+	err := c.cc.Invoke(ctx, PlansService_DeletePinByWhiteboard_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -167,10 +191,12 @@ type PlansServiceServer interface {
 	// Create a new user
 	CreatePin(context.Context, *CreatePinRequest) (*CreatePinResponse, error)
 	GetPinByID(context.Context, *PinIDRequest) (*GetPinByIDResponse, error)
+	GetPinsByWhiteboard(context.Context, *ManyPinIDRequest) (*GetPinsResponse, error)
 	GetPinByParticipant(context.Context, *GetPinByParticipantRequest) (*GetPinsResponse, error)
 	UpdatePin(context.Context, *UpdatePinRequest) (*SuccessResponse, error)
 	UpdatePinImage(context.Context, *UpdatePinImageRequest) (*SuccessResponse, error)
 	DeletePinByID(context.Context, *PinIDRequest) (*SuccessResponse, error)
+	DeletePinByWhiteboard(context.Context, *ManyPinIDRequest) (*SuccessResponse, error)
 	CreateWhiteboard(context.Context, *CreateWhiteboardRequest) (*CreateWhiteboardResponse, error)
 	GetWhiteboardByID(context.Context, *WhiteboardIDRequest) (*GetWhiteboardByIDResponse, error)
 	UpdateWhiteboard(context.Context, *UpdateWhiteboardRequest) (*SuccessResponse, error)
@@ -191,6 +217,9 @@ func (UnimplementedPlansServiceServer) CreatePin(context.Context, *CreatePinRequ
 func (UnimplementedPlansServiceServer) GetPinByID(context.Context, *PinIDRequest) (*GetPinByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPinByID not implemented")
 }
+func (UnimplementedPlansServiceServer) GetPinsByWhiteboard(context.Context, *ManyPinIDRequest) (*GetPinsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPinsByWhiteboard not implemented")
+}
 func (UnimplementedPlansServiceServer) GetPinByParticipant(context.Context, *GetPinByParticipantRequest) (*GetPinsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPinByParticipant not implemented")
 }
@@ -202,6 +231,9 @@ func (UnimplementedPlansServiceServer) UpdatePinImage(context.Context, *UpdatePi
 }
 func (UnimplementedPlansServiceServer) DeletePinByID(context.Context, *PinIDRequest) (*SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePinByID not implemented")
+}
+func (UnimplementedPlansServiceServer) DeletePinByWhiteboard(context.Context, *ManyPinIDRequest) (*SuccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePinByWhiteboard not implemented")
 }
 func (UnimplementedPlansServiceServer) CreateWhiteboard(context.Context, *CreateWhiteboardRequest) (*CreateWhiteboardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateWhiteboard not implemented")
@@ -268,6 +300,24 @@ func _PlansService_GetPinByID_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PlansServiceServer).GetPinByID(ctx, req.(*PinIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlansService_GetPinsByWhiteboard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ManyPinIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).GetPinsByWhiteboard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_GetPinsByWhiteboard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).GetPinsByWhiteboard(ctx, req.(*ManyPinIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -340,6 +390,24 @@ func _PlansService_DeletePinByID_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PlansServiceServer).DeletePinByID(ctx, req.(*PinIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlansService_DeletePinByWhiteboard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ManyPinIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).DeletePinByWhiteboard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_DeletePinByWhiteboard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).DeletePinByWhiteboard(ctx, req.(*ManyPinIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -432,6 +500,10 @@ var PlansService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PlansService_GetPinByID_Handler,
 		},
 		{
+			MethodName: "GetPinsByWhiteboard",
+			Handler:    _PlansService_GetPinsByWhiteboard_Handler,
+		},
+		{
 			MethodName: "GetPinByParticipant",
 			Handler:    _PlansService_GetPinByParticipant_Handler,
 		},
@@ -446,6 +518,10 @@ var PlansService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePinByID",
 			Handler:    _PlansService_DeletePinByID_Handler,
+		},
+		{
+			MethodName: "DeletePinByWhiteboard",
+			Handler:    _PlansService_DeletePinByWhiteboard_Handler,
 		},
 		{
 			MethodName: "CreateWhiteboard",

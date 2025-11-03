@@ -41,6 +41,7 @@ func (ds *PlansServiceClient) Close() {
 	}
 }
 
+// pins
 func (ds *PlansServiceClient) CreateUser(ctx context.Context, req *pb.CreatePinRequest) (*pb.CreatePinResponse, error) {
 	return ds.Client.CreatePin(ctx, req)
 }
@@ -53,6 +54,10 @@ func (ds *PlansServiceClient) GetPinByParticipant(ctx context.Context, req *pb.G
 	return ds.Client.GetPinByParticipant(ctx, req)
 }
 
+func (ds *PlansServiceClient) GetPinsByWhiteboard(ctx context.Context, req *pb.ManyPinIDRequest) (*pb.GetPinsResponse, error) {
+	return ds.Client.GetPinsByWhiteboard(ctx, req)
+}
+
 func (ds *PlansServiceClient) UpdatePin(ctx context.Context, req *pb.UpdatePinRequest) (*pb.SuccessResponse, error) {
 	return ds.Client.UpdatePin(ctx, req)
 }
@@ -63,4 +68,21 @@ func (ds *PlansServiceClient) UpdatePinImage(ctx context.Context, req *pb.Update
 
 func (ds *PlansServiceClient) DeletePinByID(ctx context.Context, req *pb.PinIDRequest) (*pb.SuccessResponse, error) {
 	return ds.Client.DeletePinByID(ctx, req)
+}
+
+// whiteboards
+func (ds *PlansServiceClient) CreateWhiteboard(ctx context.Context, req *pb.CreateWhiteboardRequest) (*pb.CreateWhiteboardResponse, error) {
+	return ds.Client.CreateWhiteboard(ctx, req)
+}
+
+func (ds *PlansServiceClient) GetWhiteboardByID(ctx context.Context, req *pb.WhiteboardIDRequest) (*pb.GetWhiteboardByIDResponse, error) {
+	return ds.Client.GetWhiteboardByID(ctx, req)
+}
+
+func (ds *PlansServiceClient) UpdateWhiteboard(ctx context.Context, req *pb.UpdateWhiteboardRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.UpdateWhiteboard(ctx, req)
+}
+
+func (ds *PlansServiceClient) DeleteWhiteboardByID(ctx context.Context, req *pb.WhiteboardIDRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.DeleteWhiteboardByID(ctx, req)
 }

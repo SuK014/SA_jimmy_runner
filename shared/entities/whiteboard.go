@@ -12,8 +12,8 @@ type WhiteboardDataModel struct {
 }
 
 type CreatedWhiteboardModel struct {
-	Pins []string `json:"pins" bson:"pins"`
-	Day  int      `json:"day" bson:"day"`
+	Pins []string `bson:"pin"`
+	Day  int      `bson:"day"`
 }
 
 type UpdatedWhiteboardModel struct {
