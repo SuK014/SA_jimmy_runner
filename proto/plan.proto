@@ -4,12 +4,8 @@ package plan;
 
 option go_package = "shared/proto/plan";
 
-// User service definition
 service PlansService {
-  // Get a single user by ID
-//   rpc GetUser(GetUserRequest) returns (GetUserResponse);
-  
-  // Create a new user
+  // pin
   rpc CreatePin(CreatePinRequest) returns (CreatePinResponse);
   rpc GetPinByID(PinIDRequest) returns (GetPinByIDResponse);
   rpc GetPinsByWhiteboard(ManyPinIDRequest) returns (GetPinsResponse);
@@ -19,10 +15,18 @@ service PlansService {
   rpc DeletePinByID(PinIDRequest) returns (SuccessResponse);
   rpc DeletePinByWhiteboard(ManyPinIDRequest) returns (SuccessResponse);
 
+  // whiteboard
   rpc CreateWhiteboard(CreateWhiteboardRequest) returns (CreateWhiteboardResponse);
   rpc GetWhiteboardByID(WhiteboardIDRequest) returns (GetWhiteboardByIDResponse);
   rpc UpdateWhiteboard(UpdateWhiteboardRequest) returns (SuccessResponse);
   rpc DeleteWhiteboardByID(WhiteboardIDRequest) returns (SuccessResponse);
+
+  // trip
+  rpc CreateTrip(CreateTripRequest) returns (CreateTripResponse);
+  rpc GetTripByID(TripIDRequest) returns (GetTripByIDResponse);
+  rpc UpdateTrip(UpdateTripRequest) returns (SuccessResponse);
+  rpc UpdateTripImage(UpdateTripImageRequest) returns (SuccessResponse);
+  rpc DeleteTripByID(TripIDRequest) returns (SuccessResponse);
 }
 
 // shared
@@ -128,4 +132,38 @@ message UpdateWhiteboardRequest {
   repeated string pins = 2;
   string pinChangeType = 3; // add, remove, set
   int32 day = 4;
+}
+
+
+// trip
+message CreateTripRequest {
+  string pin = 1;
+  int32 day = 2;
+}
+
+message CreateTripResponse {
+  bool success = 1;
+  string whiteboardId = 2; //objectId AS a string
+}
+
+message TripIDRequest { // for getWhiteboardByID and DeleteWhiteboardByID
+  string whiteboardId = 1;
+}
+
+message GetTripByIDResponse {
+    bool success = 1;
+    repeated string pins = 2;
+    int32 day = 3;
+}
+
+message UpdateTripRequest {
+  string id = 1;
+  repeated string pins = 2;
+  string pinChangeType = 3; // add, remove, set
+  int32 day = 4;
+}
+
+message UpdateTripImageRequest {
+  string id = 1;
+  bytes image = 2;
 }

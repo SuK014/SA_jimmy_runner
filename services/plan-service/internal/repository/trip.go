@@ -24,6 +24,7 @@ type ITripsRepository interface {
 	InsertTrip(data entities.CreatedTripModel) (string, error)
 	FindByID(tripID primitive.ObjectID) (*entities.TripDataModel, error)
 	UpdateTrip(tripID primitive.ObjectID, data entities.UpdatedTripModel) error
+	UpdateTripImage(tripID primitive.ObjectID, image []byte) error
 	DeleteTripByID(tripID primitive.ObjectID) error
 }
 
@@ -88,6 +89,27 @@ func (repo *tripsRepository) UpdateTrip(tripID primitive.ObjectID, data entities
 	result, err := repo.Collection.UpdateOne(repo.Context, filter, update)
 	if err != nil {
 		fiberlog.Errorf("Trips -> UpdateTrip: %s \n", err)
+		return err
+	}
+
+	// Check if any document was modified
+	if result.MatchedCount == 0 {
+		fiberlog.Warnf("Trips -> UpdateTrip: No document found with ID: %s \n", tripID.Hex())
+		return errors.New("trip not found")
+	}
+
+	return nil
+}
+
+func (repo *tripsRepository) UpdateTripImage(tripID primitive.ObjectID, image []byte) error {
+
+	filter := bson.M{"_id": tripID}
+	update := bson.M{"$set": bson.M{"image": image}}
+
+	// Perform the update operation
+	result, err := repo.Collection.UpdateOne(repo.Context, filter, update)
+	if err != nil {
+		fiberlog.Errorf("Trips -> UpdateTripImage: %s \n", err)
 		return err
 	}
 

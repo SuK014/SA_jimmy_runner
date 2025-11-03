@@ -112,7 +112,7 @@ func (repo *pinsRepository) UpdatePin(pinID primitive.ObjectID, data entities.Up
 
 	// Check if any document was modified
 	if result.MatchedCount == 0 {
-		fiberlog.Warnf("Pins -> UpdatePin: No document found with ID: %s \n", pinID)
+		fiberlog.Warnf("Pins -> UpdatePin: No document found with ID: %s \n", pinID.Hex())
 		return errors.New("pin not found")
 	}
 
@@ -133,7 +133,7 @@ func (repo *pinsRepository) UpdatePinImage(pinID primitive.ObjectID, image []byt
 
 	// Check if any document was modified
 	if result.MatchedCount == 0 {
-		fiberlog.Warnf("Pins -> UpdatePin: No document found with ID: %s \n", pinID)
+		fiberlog.Warnf("Pins -> UpdatePin: No document found with ID: %s \n", pinID.Hex())
 		return errors.New("pin not found")
 	}
 

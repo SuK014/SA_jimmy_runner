@@ -31,15 +31,18 @@ const (
 	PlansService_GetWhiteboardByID_FullMethodName     = "/plan.PlansService/GetWhiteboardByID"
 	PlansService_UpdateWhiteboard_FullMethodName      = "/plan.PlansService/UpdateWhiteboard"
 	PlansService_DeleteWhiteboardByID_FullMethodName  = "/plan.PlansService/DeleteWhiteboardByID"
+	PlansService_CreateTrip_FullMethodName            = "/plan.PlansService/CreateTrip"
+	PlansService_GetTripByID_FullMethodName           = "/plan.PlansService/GetTripByID"
+	PlansService_UpdateTrip_FullMethodName            = "/plan.PlansService/UpdateTrip"
+	PlansService_UpdateTripImage_FullMethodName       = "/plan.PlansService/UpdateTripImage"
+	PlansService_DeleteTripByID_FullMethodName        = "/plan.PlansService/DeleteTripByID"
 )
 
 // PlansServiceClient is the client API for PlansService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// User service definition
 type PlansServiceClient interface {
-	// Create a new user
+	// pin
 	CreatePin(ctx context.Context, in *CreatePinRequest, opts ...grpc.CallOption) (*CreatePinResponse, error)
 	GetPinByID(ctx context.Context, in *PinIDRequest, opts ...grpc.CallOption) (*GetPinByIDResponse, error)
 	GetPinsByWhiteboard(ctx context.Context, in *ManyPinIDRequest, opts ...grpc.CallOption) (*GetPinsResponse, error)
@@ -48,10 +51,17 @@ type PlansServiceClient interface {
 	UpdatePinImage(ctx context.Context, in *UpdatePinImageRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	DeletePinByID(ctx context.Context, in *PinIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	DeletePinByWhiteboard(ctx context.Context, in *ManyPinIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	// whiteboard
 	CreateWhiteboard(ctx context.Context, in *CreateWhiteboardRequest, opts ...grpc.CallOption) (*CreateWhiteboardResponse, error)
 	GetWhiteboardByID(ctx context.Context, in *WhiteboardIDRequest, opts ...grpc.CallOption) (*GetWhiteboardByIDResponse, error)
 	UpdateWhiteboard(ctx context.Context, in *UpdateWhiteboardRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	DeleteWhiteboardByID(ctx context.Context, in *WhiteboardIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	// trip
+	CreateTrip(ctx context.Context, in *CreateTripRequest, opts ...grpc.CallOption) (*CreateTripResponse, error)
+	GetTripByID(ctx context.Context, in *TripIDRequest, opts ...grpc.CallOption) (*GetTripByIDResponse, error)
+	UpdateTrip(ctx context.Context, in *UpdateTripRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	UpdateTripImage(ctx context.Context, in *UpdateTripImageRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	DeleteTripByID(ctx context.Context, in *TripIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 }
 
 type plansServiceClient struct {
@@ -182,13 +192,61 @@ func (c *plansServiceClient) DeleteWhiteboardByID(ctx context.Context, in *White
 	return out, nil
 }
 
+func (c *plansServiceClient) CreateTrip(ctx context.Context, in *CreateTripRequest, opts ...grpc.CallOption) (*CreateTripResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateTripResponse)
+	err := c.cc.Invoke(ctx, PlansService_CreateTrip_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *plansServiceClient) GetTripByID(ctx context.Context, in *TripIDRequest, opts ...grpc.CallOption) (*GetTripByIDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetTripByIDResponse)
+	err := c.cc.Invoke(ctx, PlansService_GetTripByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *plansServiceClient) UpdateTrip(ctx context.Context, in *UpdateTripRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SuccessResponse)
+	err := c.cc.Invoke(ctx, PlansService_UpdateTrip_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *plansServiceClient) UpdateTripImage(ctx context.Context, in *UpdateTripImageRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SuccessResponse)
+	err := c.cc.Invoke(ctx, PlansService_UpdateTripImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *plansServiceClient) DeleteTripByID(ctx context.Context, in *TripIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SuccessResponse)
+	err := c.cc.Invoke(ctx, PlansService_DeleteTripByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PlansServiceServer is the server API for PlansService service.
 // All implementations must embed UnimplementedPlansServiceServer
 // for forward compatibility.
-//
-// User service definition
 type PlansServiceServer interface {
-	// Create a new user
+	// pin
 	CreatePin(context.Context, *CreatePinRequest) (*CreatePinResponse, error)
 	GetPinByID(context.Context, *PinIDRequest) (*GetPinByIDResponse, error)
 	GetPinsByWhiteboard(context.Context, *ManyPinIDRequest) (*GetPinsResponse, error)
@@ -197,10 +255,17 @@ type PlansServiceServer interface {
 	UpdatePinImage(context.Context, *UpdatePinImageRequest) (*SuccessResponse, error)
 	DeletePinByID(context.Context, *PinIDRequest) (*SuccessResponse, error)
 	DeletePinByWhiteboard(context.Context, *ManyPinIDRequest) (*SuccessResponse, error)
+	// whiteboard
 	CreateWhiteboard(context.Context, *CreateWhiteboardRequest) (*CreateWhiteboardResponse, error)
 	GetWhiteboardByID(context.Context, *WhiteboardIDRequest) (*GetWhiteboardByIDResponse, error)
 	UpdateWhiteboard(context.Context, *UpdateWhiteboardRequest) (*SuccessResponse, error)
 	DeleteWhiteboardByID(context.Context, *WhiteboardIDRequest) (*SuccessResponse, error)
+	// trip
+	CreateTrip(context.Context, *CreateTripRequest) (*CreateTripResponse, error)
+	GetTripByID(context.Context, *TripIDRequest) (*GetTripByIDResponse, error)
+	UpdateTrip(context.Context, *UpdateTripRequest) (*SuccessResponse, error)
+	UpdateTripImage(context.Context, *UpdateTripImageRequest) (*SuccessResponse, error)
+	DeleteTripByID(context.Context, *TripIDRequest) (*SuccessResponse, error)
 	mustEmbedUnimplementedPlansServiceServer()
 }
 
@@ -246,6 +311,21 @@ func (UnimplementedPlansServiceServer) UpdateWhiteboard(context.Context, *Update
 }
 func (UnimplementedPlansServiceServer) DeleteWhiteboardByID(context.Context, *WhiteboardIDRequest) (*SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteWhiteboardByID not implemented")
+}
+func (UnimplementedPlansServiceServer) CreateTrip(context.Context, *CreateTripRequest) (*CreateTripResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTrip not implemented")
+}
+func (UnimplementedPlansServiceServer) GetTripByID(context.Context, *TripIDRequest) (*GetTripByIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTripByID not implemented")
+}
+func (UnimplementedPlansServiceServer) UpdateTrip(context.Context, *UpdateTripRequest) (*SuccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTrip not implemented")
+}
+func (UnimplementedPlansServiceServer) UpdateTripImage(context.Context, *UpdateTripImageRequest) (*SuccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTripImage not implemented")
+}
+func (UnimplementedPlansServiceServer) DeleteTripByID(context.Context, *TripIDRequest) (*SuccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTripByID not implemented")
 }
 func (UnimplementedPlansServiceServer) mustEmbedUnimplementedPlansServiceServer() {}
 func (UnimplementedPlansServiceServer) testEmbeddedByValue()                      {}
@@ -484,6 +564,96 @@ func _PlansService_DeleteWhiteboardByID_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlansService_CreateTrip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTripRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).CreateTrip(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_CreateTrip_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).CreateTrip(ctx, req.(*CreateTripRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlansService_GetTripByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TripIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).GetTripByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_GetTripByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).GetTripByID(ctx, req.(*TripIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlansService_UpdateTrip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTripRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).UpdateTrip(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_UpdateTrip_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).UpdateTrip(ctx, req.(*UpdateTripRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlansService_UpdateTripImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTripImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).UpdateTripImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_UpdateTripImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).UpdateTripImage(ctx, req.(*UpdateTripImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlansService_DeleteTripByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TripIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).DeleteTripByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_DeleteTripByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).DeleteTripByID(ctx, req.(*TripIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PlansService_ServiceDesc is the grpc.ServiceDesc for PlansService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -538,6 +708,26 @@ var PlansService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteWhiteboardByID",
 			Handler:    _PlansService_DeleteWhiteboardByID_Handler,
+		},
+		{
+			MethodName: "CreateTrip",
+			Handler:    _PlansService_CreateTrip_Handler,
+		},
+		{
+			MethodName: "GetTripByID",
+			Handler:    _PlansService_GetTripByID_Handler,
+		},
+		{
+			MethodName: "UpdateTrip",
+			Handler:    _PlansService_UpdateTrip_Handler,
+		},
+		{
+			MethodName: "UpdateTripImage",
+			Handler:    _PlansService_UpdateTripImage_Handler,
+		},
+		{
+			MethodName: "DeleteTripByID",
+			Handler:    _PlansService_DeleteTripByID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
