@@ -19,12 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PlansService_CreatePin_FullMethodName           = "/plan.PlansService/CreatePin"
-	PlansService_GetPinByID_FullMethodName          = "/plan.PlansService/GetPinByID"
-	PlansService_GetPinByParticipant_FullMethodName = "/plan.PlansService/GetPinByParticipant"
-	PlansService_UpdatePin_FullMethodName           = "/plan.PlansService/UpdatePin"
-	PlansService_UpdatePinImage_FullMethodName      = "/plan.PlansService/UpdatePinImage"
-	PlansService_DeletePinByID_FullMethodName       = "/plan.PlansService/DeletePinByID"
+	PlansService_CreatePin_FullMethodName            = "/plan.PlansService/CreatePin"
+	PlansService_GetPinByID_FullMethodName           = "/plan.PlansService/GetPinByID"
+	PlansService_GetPinByParticipant_FullMethodName  = "/plan.PlansService/GetPinByParticipant"
+	PlansService_UpdatePin_FullMethodName            = "/plan.PlansService/UpdatePin"
+	PlansService_UpdatePinImage_FullMethodName       = "/plan.PlansService/UpdatePinImage"
+	PlansService_DeletePinByID_FullMethodName        = "/plan.PlansService/DeletePinByID"
+	PlansService_CreateWhiteboard_FullMethodName     = "/plan.PlansService/CreateWhiteboard"
+	PlansService_GetWhiteboardByID_FullMethodName    = "/plan.PlansService/GetWhiteboardByID"
+	PlansService_UpdateWhiteboard_FullMethodName     = "/plan.PlansService/UpdateWhiteboard"
+	PlansService_DeleteWhiteboardByID_FullMethodName = "/plan.PlansService/DeleteWhiteboardByID"
 )
 
 // PlansServiceClient is the client API for PlansService service.
@@ -40,6 +44,10 @@ type PlansServiceClient interface {
 	UpdatePin(ctx context.Context, in *UpdatePinRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	UpdatePinImage(ctx context.Context, in *UpdatePinImageRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	DeletePinByID(ctx context.Context, in *PinIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	CreateWhiteboard(ctx context.Context, in *CreateWhiteboardRequest, opts ...grpc.CallOption) (*CreateWhiteboardResponse, error)
+	GetWhiteboardByID(ctx context.Context, in *WhiteboardIDRequest, opts ...grpc.CallOption) (*GetWhiteboardByIDResponse, error)
+	UpdateWhiteboard(ctx context.Context, in *UpdateWhiteboardRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	DeleteWhiteboardByID(ctx context.Context, in *WhiteboardIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 }
 
 type plansServiceClient struct {
@@ -110,6 +118,46 @@ func (c *plansServiceClient) DeletePinByID(ctx context.Context, in *PinIDRequest
 	return out, nil
 }
 
+func (c *plansServiceClient) CreateWhiteboard(ctx context.Context, in *CreateWhiteboardRequest, opts ...grpc.CallOption) (*CreateWhiteboardResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateWhiteboardResponse)
+	err := c.cc.Invoke(ctx, PlansService_CreateWhiteboard_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *plansServiceClient) GetWhiteboardByID(ctx context.Context, in *WhiteboardIDRequest, opts ...grpc.CallOption) (*GetWhiteboardByIDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWhiteboardByIDResponse)
+	err := c.cc.Invoke(ctx, PlansService_GetWhiteboardByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *plansServiceClient) UpdateWhiteboard(ctx context.Context, in *UpdateWhiteboardRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SuccessResponse)
+	err := c.cc.Invoke(ctx, PlansService_UpdateWhiteboard_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *plansServiceClient) DeleteWhiteboardByID(ctx context.Context, in *WhiteboardIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SuccessResponse)
+	err := c.cc.Invoke(ctx, PlansService_DeleteWhiteboardByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PlansServiceServer is the server API for PlansService service.
 // All implementations must embed UnimplementedPlansServiceServer
 // for forward compatibility.
@@ -123,6 +171,10 @@ type PlansServiceServer interface {
 	UpdatePin(context.Context, *UpdatePinRequest) (*SuccessResponse, error)
 	UpdatePinImage(context.Context, *UpdatePinImageRequest) (*SuccessResponse, error)
 	DeletePinByID(context.Context, *PinIDRequest) (*SuccessResponse, error)
+	CreateWhiteboard(context.Context, *CreateWhiteboardRequest) (*CreateWhiteboardResponse, error)
+	GetWhiteboardByID(context.Context, *WhiteboardIDRequest) (*GetWhiteboardByIDResponse, error)
+	UpdateWhiteboard(context.Context, *UpdateWhiteboardRequest) (*SuccessResponse, error)
+	DeleteWhiteboardByID(context.Context, *WhiteboardIDRequest) (*SuccessResponse, error)
 	mustEmbedUnimplementedPlansServiceServer()
 }
 
@@ -150,6 +202,18 @@ func (UnimplementedPlansServiceServer) UpdatePinImage(context.Context, *UpdatePi
 }
 func (UnimplementedPlansServiceServer) DeletePinByID(context.Context, *PinIDRequest) (*SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePinByID not implemented")
+}
+func (UnimplementedPlansServiceServer) CreateWhiteboard(context.Context, *CreateWhiteboardRequest) (*CreateWhiteboardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateWhiteboard not implemented")
+}
+func (UnimplementedPlansServiceServer) GetWhiteboardByID(context.Context, *WhiteboardIDRequest) (*GetWhiteboardByIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWhiteboardByID not implemented")
+}
+func (UnimplementedPlansServiceServer) UpdateWhiteboard(context.Context, *UpdateWhiteboardRequest) (*SuccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateWhiteboard not implemented")
+}
+func (UnimplementedPlansServiceServer) DeleteWhiteboardByID(context.Context, *WhiteboardIDRequest) (*SuccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWhiteboardByID not implemented")
 }
 func (UnimplementedPlansServiceServer) mustEmbedUnimplementedPlansServiceServer() {}
 func (UnimplementedPlansServiceServer) testEmbeddedByValue()                      {}
@@ -280,6 +344,78 @@ func _PlansService_DeletePinByID_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlansService_CreateWhiteboard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateWhiteboardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).CreateWhiteboard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_CreateWhiteboard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).CreateWhiteboard(ctx, req.(*CreateWhiteboardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlansService_GetWhiteboardByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteboardIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).GetWhiteboardByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_GetWhiteboardByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).GetWhiteboardByID(ctx, req.(*WhiteboardIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlansService_UpdateWhiteboard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateWhiteboardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).UpdateWhiteboard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_UpdateWhiteboard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).UpdateWhiteboard(ctx, req.(*UpdateWhiteboardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlansService_DeleteWhiteboardByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteboardIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).DeleteWhiteboardByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_DeleteWhiteboardByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).DeleteWhiteboardByID(ctx, req.(*WhiteboardIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PlansService_ServiceDesc is the grpc.ServiceDesc for PlansService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -310,6 +446,22 @@ var PlansService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePinByID",
 			Handler:    _PlansService_DeletePinByID_Handler,
+		},
+		{
+			MethodName: "CreateWhiteboard",
+			Handler:    _PlansService_CreateWhiteboard_Handler,
+		},
+		{
+			MethodName: "GetWhiteboardByID",
+			Handler:    _PlansService_GetWhiteboardByID_Handler,
+		},
+		{
+			MethodName: "UpdateWhiteboard",
+			Handler:    _PlansService_UpdateWhiteboard_Handler,
+		},
+		{
+			MethodName: "DeleteWhiteboardByID",
+			Handler:    _PlansService_DeleteWhiteboardByID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
