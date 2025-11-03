@@ -18,7 +18,6 @@ type PinDataModel struct {
 
 type CreatedPinModel struct {
 	Name         string    `json:"name,omitempty" bson:"name,omitempty"`
-	Image        []byte    `json:"image,omitempty" bson:"image,omitempty"` // for binary data (e.g. uploaded image)
 	Description  string    `json:"description,omitempty" bson:"description,omitempty"`
 	Expenses     []Expense `json:"expenses,omitempty" bson:"expenses,omitempty"` // for arbitrary JSON (e.g. map or array)
 	Location     float32   `json:"location,omitempty" bson:"location,omitempty"`

@@ -90,7 +90,7 @@ func (repo *whiteboardsRepository) UpdateWhiteboard(whiteboardID primitive.Objec
 
 	// Check if any document was modified
 	if result.MatchedCount == 0 {
-		fiberlog.Warnf("Whiteboards -> UpdateWhiteboard: No document found with ID: %s \n", whiteboardID)
+		fiberlog.Warnf("Whiteboards -> UpdateWhiteboard: No document found with ID: %s \n", whiteboardID.Hex())
 		return errors.New("whiteboard not found")
 	}
 

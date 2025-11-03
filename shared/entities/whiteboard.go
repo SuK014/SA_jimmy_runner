@@ -12,8 +12,8 @@ type WhiteboardDataModel struct {
 }
 
 type CreatedWhiteboardModel struct {
-	Pins []string `bson:"pin"`
-	Day  int      `bson:"day"`
+	Pins []string `bson:"pins"` // no json: use new gen
+	Day  int      `bson:"day"`  // no json: use query params
 }
 
 type UpdatedWhiteboardModel struct {
