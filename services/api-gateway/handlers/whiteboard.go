@@ -61,7 +61,7 @@ func (h *HTTPHandler) GetWhiteboardByID(ctx *fiber.Ctx) error {
 	whiteboardRes, err := h.planClient.GetWhiteboardByID(context.Background(), whiteboardReq)
 	if err != nil || !whiteboardRes.GetSuccess() {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot get pin by id: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot get whiteboard by id: " + err.Error()},
 		)
 	}
 
@@ -107,7 +107,7 @@ func (h *HTTPHandler) UpdateWhiteboardByID(ctx *fiber.Ctx) error {
 	res, err := h.planClient.UpdateWhiteboard(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot update pin: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot update whiteboard: " + err.Error()},
 		)
 	}
 
@@ -128,7 +128,7 @@ func (h *HTTPHandler) DeleteWhiteboardByID(ctx *fiber.Ctx) error {
 	getPinIDRes, err := h.planClient.GetWhiteboardByID(context.Background(), getPinIDReq)
 	if err != nil || !getPinIDRes.GetSuccess() {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot get pin by whiteboard: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot get pinID by GetWhiteboardByID: " + err.Error()},
 		)
 	}
 
@@ -138,7 +138,7 @@ func (h *HTTPHandler) DeleteWhiteboardByID(ctx *fiber.Ctx) error {
 	deletePinIDRes, err := h.planClient.DeletePinByWhiteboard(context.Background(), deletePinsReq)
 	if err != nil || !deletePinIDRes.GetSuccess() {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot delete many pin by whiteboard: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot delete many pin by whiteboardID: " + err.Error()},
 		)
 	}
 

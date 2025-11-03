@@ -38,7 +38,7 @@ func (repo *userTripRepository) Insert(tripID, userID, name string) (*entities.U
 	).Exec(repo.Context)
 
 	if err != nil {
-		return nil, fmt.Errorf("users -> InsertUser: %v", err)
+		return nil, fmt.Errorf("usersTrips -> Insert new UserTrip: %v", err)
 	}
 
 	return mapToUserTripModel(createdData)
@@ -52,10 +52,10 @@ func (repo *userTripRepository) FindByID(tripID, userID string) (*entities.UserT
 		),
 	).Exec(repo.Context)
 	if err != nil {
-		return nil, fmt.Errorf("users -> FindByID: %v", err)
+		return nil, fmt.Errorf("usersTrips -> FindByID: %v", err)
 	}
 	if user == nil {
-		return nil, fmt.Errorf("users -> FindByID: user data is nil")
+		return nil, fmt.Errorf("usersTrips -> FindByID: userTrip data is nil")
 	}
 
 	return mapToUserTripModel(user)
@@ -67,10 +67,10 @@ func (repo *userTripRepository) FindManyByID(tripID string, userID []string) (*[
 		db.UserTrip.UserID.In(userID),
 	).Exec(repo.Context)
 	if err != nil {
-		return nil, fmt.Errorf("users -> FindByID: %v", err)
+		return nil, fmt.Errorf("usersTrips -> FindByID: %v", err)
 	}
 	if users == nil {
-		return nil, fmt.Errorf("users -> FindByID: user data is nil")
+		return nil, fmt.Errorf("usersTrips -> FindByID: userTrip data is nil")
 	}
 
 	var results []entities.UserTripModel
@@ -95,7 +95,7 @@ func (repo *userTripRepository) Update(tripID, userID, name string) (*entities.U
 		db.UserTrip.Username.Set(name),
 	).Exec(repo.Context)
 	if err != nil {
-		return nil, fmt.Errorf("users -> UpdateUser: %v", err)
+		return nil, fmt.Errorf("usersTrips -> UpdateUserTrip: %v", err)
 	}
 
 	return mapToUserTripModel(updatedUser)
@@ -109,7 +109,7 @@ func (repo *userTripRepository) Delete(tripID, userID string) error {
 		),
 	).Delete().Exec(repo.Context)
 	if err != nil {
-		return fmt.Errorf("users -> DeleteUser: %v", err)
+		return fmt.Errorf("usersTrips -> DeleteUserTrip: %v", err)
 	}
 	return nil
 }

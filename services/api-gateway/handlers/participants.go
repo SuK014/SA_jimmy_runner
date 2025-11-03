@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/middlewares"
 	"github.com/SuK014/SA_jimmy_runner/shared/entities"
@@ -14,7 +13,7 @@ import (
 func (h *HTTPHandler) GetParticipantsByPinID(ctx *fiber.Ctx) error {
 	_, err := middlewares.DecodeJWTToken(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to generate token: %w", err)
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
 	}
 	bodyData := entities.AvatarResponse{}
 	if err := ctx.BodyParser(&bodyData); err != nil {
@@ -31,7 +30,7 @@ func (h *HTTPHandler) GetParticipantsByPinID(ctx *fiber.Ctx) error {
 	res, err := h.userClient.GetUsersAvatar(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot get pin by participants: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot get user Avatar (userTrip + user): " + err.Error()},
 		)
 	}
 

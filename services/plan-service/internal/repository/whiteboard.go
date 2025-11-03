@@ -37,7 +37,7 @@ func NewWhiteboardsRepository(db *MongoDB) IWhiteboardsRepository {
 func (repo *whiteboardsRepository) InsertWhiteboard(data entities.CreatedWhiteboardModel) (string, error) {
 	insertData, err := repo.Collection.InsertOne(repo.Context, data)
 	if err != nil {
-		fiberlog.Errorf("Users -> InsertNewUser: %s \n", err)
+		fiberlog.Errorf("Whiteboards -> Insert new whiteboard: %s \n", err)
 		return "", err
 	}
 	return insertData.InsertedID.(primitive.ObjectID).Hex(), nil
@@ -84,14 +84,14 @@ func (repo *whiteboardsRepository) UpdateWhiteboard(whiteboardID primitive.Objec
 	// Perform the update operation
 	result, err := repo.Collection.UpdateOne(repo.Context, filter, update)
 	if err != nil {
-		fiberlog.Errorf("Users -> UpdateUser: %s \n", err)
+		fiberlog.Errorf("Whiteboards -> UpdateWhiteboard: %s \n", err)
 		return err
 	}
 
 	// Check if any document was modified
 	if result.MatchedCount == 0 {
-		fiberlog.Warnf("Users -> UpdateUser: No document found with ID: %s \n", whiteboardID)
-		return errors.New("user not found")
+		fiberlog.Warnf("Whiteboards -> UpdateWhiteboard: No document found with ID: %s \n", whiteboardID)
+		return errors.New("whiteboard not found")
 	}
 
 	return nil
@@ -101,13 +101,13 @@ func (repo *whiteboardsRepository) DeleteWhiteboardByID(whiteboardID primitive.O
 	filter := bson.M{"_id": whiteboardID}
 	result, err := repo.Collection.DeleteOne(repo.Context, filter)
 	if err != nil {
-		fiberlog.Errorf("Pins -> DeletePinByID: %s \n", err)
+		fiberlog.Errorf("Whiteboards -> DeleteWhiteboardByID: %s \n", err)
 		return err
 	}
 
 	if result.DeletedCount == 0 {
-		fiberlog.Warnf("Pins -> DeletePinByID: No document found with ID: %s \n", whiteboardID.Hex())
-		return errors.New("pin not found")
+		fiberlog.Warnf("Whiteboards -> DeleteWhiteboardByID: No document found with ID: %s \n", whiteboardID.Hex())
+		return errors.New("whiteboard not found")
 	}
 	return nil
 }

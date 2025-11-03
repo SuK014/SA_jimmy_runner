@@ -36,7 +36,7 @@ func (sv *pinsService) InsertPin(data entities.CreatedPinModel) (string, error) 
 func (sv *pinsService) FindByID(pinID string) (*entities.PinDataModel, error) {
 	mongoID, err := primitive.ObjectIDFromHex(pinID)
 	if err != nil {
-		return nil, fmt.Errorf("invalid userID: %v", err)
+		return nil, fmt.Errorf("invalid pinID: %v", err)
 	}
 	data, err := sv.PinsRepository.FindByID(mongoID)
 	if err != nil {
@@ -61,7 +61,7 @@ func (sv *pinsService) FindManyByID(pinIDs []string) (*[]entities.PinDataModel, 
 	for _, p := range pinIDs {
 		mongoID, err := primitive.ObjectIDFromHex(p)
 		if err != nil {
-			return nil, fmt.Errorf("invalid userID: %v", err)
+			return nil, fmt.Errorf("invalid pinID: %v", err)
 		}
 		mongoIDs = append(mongoIDs, mongoID)
 	}
@@ -76,7 +76,7 @@ func (sv *pinsService) FindManyByID(pinIDs []string) (*[]entities.PinDataModel, 
 func (sv *pinsService) UpdatePin(pinID string, data entities.UpdatedPinModel) error {
 	mongoID, err := primitive.ObjectIDFromHex(pinID)
 	if err != nil {
-		return fmt.Errorf("invalid userID: %v", err)
+		return fmt.Errorf("invalid pinID: %v", err)
 	}
 	return sv.PinsRepository.UpdatePin(mongoID, data)
 }
@@ -84,7 +84,7 @@ func (sv *pinsService) UpdatePin(pinID string, data entities.UpdatedPinModel) er
 func (sv *pinsService) UpdatePinImage(pinID string, image []byte) error {
 	mongoID, err := primitive.ObjectIDFromHex(pinID)
 	if err != nil {
-		return fmt.Errorf("invalid userID: %v", err)
+		return fmt.Errorf("invalid pinID: %v", err)
 	}
 	return sv.PinsRepository.UpdatePinImage(mongoID, image)
 }
@@ -92,7 +92,7 @@ func (sv *pinsService) UpdatePinImage(pinID string, image []byte) error {
 func (sv *pinsService) DeletePinByID(pinID string) error {
 	mongoID, err := primitive.ObjectIDFromHex(pinID)
 	if err != nil {
-		return fmt.Errorf("invalid userID: %v", err)
+		return fmt.Errorf("invalid pinID: %v", err)
 	}
 	return sv.PinsRepository.DeletePinByID(mongoID)
 }
@@ -102,7 +102,7 @@ func (sv *pinsService) DeleteManyByID(pinIDs []string) error {
 	for _, p := range pinIDs {
 		mongoID, err := primitive.ObjectIDFromHex(p)
 		if err != nil {
-			return fmt.Errorf("invalid userID: %v", err)
+			return fmt.Errorf("invalid pinID: %v", err)
 		}
 		mongoIDs = append(mongoIDs, mongoID)
 	}

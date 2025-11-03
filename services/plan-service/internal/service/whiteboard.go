@@ -32,7 +32,7 @@ func (sv *whiteboardsService) InsertWhiteboard(data entities.CreatedWhiteboardMo
 func (sv *whiteboardsService) FindByID(whiteboardID string) (*entities.WhiteboardDataModel, error) {
 	mongoID, err := primitive.ObjectIDFromHex(whiteboardID)
 	if err != nil {
-		return nil, fmt.Errorf("invalid userID: %v", err)
+		return nil, fmt.Errorf("invalid whiteboardID: %v", err)
 	}
 	data, err := sv.WhiteboardsRepository.FindByID(mongoID)
 	if err != nil {
@@ -45,7 +45,7 @@ func (sv *whiteboardsService) FindByID(whiteboardID string) (*entities.Whiteboar
 func (sv *whiteboardsService) UpdateWhiteboard(whiteboardID string, data entities.UpdatedWhiteboardModel) error {
 	mongoID, err := primitive.ObjectIDFromHex(whiteboardID)
 	if err != nil {
-		return fmt.Errorf("invalid userID: %v", err)
+		return fmt.Errorf("invalid whiteboardID: %v", err)
 	}
 	return sv.WhiteboardsRepository.UpdateWhiteboard(mongoID, data)
 }
@@ -53,7 +53,7 @@ func (sv *whiteboardsService) UpdateWhiteboard(whiteboardID string, data entitie
 func (sv *whiteboardsService) DeleteWhiteboardByID(whiteboardID string) error {
 	mongoID, err := primitive.ObjectIDFromHex(whiteboardID)
 	if err != nil {
-		return fmt.Errorf("invalid userID: %v", err)
+		return fmt.Errorf("invalid whiteboardID: %v", err)
 	}
 	return sv.WhiteboardsRepository.DeleteWhiteboardByID(mongoID)
 }

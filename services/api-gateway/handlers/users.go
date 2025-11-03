@@ -180,7 +180,7 @@ func (h *HTTPHandler) GetUser(ctx *fiber.Ctx) error {
 	res, err := h.userClient.GetUser(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot update user: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot get user: " + err.Error()},
 		)
 	}
 
@@ -200,7 +200,7 @@ func (h *HTTPHandler) DeleteUser(ctx *fiber.Ctx) error {
 	res, err := h.userClient.DeleteUser(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot update user: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot delete user: " + err.Error()},
 		)
 	}
 

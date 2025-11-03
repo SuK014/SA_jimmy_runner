@@ -40,7 +40,7 @@ func (repo *usersRepository) InsertUser(data entities.CreatedUserModel) (*entiti
 	).Exec(repo.Context)
 
 	if err != nil {
-		return nil, fmt.Errorf("users -> InsertUser: %v", err)
+		return nil, fmt.Errorf("users -> Insert new User: %v", err)
 	}
 
 	return mapToUserDataModel(createdData)

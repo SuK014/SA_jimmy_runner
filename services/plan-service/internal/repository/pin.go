@@ -41,7 +41,7 @@ func NewPinsRepository(db *MongoDB) IPinsRepository {
 func (repo *pinsRepository) InsertPin(data entities.CreatedPinModel) (string, error) {
 	insertData, err := repo.Collection.InsertOne(repo.Context, data)
 	if err != nil {
-		fiberlog.Errorf("Users -> InsertNewUser: %s \n", err)
+		fiberlog.Errorf("Pins -> Insert new pin: %s \n", err)
 		return "", err
 	}
 	return insertData.InsertedID.(primitive.ObjectID).Hex(), nil
@@ -106,14 +106,14 @@ func (repo *pinsRepository) UpdatePin(pinID primitive.ObjectID, data entities.Up
 	// Perform the update operation
 	result, err := repo.Collection.UpdateOne(repo.Context, filter, update)
 	if err != nil {
-		fiberlog.Errorf("Users -> UpdateUser: %s \n", err)
+		fiberlog.Errorf("Pins -> UpdatePin: %s \n", err)
 		return err
 	}
 
 	// Check if any document was modified
 	if result.MatchedCount == 0 {
-		fiberlog.Warnf("Users -> UpdateUser: No document found with ID: %s \n", pinID)
-		return errors.New("user not found")
+		fiberlog.Warnf("Pins -> UpdatePin: No document found with ID: %s \n", pinID)
+		return errors.New("pin not found")
 	}
 
 	return nil
@@ -127,14 +127,14 @@ func (repo *pinsRepository) UpdatePinImage(pinID primitive.ObjectID, image []byt
 	// Perform the update operation
 	result, err := repo.Collection.UpdateOne(repo.Context, filter, update)
 	if err != nil {
-		fiberlog.Errorf("Users -> UpdateUser: %s \n", err)
+		fiberlog.Errorf("Pins -> UpdatePinImage: %s \n", err)
 		return err
 	}
 
 	// Check if any document was modified
 	if result.MatchedCount == 0 {
-		fiberlog.Warnf("Users -> UpdateUser: No document found with ID: %s \n", pinID)
-		return errors.New("user not found")
+		fiberlog.Warnf("Pins -> UpdatePin: No document found with ID: %s \n", pinID)
+		return errors.New("pin not found")
 	}
 
 	return nil
