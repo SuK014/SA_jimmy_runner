@@ -12,7 +12,7 @@ func (h *gRPCHandler) CreateTrip(ctx context.Context, req *pb.CreateTripRequest)
 	trip := entities.CreatedTripModel{
 		Name:        req.GetName(),
 		Description: req.GetDescription(),
-		Whiteboards: []string{req.GetDescription()},
+		Whiteboards: req.GetWhiteboards(),
 	}
 
 	res, err := h.TripService.InsertTrip(trip)

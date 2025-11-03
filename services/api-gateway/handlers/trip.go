@@ -46,7 +46,7 @@ func (h *HTTPHandler) CreateTrip(ctx *fiber.Ctx) error {
 	res, err := h.planClient.CreateTrip(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot create whiteboard: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot create trip: " + err.Error()},
 		)
 	}
 
@@ -66,7 +66,7 @@ func (h *HTTPHandler) GetTripByID(ctx *fiber.Ctx) error {
 	tripRes, err := h.planClient.GetTripByID(context.Background(), tripReq)
 	if err != nil || !tripRes.GetSuccess() {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot get whiteboard by id: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot get trip by id: " + err.Error()},
 		)
 	}
 
