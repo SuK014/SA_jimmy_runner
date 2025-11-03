@@ -54,7 +54,7 @@ func (sv *usersService) GetAvatars(tripID string, userID []string) (*[]entities.
 	if err != nil {
 		return nil, err
 	}
-	nameData, err := sv.UserTripRepository.FindManyByID(tripID, userID)
+	nameData, err := sv.UserTripRepository.FindManyUsersByTripID(tripID, userID)
 	if err != nil {
 		return nil, err
 	}

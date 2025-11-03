@@ -18,7 +18,7 @@ type userTripRepository struct {
 type IUserTripRepository interface {
 	Insert(tripID, userID, name string) (*entities.UserTripModel, error)
 	FindByID(tripID, userID string) (*entities.UserTripModel, error)
-	FindManyByID(tripID string, userID []string) (*[]entities.UserTripModel, error)
+	FindManyUsersByTripID(tripID string, userID []string) (*[]entities.UserTripModel, error)
 	Update(tripID, userID, name string) (*entities.UserTripModel, error)
 	Delete(tripID, userID string) error
 }
@@ -61,20 +61,44 @@ func (repo *userTripRepository) FindByID(tripID, userID string) (*entities.UserT
 	return mapToUserTripModel(user)
 }
 
-func (repo *userTripRepository) FindManyByID(tripID string, userID []string) (*[]entities.UserTripModel, error) {
+func (repo *userTripRepository) FindManyUsersByTripID(tripID string, userID []string) (*[]entities.UserTripModel, error) {
 	users, err := repo.Collection.UserTrip.FindMany(
 		db.UserTrip.TripID.Equals(tripID),
 		db.UserTrip.UserID.In(userID),
 	).Exec(repo.Context)
 	if err != nil {
-		return nil, fmt.Errorf("usersTrips -> FindByID: %v", err)
+		return nil, fmt.Errorf("usersTrips -> FindManyUsersByTripID: %v", err)
 	}
 	if users == nil {
-		return nil, fmt.Errorf("usersTrips -> FindByID: userTrip data is nil")
+		return nil, fmt.Errorf("usersTrips -> FindManyUsersByTripID: userTrip data is nil")
 	}
 
 	var results []entities.UserTripModel
 	for _, u := range users {
+		result, err := mapToUserTripModel(&u)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, *result)
+	}
+
+	return &results, nil
+}
+
+func (repo *userTripRepository) FindManyTripsByUserID(tripID []string, userID string) (*[]entities.UserTripModel, error) {
+	trips, err := repo.Collection.UserTrip.FindMany(
+		db.UserTrip.UserID.Equals(userID),
+		db.UserTrip.TripID.In(tripID),
+	).Exec(repo.Context)
+	if err != nil {
+		return nil, fmt.Errorf("usersTrips -> FindManyTripsByUserID: %v", err)
+	}
+	if trips == nil {
+		return nil, fmt.Errorf("usersTrips -> FindManyTripsByUserID: userTrip data is nil")
+	}
+
+	var results []entities.UserTripModel
+	for _, u := range trips {
 		result, err := mapToUserTripModel(&u)
 		if err != nil {
 			return nil, err

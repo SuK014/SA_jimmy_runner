@@ -76,7 +76,7 @@ func (h *HTTPHandler) GetTripByID(ctx *fiber.Ctx) error {
 	whiteboardRes, err := h.planClient.GetWhiteboardsByTrip(context.Background(), whiteboardReq)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot get whiteboard by id: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot get whiteboard by trip: " + err.Error()},
 		)
 	}
 
@@ -118,7 +118,7 @@ func (h *HTTPHandler) UpdateTripByID(ctx *fiber.Ctx) error {
 	res, err := h.planClient.UpdateTrip(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot update whiteboard: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot update trip: " + err.Error()},
 		)
 	}
 
@@ -161,7 +161,7 @@ func (h *HTTPHandler) UpdateTripImageByID(ctx *fiber.Ctx) error {
 	res, err := h.planClient.UpdateTripImage(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot update pin image: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot update trip image: " + err.Error()},
 		)
 	}
 
@@ -182,7 +182,7 @@ func (h *HTTPHandler) DeleteTripByID(ctx *fiber.Ctx) error {
 	getWhiteboardIDRes, err := h.planClient.GetTripByID(context.Background(), getWhiteboardIDReq)
 	if err != nil || !getWhiteboardIDRes.GetSuccess() {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot get pinID by GetWhiteboardByID: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot GetTripByID: " + err.Error()},
 		)
 	}
 
@@ -192,7 +192,7 @@ func (h *HTTPHandler) DeleteTripByID(ctx *fiber.Ctx) error {
 	deleteWhiteboardRes, err := h.planClient.DeleteWhiteboardByTrip(context.Background(), deleteWhiteboardReq)
 	if err != nil || !deleteWhiteboardRes.GetSuccess() {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot get pinID by GetWhiteboardByID: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot DeleteWhiteboardByTrip: " + err.Error()},
 		)
 	}
 
@@ -202,7 +202,7 @@ func (h *HTTPHandler) DeleteTripByID(ctx *fiber.Ctx) error {
 	res, err := h.planClient.DeleteTripByID(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot delete whiteboard: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot DeleteTripByID: " + err.Error()},
 		)
 	}
 

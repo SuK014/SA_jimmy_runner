@@ -33,7 +33,7 @@ func (sv *tripsService) InsertTrip(data entities.CreatedTripModel) (string, erro
 func (sv *tripsService) FindByID(tripID string) (*entities.TripDataModel, error) {
 	mongoID, err := primitive.ObjectIDFromHex(tripID)
 	if err != nil {
-		return nil, fmt.Errorf("invalid whiteboardID: %v", err)
+		return nil, fmt.Errorf("invalid tripID: %v", err)
 	}
 	data, err := sv.TripsRepository.FindByID(mongoID)
 	if err != nil {
@@ -46,7 +46,7 @@ func (sv *tripsService) FindByID(tripID string) (*entities.TripDataModel, error)
 func (sv *tripsService) UpdateTrip(tripID string, data entities.UpdatedTripModel) error {
 	mongoID, err := primitive.ObjectIDFromHex(tripID)
 	if err != nil {
-		return fmt.Errorf("invalid whiteboardID: %v", err)
+		return fmt.Errorf("invalid tripID: %v", err)
 	}
 	return sv.TripsRepository.UpdateTrip(mongoID, data)
 }
@@ -54,7 +54,7 @@ func (sv *tripsService) UpdateTrip(tripID string, data entities.UpdatedTripModel
 func (sv *tripsService) UpdateTripImage(tripID string, image []byte) error {
 	mongoID, err := primitive.ObjectIDFromHex(tripID)
 	if err != nil {
-		return fmt.Errorf("invalid pinID: %v", err)
+		return fmt.Errorf("invalid tripID: %v", err)
 	}
 	return sv.TripsRepository.UpdateTripImage(mongoID, image)
 }
@@ -62,7 +62,7 @@ func (sv *tripsService) UpdateTripImage(tripID string, image []byte) error {
 func (sv *tripsService) DeleteTripByID(tripID string) error {
 	mongoID, err := primitive.ObjectIDFromHex(tripID)
 	if err != nil {
-		return fmt.Errorf("invalid whiteboardID: %v", err)
+		return fmt.Errorf("invalid tripID: %v", err)
 	}
 	return sv.TripsRepository.DeleteTripByID(mongoID)
 }

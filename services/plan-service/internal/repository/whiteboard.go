@@ -26,7 +26,7 @@ type IWhiteboardsRepository interface {
 	FindManyByID(whiteboardIDs []primitive.ObjectID) (*[]entities.WhiteboardDataModel, error)
 	UpdateWhiteboard(whiteboardID primitive.ObjectID, data entities.UpdatedWhiteboardModel) error
 	DeleteWhiteboardByID(whiteboardID primitive.ObjectID) error
-	DeleteManyByID(tripIDs []primitive.ObjectID) error
+	DeleteManyByID(whiteboardIDs []primitive.ObjectID) error
 }
 
 func NewWhiteboardsRepository(db *MongoDB) IWhiteboardsRepository {
@@ -134,17 +134,17 @@ func (repo *whiteboardsRepository) DeleteWhiteboardByID(whiteboardID primitive.O
 	return nil
 }
 
-func (repo *whiteboardsRepository) DeleteManyByID(tripIDs []primitive.ObjectID) error {
-	filter := bson.M{"_id": bson.M{"$in": tripIDs}}
+func (repo *whiteboardsRepository) DeleteManyByID(whiteboardIDs []primitive.ObjectID) error {
+	filter := bson.M{"_id": bson.M{"$in": whiteboardIDs}}
 	result, err := repo.Collection.DeleteMany(repo.Context, filter)
 	if err != nil {
-		fiberlog.Errorf("Pins -> DeleteManyByID: %s \n", err)
+		fiberlog.Errorf("Whiteboards -> DeleteManyByID: %s \n", err)
 		return err
 	}
 
 	if result.DeletedCount == 0 {
-		fiberlog.Warnf("Pins -> DeleteManyByID: No document found with ID: %s \n", tripIDs)
-		return errors.New("pin not found")
+		fiberlog.Warnf("Whiteboards -> DeleteManyByID: No document found with ID: %s \n", whiteboardIDs)
+		return errors.New("whiteboard not found")
 	}
 	return nil
 }

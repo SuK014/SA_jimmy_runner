@@ -15,7 +15,7 @@ func (h *HTTPHandler) CreateWhiteboard(ctx *fiber.Ctx) error {
 	tripID := ctx.Query("trip_id")
 	if tripID == "" {
 		return ctx.Status(fiber.StatusBadRequest).JSON(
-			entities.ResponseMessage{Message: "missing or empty 'whiteboard_id' query parameter"},
+			entities.ResponseMessage{Message: "missing or empty 'trip_id' query parameter"},
 		)
 	}
 	day := ctx.Query("day")
@@ -141,7 +141,7 @@ func (h *HTTPHandler) DeleteWhiteboardByID(ctx *fiber.Ctx) error {
 	tripID := ctx.Query("trip_id")
 	if tripID == "" {
 		return ctx.Status(fiber.StatusBadRequest).JSON(
-			entities.ResponseMessage{Message: "missing or empty 'whiteboard_id' query parameter"},
+			entities.ResponseMessage{Message: "missing or empty 'trip_id' query parameter"},
 		)
 	}
 
