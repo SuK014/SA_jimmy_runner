@@ -18,8 +18,10 @@ service PlansService {
   // whiteboard
   rpc CreateWhiteboard(CreateWhiteboardRequest) returns (CreateWhiteboardResponse);
   rpc GetWhiteboardByID(WhiteboardIDRequest) returns (GetWhiteboardByIDResponse);
+  rpc GetWhiteboardsByTrip(ManyWhiteboardIDRequest) returns (GetWhiteboardsResponse);
   rpc UpdateWhiteboard(UpdateWhiteboardRequest) returns (SuccessResponse);
   rpc DeleteWhiteboardByID(WhiteboardIDRequest) returns (SuccessResponse);
+  rpc DeleteWhiteboardByTrip(ManyWhiteboardIDRequest) returns (SuccessResponse);
 
   // trip
   rpc CreateTrip(CreateTripRequest) returns (CreateTripResponse);
@@ -64,7 +66,7 @@ message GetPinByIDResponse {
     repeated string participant = 8;
 }
 
-message ManyPinIDRequest { // for getPinByID and DeletePinByID
+message ManyPinIDRequest { // for GetPinsByWhiteboard and DeletePinByWhiteboard
   repeated string pins = 1;
 }
 
@@ -72,7 +74,7 @@ message GetPinByParticipantRequest {
   string userId = 1;
 }
 
-message GetPinsResponse { // for GetPinByParticipant
+message GetPinsResponse { // for GetPinByParticipant and GetPinByParticipant
   repeated GetPinResponse pins = 1;
 }
 
@@ -123,8 +125,21 @@ message WhiteboardIDRequest { // for getWhiteboardByID and DeleteWhiteboardByID
 
 message GetWhiteboardByIDResponse {
     bool success = 1;
-    repeated string pins = 2;
-    int32 day = 3;
+    int32 day = 2;
+    repeated string pins = 3;
+}
+
+message ManyWhiteboardIDRequest { // for GetWhiteboardsByTrip and DeleteWhiteboardByTrip
+  repeated string whiteboards = 1;
+}
+
+message GetWhiteboardsResponse { // for GetPinByParticipant
+  repeated GetWhiteboardResponse whiteboards = 1;
+}
+
+message GetWhiteboardResponse { // for GetWhiteboardsResponse
+    int32 day = 1;
+    repeated GetPinResponse pins = 2;
 }
 
 message UpdateWhiteboardRequest {
@@ -137,30 +152,34 @@ message UpdateWhiteboardRequest {
 
 // trip
 message CreateTripRequest {
-  string pin = 1;
-  int32 day = 2;
+  string name = 1;
+  string description = 2;
+  repeated string whiteboards = 3;
 }
 
 message CreateTripResponse {
   bool success = 1;
-  string whiteboardId = 2; //objectId AS a string
+  string TripId = 2; //objectId AS a string
 }
 
 message TripIDRequest { // for getWhiteboardByID and DeleteWhiteboardByID
-  string whiteboardId = 1;
+  string TripId = 1;
 }
 
 message GetTripByIDResponse {
     bool success = 1;
-    repeated string pins = 2;
-    int32 day = 3;
+    string name = 2;
+    string description = 3;
+    bytes image = 4;
+    repeated string whiteboards = 5;
 }
 
 message UpdateTripRequest {
   string id = 1;
-  repeated string pins = 2;
-  string pinChangeType = 3; // add, remove, set
-  int32 day = 4;
+  string name = 2;
+  string description = 3;
+  repeated string whiteboards = 4;
+  string whiteboardChangeType = 5; // add, remove, set
 }
 
 message UpdateTripImageRequest {

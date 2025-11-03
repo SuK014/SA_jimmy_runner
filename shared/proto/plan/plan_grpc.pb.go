@@ -19,23 +19,25 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PlansService_CreatePin_FullMethodName             = "/plan.PlansService/CreatePin"
-	PlansService_GetPinByID_FullMethodName            = "/plan.PlansService/GetPinByID"
-	PlansService_GetPinsByWhiteboard_FullMethodName   = "/plan.PlansService/GetPinsByWhiteboard"
-	PlansService_GetPinByParticipant_FullMethodName   = "/plan.PlansService/GetPinByParticipant"
-	PlansService_UpdatePin_FullMethodName             = "/plan.PlansService/UpdatePin"
-	PlansService_UpdatePinImage_FullMethodName        = "/plan.PlansService/UpdatePinImage"
-	PlansService_DeletePinByID_FullMethodName         = "/plan.PlansService/DeletePinByID"
-	PlansService_DeletePinByWhiteboard_FullMethodName = "/plan.PlansService/DeletePinByWhiteboard"
-	PlansService_CreateWhiteboard_FullMethodName      = "/plan.PlansService/CreateWhiteboard"
-	PlansService_GetWhiteboardByID_FullMethodName     = "/plan.PlansService/GetWhiteboardByID"
-	PlansService_UpdateWhiteboard_FullMethodName      = "/plan.PlansService/UpdateWhiteboard"
-	PlansService_DeleteWhiteboardByID_FullMethodName  = "/plan.PlansService/DeleteWhiteboardByID"
-	PlansService_CreateTrip_FullMethodName            = "/plan.PlansService/CreateTrip"
-	PlansService_GetTripByID_FullMethodName           = "/plan.PlansService/GetTripByID"
-	PlansService_UpdateTrip_FullMethodName            = "/plan.PlansService/UpdateTrip"
-	PlansService_UpdateTripImage_FullMethodName       = "/plan.PlansService/UpdateTripImage"
-	PlansService_DeleteTripByID_FullMethodName        = "/plan.PlansService/DeleteTripByID"
+	PlansService_CreatePin_FullMethodName              = "/plan.PlansService/CreatePin"
+	PlansService_GetPinByID_FullMethodName             = "/plan.PlansService/GetPinByID"
+	PlansService_GetPinsByWhiteboard_FullMethodName    = "/plan.PlansService/GetPinsByWhiteboard"
+	PlansService_GetPinByParticipant_FullMethodName    = "/plan.PlansService/GetPinByParticipant"
+	PlansService_UpdatePin_FullMethodName              = "/plan.PlansService/UpdatePin"
+	PlansService_UpdatePinImage_FullMethodName         = "/plan.PlansService/UpdatePinImage"
+	PlansService_DeletePinByID_FullMethodName          = "/plan.PlansService/DeletePinByID"
+	PlansService_DeletePinByWhiteboard_FullMethodName  = "/plan.PlansService/DeletePinByWhiteboard"
+	PlansService_CreateWhiteboard_FullMethodName       = "/plan.PlansService/CreateWhiteboard"
+	PlansService_GetWhiteboardByID_FullMethodName      = "/plan.PlansService/GetWhiteboardByID"
+	PlansService_GetWhiteboardsByTrip_FullMethodName   = "/plan.PlansService/GetWhiteboardsByTrip"
+	PlansService_UpdateWhiteboard_FullMethodName       = "/plan.PlansService/UpdateWhiteboard"
+	PlansService_DeleteWhiteboardByID_FullMethodName   = "/plan.PlansService/DeleteWhiteboardByID"
+	PlansService_DeleteWhiteboardByTrip_FullMethodName = "/plan.PlansService/DeleteWhiteboardByTrip"
+	PlansService_CreateTrip_FullMethodName             = "/plan.PlansService/CreateTrip"
+	PlansService_GetTripByID_FullMethodName            = "/plan.PlansService/GetTripByID"
+	PlansService_UpdateTrip_FullMethodName             = "/plan.PlansService/UpdateTrip"
+	PlansService_UpdateTripImage_FullMethodName        = "/plan.PlansService/UpdateTripImage"
+	PlansService_DeleteTripByID_FullMethodName         = "/plan.PlansService/DeleteTripByID"
 )
 
 // PlansServiceClient is the client API for PlansService service.
@@ -54,8 +56,10 @@ type PlansServiceClient interface {
 	// whiteboard
 	CreateWhiteboard(ctx context.Context, in *CreateWhiteboardRequest, opts ...grpc.CallOption) (*CreateWhiteboardResponse, error)
 	GetWhiteboardByID(ctx context.Context, in *WhiteboardIDRequest, opts ...grpc.CallOption) (*GetWhiteboardByIDResponse, error)
+	GetWhiteboardsByTrip(ctx context.Context, in *ManyWhiteboardIDRequest, opts ...grpc.CallOption) (*GetWhiteboardsResponse, error)
 	UpdateWhiteboard(ctx context.Context, in *UpdateWhiteboardRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	DeleteWhiteboardByID(ctx context.Context, in *WhiteboardIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	DeleteWhiteboardByTrip(ctx context.Context, in *ManyWhiteboardIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	// trip
 	CreateTrip(ctx context.Context, in *CreateTripRequest, opts ...grpc.CallOption) (*CreateTripResponse, error)
 	GetTripByID(ctx context.Context, in *TripIDRequest, opts ...grpc.CallOption) (*GetTripByIDResponse, error)
@@ -172,6 +176,16 @@ func (c *plansServiceClient) GetWhiteboardByID(ctx context.Context, in *Whiteboa
 	return out, nil
 }
 
+func (c *plansServiceClient) GetWhiteboardsByTrip(ctx context.Context, in *ManyWhiteboardIDRequest, opts ...grpc.CallOption) (*GetWhiteboardsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWhiteboardsResponse)
+	err := c.cc.Invoke(ctx, PlansService_GetWhiteboardsByTrip_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *plansServiceClient) UpdateWhiteboard(ctx context.Context, in *UpdateWhiteboardRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SuccessResponse)
@@ -186,6 +200,16 @@ func (c *plansServiceClient) DeleteWhiteboardByID(ctx context.Context, in *White
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SuccessResponse)
 	err := c.cc.Invoke(ctx, PlansService_DeleteWhiteboardByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *plansServiceClient) DeleteWhiteboardByTrip(ctx context.Context, in *ManyWhiteboardIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SuccessResponse)
+	err := c.cc.Invoke(ctx, PlansService_DeleteWhiteboardByTrip_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -258,8 +282,10 @@ type PlansServiceServer interface {
 	// whiteboard
 	CreateWhiteboard(context.Context, *CreateWhiteboardRequest) (*CreateWhiteboardResponse, error)
 	GetWhiteboardByID(context.Context, *WhiteboardIDRequest) (*GetWhiteboardByIDResponse, error)
+	GetWhiteboardsByTrip(context.Context, *ManyWhiteboardIDRequest) (*GetWhiteboardsResponse, error)
 	UpdateWhiteboard(context.Context, *UpdateWhiteboardRequest) (*SuccessResponse, error)
 	DeleteWhiteboardByID(context.Context, *WhiteboardIDRequest) (*SuccessResponse, error)
+	DeleteWhiteboardByTrip(context.Context, *ManyWhiteboardIDRequest) (*SuccessResponse, error)
 	// trip
 	CreateTrip(context.Context, *CreateTripRequest) (*CreateTripResponse, error)
 	GetTripByID(context.Context, *TripIDRequest) (*GetTripByIDResponse, error)
@@ -306,11 +332,17 @@ func (UnimplementedPlansServiceServer) CreateWhiteboard(context.Context, *Create
 func (UnimplementedPlansServiceServer) GetWhiteboardByID(context.Context, *WhiteboardIDRequest) (*GetWhiteboardByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWhiteboardByID not implemented")
 }
+func (UnimplementedPlansServiceServer) GetWhiteboardsByTrip(context.Context, *ManyWhiteboardIDRequest) (*GetWhiteboardsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWhiteboardsByTrip not implemented")
+}
 func (UnimplementedPlansServiceServer) UpdateWhiteboard(context.Context, *UpdateWhiteboardRequest) (*SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateWhiteboard not implemented")
 }
 func (UnimplementedPlansServiceServer) DeleteWhiteboardByID(context.Context, *WhiteboardIDRequest) (*SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteWhiteboardByID not implemented")
+}
+func (UnimplementedPlansServiceServer) DeleteWhiteboardByTrip(context.Context, *ManyWhiteboardIDRequest) (*SuccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWhiteboardByTrip not implemented")
 }
 func (UnimplementedPlansServiceServer) CreateTrip(context.Context, *CreateTripRequest) (*CreateTripResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTrip not implemented")
@@ -528,6 +560,24 @@ func _PlansService_GetWhiteboardByID_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlansService_GetWhiteboardsByTrip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ManyWhiteboardIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).GetWhiteboardsByTrip(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_GetWhiteboardsByTrip_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).GetWhiteboardsByTrip(ctx, req.(*ManyWhiteboardIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PlansService_UpdateWhiteboard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateWhiteboardRequest)
 	if err := dec(in); err != nil {
@@ -560,6 +610,24 @@ func _PlansService_DeleteWhiteboardByID_Handler(srv interface{}, ctx context.Con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PlansServiceServer).DeleteWhiteboardByID(ctx, req.(*WhiteboardIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlansService_DeleteWhiteboardByTrip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ManyWhiteboardIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).DeleteWhiteboardByTrip(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_DeleteWhiteboardByTrip_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).DeleteWhiteboardByTrip(ctx, req.(*ManyWhiteboardIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -702,12 +770,20 @@ var PlansService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PlansService_GetWhiteboardByID_Handler,
 		},
 		{
+			MethodName: "GetWhiteboardsByTrip",
+			Handler:    _PlansService_GetWhiteboardsByTrip_Handler,
+		},
+		{
 			MethodName: "UpdateWhiteboard",
 			Handler:    _PlansService_UpdateWhiteboard_Handler,
 		},
 		{
 			MethodName: "DeleteWhiteboardByID",
 			Handler:    _PlansService_DeleteWhiteboardByID_Handler,
+		},
+		{
+			MethodName: "DeleteWhiteboardByTrip",
+			Handler:    _PlansService_DeleteWhiteboardByTrip_Handler,
 		},
 		{
 			MethodName: "CreateTrip",

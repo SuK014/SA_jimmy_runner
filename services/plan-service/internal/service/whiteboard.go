@@ -15,8 +15,10 @@ type whiteboardsService struct {
 type IWhiteboardsService interface {
 	InsertWhiteboard(data entities.CreatedWhiteboardModel) (string, error)
 	FindByID(whiteboardID string) (*entities.WhiteboardDataModel, error)
+	FindManyByID(whiteboardIDs []string) (*[]entities.WhiteboardDataModel, error)
 	UpdateWhiteboard(whiteboardID string, data entities.UpdatedWhiteboardModel) error
 	DeleteWhiteboardByID(whiteboardID string) error
+	DeleteManyByID(tripIDs []string) error
 }
 
 func NewWhiteboardsService(repo0 repository.IWhiteboardsRepository) IWhiteboardsService {
@@ -42,6 +44,24 @@ func (sv *whiteboardsService) FindByID(whiteboardID string) (*entities.Whiteboar
 	return data, nil
 }
 
+func (sv *whiteboardsService) FindManyByID(whiteboardIDs []string) (*[]entities.WhiteboardDataModel, error) {
+
+	mongoIDs := []primitive.ObjectID{}
+	for _, p := range whiteboardIDs {
+		mongoID, err := primitive.ObjectIDFromHex(p)
+		if err != nil {
+			return nil, fmt.Errorf("invalid pinID: %v", err)
+		}
+		mongoIDs = append(mongoIDs, mongoID)
+	}
+	data, err := sv.WhiteboardsRepository.FindManyByID(mongoIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
 func (sv *whiteboardsService) UpdateWhiteboard(whiteboardID string, data entities.UpdatedWhiteboardModel) error {
 	mongoID, err := primitive.ObjectIDFromHex(whiteboardID)
 	if err != nil {
@@ -56,4 +76,16 @@ func (sv *whiteboardsService) DeleteWhiteboardByID(whiteboardID string) error {
 		return fmt.Errorf("invalid whiteboardID: %v", err)
 	}
 	return sv.WhiteboardsRepository.DeleteWhiteboardByID(mongoID)
+}
+
+func (sv *whiteboardsService) DeleteManyByID(tripIDs []string) error {
+	mongoIDs := []primitive.ObjectID{}
+	for _, p := range tripIDs {
+		mongoID, err := primitive.ObjectIDFromHex(p)
+		if err != nil {
+			return fmt.Errorf("invalid pinID: %v", err)
+		}
+		mongoIDs = append(mongoIDs, mongoID)
+	}
+	return sv.WhiteboardsRepository.DeleteManyByID(mongoIDs)
 }

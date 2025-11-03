@@ -26,16 +26,23 @@ func HandlerPlans(handler HTTPHandler, app *fiber.App) {
 	plan.Get("/participants/pin", middlewares.SetJWtHeaderHandler(), handler.GetParticipantsByPinID)
 
 	pin := plan.Group("/pin")
-	pin.Post("/", middlewares.SetJWtHeaderHandler(), handler.CreatePin)
+	pin.Post("/", middlewares.SetJWtHeaderHandler(), handler.CreatePin) // auto add to whiteboard
 	pin.Get("/", middlewares.SetJWtHeaderHandler(), handler.GetPinByID)
 	pin.Get("/participants", middlewares.SetJWtHeaderHandler(), handler.GetPinByParticipant)
 	pin.Put("/", middlewares.SetJWtHeaderHandler(), handler.UpdatePinByID)
 	pin.Put("/image", middlewares.SetJWtHeaderHandler(), handler.UpdatePinImageByID)
-	pin.Delete("/", middlewares.SetJWtHeaderHandler(), handler.DeletePinByID)
+	pin.Delete("/", middlewares.SetJWtHeaderHandler(), handler.DeletePinByID) // auto remove from whiteboard
 
 	whiteboard := plan.Group("/whiteboard")
-	whiteboard.Post("/", middlewares.SetJWtHeaderHandler(), handler.CreateWhiteboard) // create whiteboard and one default pin
+	whiteboard.Post("/", middlewares.SetJWtHeaderHandler(), handler.CreateWhiteboard) // create one default pin and auto add to trip
 	whiteboard.Get("/", middlewares.SetJWtHeaderHandler(), handler.GetWhiteboardByID)
 	whiteboard.Put("/", middlewares.SetJWtHeaderHandler(), handler.UpdateWhiteboardByID)
-	whiteboard.Delete("/", middlewares.SetJWtHeaderHandler(), handler.DeleteWhiteboardByID)
+	whiteboard.Delete("/", middlewares.SetJWtHeaderHandler(), handler.DeleteWhiteboardByID) // auto delete pin and auto remove from trip
+
+	trip := plan.Group("/trip")
+	trip.Post("/", middlewares.SetJWtHeaderHandler(), handler.CreateTrip) // create one default whiteboard
+	trip.Get("/", middlewares.SetJWtHeaderHandler(), handler.GetTripByID)
+	trip.Put("/", middlewares.SetJWtHeaderHandler(), handler.UpdateTripByID)
+	trip.Put("/image", middlewares.SetJWtHeaderHandler(), handler.UpdateTripImageByID)
+	trip.Delete("/", middlewares.SetJWtHeaderHandler(), handler.DeleteTripByID) // auto delete whiteboard and pin
 }

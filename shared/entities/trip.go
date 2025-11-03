@@ -20,8 +20,8 @@ type CreatedTripModel struct {
 }
 
 type UpdatedTripModel struct {
-	Whiteboards           []string `json:"whiteboards,omitempty" bson:"whiteboards,omitempty"`
-	WhiteboardsChangeType string   `json:"whiteboards_change_type,omitempty"` // add, remove, set
 	Name                  string   `json:"name,omitempty" bson:"name,omitempty"`
 	Description           string   `json:"description,omitempty" bson:"description,omitempty"`
+	Whiteboards           []string `json:"whiteboards,omitempty" bson:"whiteboards,omitempty"`
+	WhiteboardsChangeType string   `json:"whiteboards_change_type,omitempty"` // add, remove, set
 }

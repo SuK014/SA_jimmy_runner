@@ -11,12 +11,14 @@ type gRPCHandler struct {
 	pb.UnimplementedPlansServiceServer
 	PinService        services.IPinsService
 	WhiteboardService services.IWhiteboardsService
+	TripService       services.ITripsService
 }
 
-func NewGRPCHandler(server *grpc.Server, pinService services.IPinsService, whiteboardService services.IWhiteboardsService) (*gRPCHandler, error) {
+func NewGRPCHandler(server *grpc.Server, pinService services.IPinsService, whiteboardService services.IWhiteboardsService, tripService services.ITripsService) (*gRPCHandler, error) {
 	handler := &gRPCHandler{
 		PinService:        pinService,
 		WhiteboardService: whiteboardService,
+		TripService:       tripService,
 	}
 	pb.RegisterPlansServiceServer(server, handler)
 	return handler, nil

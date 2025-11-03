@@ -23,8 +23,10 @@ type whiteboardsRepository struct {
 type IWhiteboardsRepository interface {
 	InsertWhiteboard(data entities.CreatedWhiteboardModel) (string, error)
 	FindByID(whiteboardID primitive.ObjectID) (*entities.WhiteboardDataModel, error)
+	FindManyByID(whiteboardIDs []primitive.ObjectID) (*[]entities.WhiteboardDataModel, error)
 	UpdateWhiteboard(whiteboardID primitive.ObjectID, data entities.UpdatedWhiteboardModel) error
 	DeleteWhiteboardByID(whiteboardID primitive.ObjectID) error
+	DeleteManyByID(tripIDs []primitive.ObjectID) error
 }
 
 func NewWhiteboardsRepository(db *MongoDB) IWhiteboardsRepository {
@@ -52,6 +54,26 @@ func (repo *whiteboardsRepository) FindByID(whiteboardID primitive.ObjectID) (*e
 		return &whiteboard, err
 	}
 	return &whiteboard, nil
+}
+
+func (repo *whiteboardsRepository) FindManyByID(whiteboardIDs []primitive.ObjectID) (*[]entities.WhiteboardDataModel, error) {
+	filter := bson.M{"_id": bson.M{"$in": whiteboardIDs}}
+	cursor, err := repo.Collection.Find(repo.Context, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(repo.Context)
+
+	var whiteboards []entities.WhiteboardDataModel
+	if err := cursor.All(repo.Context, &whiteboards); err != nil {
+		return nil, err
+	}
+
+	for i := range whiteboards {
+		whiteboards[i].WhiteboardID = whiteboards[i].ID.Hex()
+	}
+
+	return &whiteboards, nil
 }
 
 func (repo *whiteboardsRepository) UpdateWhiteboard(whiteboardID primitive.ObjectID, data entities.UpdatedWhiteboardModel) error {
@@ -108,6 +130,21 @@ func (repo *whiteboardsRepository) DeleteWhiteboardByID(whiteboardID primitive.O
 	if result.DeletedCount == 0 {
 		fiberlog.Warnf("Whiteboards -> DeleteWhiteboardByID: No document found with ID: %s \n", whiteboardID.Hex())
 		return errors.New("whiteboard not found")
+	}
+	return nil
+}
+
+func (repo *whiteboardsRepository) DeleteManyByID(tripIDs []primitive.ObjectID) error {
+	filter := bson.M{"_id": bson.M{"$in": tripIDs}}
+	result, err := repo.Collection.DeleteMany(repo.Context, filter)
+	if err != nil {
+		fiberlog.Errorf("Pins -> DeleteManyByID: %s \n", err)
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		fiberlog.Warnf("Pins -> DeleteManyByID: No document found with ID: %s \n", tripIDs)
+		return errors.New("pin not found")
 	}
 	return nil
 }

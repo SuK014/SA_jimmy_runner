@@ -86,3 +86,28 @@ func (ds *PlansServiceClient) UpdateWhiteboard(ctx context.Context, req *pb.Upda
 func (ds *PlansServiceClient) DeleteWhiteboardByID(ctx context.Context, req *pb.WhiteboardIDRequest) (*pb.SuccessResponse, error) {
 	return ds.Client.DeleteWhiteboardByID(ctx, req)
 }
+
+// trips
+func (ds *PlansServiceClient) CreateTrip(ctx context.Context, req *pb.CreateTripRequest) (*pb.CreateTripResponse, error) {
+	return ds.Client.CreateTrip(ctx, req)
+}
+
+func (ds *PlansServiceClient) GetTripByID(ctx context.Context, req *pb.TripIDRequest) (*pb.GetTripByIDResponse, error) {
+	return ds.Client.GetTripByID(ctx, req)
+}
+
+func (ds *PlansServiceClient) GetWhiteboardsByTrip(ctx context.Context, req *pb.ManyWhiteboardIDRequest) (*pb.GetWhiteboardsResponse, error) {
+	return ds.Client.GetWhiteboardsByTrip(ctx, req)
+}
+
+func (ds *PlansServiceClient) UpdateTrip(ctx context.Context, req *pb.UpdateTripRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.UpdateTrip(ctx, req)
+}
+
+func (ds *PlansServiceClient) UpdateTripImage(ctx context.Context, req *pb.UpdateTripImageRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.UpdateTripImage(ctx, req)
+}
+
+func (ds *PlansServiceClient) DeleteTripByID(ctx context.Context, req *pb.TripIDRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.DeleteTripByID(ctx, req)
+}

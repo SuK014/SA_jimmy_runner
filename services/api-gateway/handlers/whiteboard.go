@@ -12,6 +12,12 @@ import (
 
 // CreateUser handles REST requests and forwards them to gRPC
 func (h *HTTPHandler) CreateWhiteboard(ctx *fiber.Ctx) error {
+	tripID := ctx.Query("trip_id")
+	if tripID == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'whiteboard_id' query parameter"},
+		)
+	}
 	day := ctx.Query("day")
 	if day == "" {
 		return ctx.Status(fiber.StatusBadRequest).JSON(
@@ -41,6 +47,17 @@ func (h *HTTPHandler) CreateWhiteboard(ctx *fiber.Ctx) error {
 	if err != nil || !pinRes.GetSuccess() {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot create whiteboard: " + err.Error()},
+		)
+	}
+
+	tripReq := &pb.UpdateTripRequest{
+		Id:                   tripID,
+		Whiteboards:          []string{res.GetWhiteboardId()},
+		WhiteboardChangeType: "add",
+	}
+	if _, err = h.planClient.UpdateTrip(context.Background(), tripReq); err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot auto update trip(add whiteboard): " + err.Error()},
 		)
 	}
 
@@ -121,6 +138,12 @@ func (h *HTTPHandler) DeleteWhiteboardByID(ctx *fiber.Ctx) error {
 			entities.ResponseMessage{Message: "missing or empty 'id' query parameter"},
 		)
 	}
+	tripID := ctx.Query("trip_id")
+	if tripID == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'whiteboard_id' query parameter"},
+		)
+	}
 
 	getPinIDReq := &pb.WhiteboardIDRequest{
 		WhiteboardId: id,
@@ -149,6 +172,17 @@ func (h *HTTPHandler) DeleteWhiteboardByID(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot delete whiteboard: " + err.Error()},
+		)
+	}
+
+	tripReq := &pb.UpdateTripRequest{
+		Id:                   tripID,
+		Whiteboards:          []string{id},
+		WhiteboardChangeType: "remove",
+	}
+	if _, err = h.planClient.UpdateTrip(context.Background(), tripReq); err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot auto update trip(remove whiteboard): " + err.Error()},
 		)
 	}
 
