@@ -11,8 +11,7 @@ import (
 )
 
 func SendEmail() {
-	// rb, err := messaging.NewRabbitMQ(os.Getenv("RABBITMQ_URL"))
-	rb, err := messaging.NewRabbitMQ("amqps://frqwrbeu:2r8iEMSWuuGsR5aKbR2Jx3fUWygENs8D@gorilla.lmq.cloudamqp.com/frqwrbeu")
+	rb, err := messaging.NewRabbitMQ(os.Getenv("RABBITMQ_URL"))
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
 	}
@@ -28,8 +27,7 @@ func SendEmail() {
 }
 
 func StartEmailConsumers() {
-	// rb, err := messaging.NewRabbitMQ(os.Getenv("RABBITMQ_URL"))
-	rb, err := messaging.NewRabbitMQ("amqps://frqwrbeu:2r8iEMSWuuGsR5aKbR2Jx3fUWygENs8D@gorilla.lmq.cloudamqp.com/frqwrbeu")
+	rb, err := messaging.NewRabbitMQ(os.Getenv("RABBITMQ_URL"))
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
 	}
