@@ -11,11 +11,11 @@ service UserService {
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc GetUser(UserIDRequest) returns (UserResponse);
   rpc DeleteUser(UserIDRequest) returns (UserResponse);
-  rpc GetUsersAvatar(UsersAvatarRequest) returns (UsersAvatarResponse);
 
   // user_trip
   rpc CreateUsersTrip(UsersTripRequest) returns (UsersTripResponse);
   rpc UpdateUsername(UserTripModel) returns (UserTripResponse);
+  rpc GetUsersAvatar(UsersAvatarRequest) returns (UsersAvatarResponse);
   rpc GetAllTripsByUserID(UserIDRequest) returns (TripIDsResponse);
   rpc Delete(UserTripRequest) returns (SuccessResponse);
   rpc DeleteByUser(UserTripRequest) returns (SuccessResponse);
@@ -68,7 +68,6 @@ message UserIDRequest {
 
 message UsersAvatarRequest {
   string trip_id = 1;
-  repeated string user_id = 2;
 }
 
 message Avatar {

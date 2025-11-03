@@ -57,3 +57,69 @@ func (h *HTTPHandler) GetTripsByUserID(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(res)
 }
+
+func (h *HTTPHandler) GetTripUsersAvatar(ctx *fiber.Ctx) error {
+	_, err := middlewares.DecodeJWTToken(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
+	}
+	tripID := ctx.Query("trip_id")
+	if tripID == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'trip_id' query parameter"},
+		)
+	}
+
+	req := &pb.UsersAvatarRequest{
+		TripId: tripID,
+	}
+
+	res, err := h.userClient.GetUsersAvatar(context.Background(), req)
+	if err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot get user Avatar (userTrip + user): " + err.Error()},
+		)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(
+		entities.ResponseModel{
+			Message: "success",
+			Data:    res,
+			Status:  fiber.StatusOK,
+		},
+	)
+}
+
+func (h *HTTPHandler) UpdateUsername(ctx *fiber.Ctx) error {
+	token, err := middlewares.DecodeJWTToken(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
+	}
+	tripID := ctx.Query("trip_id")
+	if tripID == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'trip_id' query parameter"},
+		)
+	}
+	name := ctx.Query("name")
+	if tripID == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'name' query parameter"},
+		)
+	}
+
+	req := &pb.UserTripModel{
+		UserId:   token.UserID,
+		TripId:   tripID,
+		Username: name,
+	}
+
+	res, err := h.userClient.UpdateUsername(context.Background(), req)
+	if err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot UpdateUsername: " + err.Error()},
+		)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(res)
+}

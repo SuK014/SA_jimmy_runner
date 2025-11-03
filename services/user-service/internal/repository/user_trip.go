@@ -19,7 +19,7 @@ type IUserTripRepository interface {
 	Insert(tripID, userID, name string) (*entities.UserTripModel, error)
 	InsertManyUsers(tripID string, userIDs []string) (*entities.UsersTripModel, error)
 	FindByID(tripID, userID string) (*entities.UserTripModel, error)
-	FindManyUsersByTripID(tripID string, userID []string) (*[]entities.UserTripModel, error)
+	FindManyUsersByTripID(tripID string) (*[]entities.UserTripModel, error)
 	FindManyTripsByUserID(userID string) (*entities.UserTripsModel, error)
 	Update(tripID, userID, name string) (*entities.UserTripModel, error)
 	DeleteByID(tripID, userID string) error
@@ -88,10 +88,9 @@ func (repo *userTripRepository) FindByID(tripID, userID string) (*entities.UserT
 	return mapToUserTripModel(user)
 }
 
-func (repo *userTripRepository) FindManyUsersByTripID(tripID string, userID []string) (*[]entities.UserTripModel, error) {
+func (repo *userTripRepository) FindManyUsersByTripID(tripID string) (*[]entities.UserTripModel, error) {
 	users, err := repo.Collection.UserTrip.FindMany(
 		db.UserTrip.TripID.Equals(tripID),
-		db.UserTrip.UserID.In(userID),
 	).Exec(repo.Context)
 	if err != nil {
 		return nil, fmt.Errorf("usersTrips -> FindManyUsersByTripID: %v", err)
@@ -117,10 +116,10 @@ func (repo *userTripRepository) FindManyTripsByUserID(userID string) (*entities.
 		db.UserTrip.UserID.Equals(userID),
 	).Exec(repo.Context)
 	if err != nil {
-		return nil, fmt.Errorf("usersTrips -> FindManyUsersByTripID: %v", err)
+		return nil, fmt.Errorf("usersTrips -> FindManyTripsByUserID: %v", err)
 	}
 	if trips == nil {
-		return nil, fmt.Errorf("usersTrips -> FindManyUsersByTripID: userTrip data is nil")
+		return nil, fmt.Errorf("usersTrips -> FindManyTripsByUserID: userTrip data is nil")
 	}
 
 	var trip_ids []string
@@ -148,19 +147,6 @@ func (repo *userTripRepository) Update(tripID, userID, name string) (*entities.U
 	}
 
 	return mapToUserTripModel(updatedUser)
-}
-
-func (repo *userTripRepository) Delete(tripID, userID string) error {
-	_, err := repo.Collection.UserTrip.FindUnique(
-		db.UserTrip.UserTripUserIDTripIDKey(
-			db.UserTrip.UserID.Equals(userID),
-			db.UserTrip.TripID.Equals(tripID),
-		),
-	).Delete().Exec(repo.Context)
-	if err != nil {
-		return fmt.Errorf("usersTrips -> DeleteUserTrip: %v", err)
-	}
-	return nil
 }
 
 func (repo *userTripRepository) DeleteByID(tripID, userID string) error {

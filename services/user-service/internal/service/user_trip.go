@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	repositories "github.com/SuK014/SA_jimmy_runner/services/user-service/internal/repository"
 	"github.com/SuK014/SA_jimmy_runner/shared/entities"
 )
@@ -11,13 +13,14 @@ type userTripService struct {
 
 type IUserTripService interface {
 	InsertManyUsers(tripID string, userIDs []string) (*entities.UsersTripModel, error)
-	GetAvatars(tripID string, profileData *[]entities.UserDataModel) (*[]entities.AvatarUserModel, error)
+	FindManyUsersByTripID(tripID string) (*[]entities.UserTripModel, error)
 	FindManyTripsByUserID(userID string) (*entities.UserTripsModel, error)
 	FindByID(tripID, userID string) (*entities.UserTripModel, error)
 	UpdateUsername(tripID, userID, name string) (*entities.UserTripModel, error)
 	DeleteByID(tripID, userID string) error
 	DeleteByUserID(userID string) error
 	DeleteByTripID(tripID string) error
+	MergeAvatar(userRes *[]entities.UserDataModel, userTripRes *[]entities.UserTripModel) (*[]entities.AvatarUserModel, error)
 }
 
 func NewUserTripService(repo0 repositories.IUserTripRepository) IUserTripService {
@@ -30,41 +33,8 @@ func (sv *userTripService) InsertManyUsers(tripID string, userIDs []string) (*en
 	return sv.UserTripRepository.InsertManyUsers(tripID, userIDs)
 }
 
-func (sv *userTripService) GetAvatars(tripID string, profileData *[]entities.UserDataModel) (*[]entities.AvatarUserModel, error) {
-	var userIDs []string
-	for _, u := range *profileData {
-		userIDs = append(userIDs, u.UserID)
-	}
-	nameData, err := sv.UserTripRepository.FindManyUsersByTripID(tripID, userIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	// Map for fast lookup by user_id
-	nameMap := make(map[string]entities.UserTripModel)
-	for _, n := range *nameData {
-		nameMap[n.UserID] = n
-	}
-
-	// Merge
-	var result []entities.AvatarUserModel
-	for _, p := range *profileData {
-		u := entities.AvatarUserModel{
-			ID:      p.UserID,
-			Name:    p.Name,
-			Profile: p.Profile,
-		}
-
-		if n, ok := nameMap[p.UserID]; ok {
-			if n.Name != "" {
-				u.Name = n.Name
-			}
-		}
-
-		result = append(result, u)
-	}
-
-	return &result, nil
+func (sv *userTripService) FindManyUsersByTripID(tripID string) (*[]entities.UserTripModel, error) {
+	return sv.UserTripRepository.FindManyUsersByTripID(tripID)
 }
 
 func (sv *userTripService) FindManyTripsByUserID(userID string) (*entities.UserTripsModel, error) {
@@ -89,4 +59,35 @@ func (sv *userTripService) DeleteByUserID(userID string) error {
 
 func (sv *userTripService) DeleteByTripID(tripID string) error {
 	return sv.UserTripRepository.DeleteByTripID(tripID)
+}
+
+func (sv *userTripService) MergeAvatar(userRes *[]entities.UserDataModel, userTripRes *[]entities.UserTripModel) (*[]entities.AvatarUserModel, error) {
+	if userRes == nil || userTripRes == nil {
+		return nil, fmt.Errorf("MergeAvatar: input slices cannot be nil")
+	}
+
+	// Build a quick lookup for trip data by UserID
+	tripMap := make(map[string]string)
+	for _, trip := range *userTripRes {
+		tripMap[trip.UserID] = trip.Name
+	}
+
+	var merged []entities.AvatarUserModel
+	for _, user := range *userRes {
+		tripName, exists := tripMap[user.UserID]
+
+		// Decide which name to use
+		name := user.Name
+		if exists && tripName != "" {
+			name = tripName
+		}
+
+		merged = append(merged, entities.AvatarUserModel{
+			ID:      user.UserID,
+			Name:    name,
+			Profile: user.Profile,
+		})
+	}
+
+	return &merged, nil
 }

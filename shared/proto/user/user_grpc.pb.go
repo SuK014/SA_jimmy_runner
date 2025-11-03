@@ -24,9 +24,9 @@ const (
 	UserService_UpdateUser_FullMethodName          = "/user.UserService/UpdateUser"
 	UserService_GetUser_FullMethodName             = "/user.UserService/GetUser"
 	UserService_DeleteUser_FullMethodName          = "/user.UserService/DeleteUser"
-	UserService_GetUsersAvatar_FullMethodName      = "/user.UserService/GetUsersAvatar"
 	UserService_CreateUsersTrip_FullMethodName     = "/user.UserService/CreateUsersTrip"
 	UserService_UpdateUsername_FullMethodName      = "/user.UserService/UpdateUsername"
+	UserService_GetUsersAvatar_FullMethodName      = "/user.UserService/GetUsersAvatar"
 	UserService_GetAllTripsByUserID_FullMethodName = "/user.UserService/GetAllTripsByUserID"
 	UserService_Delete_FullMethodName              = "/user.UserService/Delete"
 	UserService_DeleteByUser_FullMethodName        = "/user.UserService/DeleteByUser"
@@ -44,10 +44,10 @@ type UserServiceClient interface {
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetUser(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	DeleteUser(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*UserResponse, error)
-	GetUsersAvatar(ctx context.Context, in *UsersAvatarRequest, opts ...grpc.CallOption) (*UsersAvatarResponse, error)
 	// user_trip
 	CreateUsersTrip(ctx context.Context, in *UsersTripRequest, opts ...grpc.CallOption) (*UsersTripResponse, error)
 	UpdateUsername(ctx context.Context, in *UserTripModel, opts ...grpc.CallOption) (*UserTripResponse, error)
+	GetUsersAvatar(ctx context.Context, in *UsersAvatarRequest, opts ...grpc.CallOption) (*UsersAvatarResponse, error)
 	GetAllTripsByUserID(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*TripIDsResponse, error)
 	Delete(ctx context.Context, in *UserTripRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	DeleteByUser(ctx context.Context, in *UserTripRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
@@ -113,16 +113,6 @@ func (c *userServiceClient) DeleteUser(ctx context.Context, in *UserIDRequest, o
 	return out, nil
 }
 
-func (c *userServiceClient) GetUsersAvatar(ctx context.Context, in *UsersAvatarRequest, opts ...grpc.CallOption) (*UsersAvatarResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UsersAvatarResponse)
-	err := c.cc.Invoke(ctx, UserService_GetUsersAvatar_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *userServiceClient) CreateUsersTrip(ctx context.Context, in *UsersTripRequest, opts ...grpc.CallOption) (*UsersTripResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UsersTripResponse)
@@ -137,6 +127,16 @@ func (c *userServiceClient) UpdateUsername(ctx context.Context, in *UserTripMode
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserTripResponse)
 	err := c.cc.Invoke(ctx, UserService_UpdateUsername_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetUsersAvatar(ctx context.Context, in *UsersAvatarRequest, opts ...grpc.CallOption) (*UsersAvatarResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UsersAvatarResponse)
+	err := c.cc.Invoke(ctx, UserService_GetUsersAvatar_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -203,10 +203,10 @@ type UserServiceServer interface {
 	UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error)
 	GetUser(context.Context, *UserIDRequest) (*UserResponse, error)
 	DeleteUser(context.Context, *UserIDRequest) (*UserResponse, error)
-	GetUsersAvatar(context.Context, *UsersAvatarRequest) (*UsersAvatarResponse, error)
 	// user_trip
 	CreateUsersTrip(context.Context, *UsersTripRequest) (*UsersTripResponse, error)
 	UpdateUsername(context.Context, *UserTripModel) (*UserTripResponse, error)
+	GetUsersAvatar(context.Context, *UsersAvatarRequest) (*UsersAvatarResponse, error)
 	GetAllTripsByUserID(context.Context, *UserIDRequest) (*TripIDsResponse, error)
 	Delete(context.Context, *UserTripRequest) (*SuccessResponse, error)
 	DeleteByUser(context.Context, *UserTripRequest) (*SuccessResponse, error)
@@ -237,14 +237,14 @@ func (UnimplementedUserServiceServer) GetUser(context.Context, *UserIDRequest) (
 func (UnimplementedUserServiceServer) DeleteUser(context.Context, *UserIDRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
 }
-func (UnimplementedUserServiceServer) GetUsersAvatar(context.Context, *UsersAvatarRequest) (*UsersAvatarResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUsersAvatar not implemented")
-}
 func (UnimplementedUserServiceServer) CreateUsersTrip(context.Context, *UsersTripRequest) (*UsersTripResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUsersTrip not implemented")
 }
 func (UnimplementedUserServiceServer) UpdateUsername(context.Context, *UserTripModel) (*UserTripResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUsername not implemented")
+}
+func (UnimplementedUserServiceServer) GetUsersAvatar(context.Context, *UsersAvatarRequest) (*UsersAvatarResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUsersAvatar not implemented")
 }
 func (UnimplementedUserServiceServer) GetAllTripsByUserID(context.Context, *UserIDRequest) (*TripIDsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllTripsByUserID not implemented")
@@ -372,24 +372,6 @@ func _UserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetUsersAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UsersAvatarRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).GetUsersAvatar(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_GetUsersAvatar_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUsersAvatar(ctx, req.(*UsersAvatarRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _UserService_CreateUsersTrip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UsersTripRequest)
 	if err := dec(in); err != nil {
@@ -422,6 +404,24 @@ func _UserService_UpdateUsername_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).UpdateUsername(ctx, req.(*UserTripModel))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetUsersAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UsersAvatarRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUsersAvatar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetUsersAvatar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUsersAvatar(ctx, req.(*UsersAvatarRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -544,16 +544,16 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_DeleteUser_Handler,
 		},
 		{
-			MethodName: "GetUsersAvatar",
-			Handler:    _UserService_GetUsersAvatar_Handler,
-		},
-		{
 			MethodName: "CreateUsersTrip",
 			Handler:    _UserService_CreateUsersTrip_Handler,
 		},
 		{
 			MethodName: "UpdateUsername",
 			Handler:    _UserService_UpdateUsername_Handler,
+		},
+		{
+			MethodName: "GetUsersAvatar",
+			Handler:    _UserService_GetUsersAvatar_Handler,
 		},
 		{
 			MethodName: "GetAllTripsByUserID",

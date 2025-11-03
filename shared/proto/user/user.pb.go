@@ -424,7 +424,6 @@ func (x *UserIDRequest) GetUserId() string {
 type UsersAvatarRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TripId        string                 `protobuf:"bytes,1,opt,name=trip_id,json=tripId,proto3" json:"trip_id,omitempty"`
-	UserId        []string               `protobuf:"bytes,2,rep,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -464,13 +463,6 @@ func (x *UsersAvatarRequest) GetTripId() string {
 		return x.TripId
 	}
 	return ""
-}
-
-func (x *UsersAvatarRequest) GetUserId() []string {
-	if x != nil {
-		return x.UserId
-	}
-	return nil
 }
 
 type Avatar struct {
@@ -1064,10 +1056,9 @@ const file_user_proto_rawDesc = "" +
 	"\fcontent_type\x18\x02 \x01(\tR\vcontentType\x12\x1b\n" +
 	"\tfile_data\x18\x03 \x01(\fR\bfileData\"(\n" +
 	"\rUserIDRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"F\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"-\n" +
 	"\x12UsersAvatarRequest\x12\x17\n" +
-	"\atrip_id\x18\x01 \x01(\tR\x06tripId\x12\x17\n" +
-	"\auser_id\x18\x02 \x03(\tR\x06userId\"^\n" +
+	"\atrip_id\x18\x01 \x01(\tR\x06tripId\"^\n" +
 	"\x06Avatar\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x18\n" +
@@ -1111,10 +1102,10 @@ const file_user_proto_rawDesc = "" +
 	"UpdateUser\x12\x17.user.UpdateUserRequest\x1a\x12.user.UserResponse\x122\n" +
 	"\aGetUser\x12\x13.user.UserIDRequest\x1a\x12.user.UserResponse\x125\n" +
 	"\n" +
-	"DeleteUser\x12\x13.user.UserIDRequest\x1a\x12.user.UserResponse\x12E\n" +
-	"\x0eGetUsersAvatar\x12\x18.user.UsersAvatarRequest\x1a\x19.user.UsersAvatarResponse\x12B\n" +
+	"DeleteUser\x12\x13.user.UserIDRequest\x1a\x12.user.UserResponse\x12B\n" +
 	"\x0fCreateUsersTrip\x12\x16.user.UsersTripRequest\x1a\x17.user.UsersTripResponse\x12=\n" +
-	"\x0eUpdateUsername\x12\x13.user.UserTripModel\x1a\x16.user.UserTripResponse\x12A\n" +
+	"\x0eUpdateUsername\x12\x13.user.UserTripModel\x1a\x16.user.UserTripResponse\x12E\n" +
+	"\x0eGetUsersAvatar\x12\x18.user.UsersAvatarRequest\x1a\x19.user.UsersAvatarResponse\x12A\n" +
 	"\x13GetAllTripsByUserID\x12\x13.user.UserIDRequest\x1a\x15.user.TripIDsResponse\x126\n" +
 	"\x06Delete\x12\x15.user.UserTripRequest\x1a\x15.user.SuccessResponse\x12<\n" +
 	"\fDeleteByUser\x12\x15.user.UserTripRequest\x1a\x15.user.SuccessResponse\x12<\n" +
@@ -1163,9 +1154,9 @@ var file_user_proto_depIdxs = []int32{
 	4,  // 5: user.UserService.UpdateUser:input_type -> user.UpdateUserRequest
 	6,  // 6: user.UserService.GetUser:input_type -> user.UserIDRequest
 	6,  // 7: user.UserService.DeleteUser:input_type -> user.UserIDRequest
-	7,  // 8: user.UserService.GetUsersAvatar:input_type -> user.UsersAvatarRequest
-	10, // 9: user.UserService.CreateUsersTrip:input_type -> user.UsersTripRequest
-	15, // 10: user.UserService.UpdateUsername:input_type -> user.UserTripModel
+	10, // 8: user.UserService.CreateUsersTrip:input_type -> user.UsersTripRequest
+	15, // 9: user.UserService.UpdateUsername:input_type -> user.UserTripModel
+	7,  // 10: user.UserService.GetUsersAvatar:input_type -> user.UsersAvatarRequest
 	6,  // 11: user.UserService.GetAllTripsByUserID:input_type -> user.UserIDRequest
 	13, // 12: user.UserService.Delete:input_type -> user.UserTripRequest
 	13, // 13: user.UserService.DeleteByUser:input_type -> user.UserTripRequest
@@ -1176,9 +1167,9 @@ var file_user_proto_depIdxs = []int32{
 	2,  // 18: user.UserService.UpdateUser:output_type -> user.UserResponse
 	2,  // 19: user.UserService.GetUser:output_type -> user.UserResponse
 	2,  // 20: user.UserService.DeleteUser:output_type -> user.UserResponse
-	9,  // 21: user.UserService.GetUsersAvatar:output_type -> user.UsersAvatarResponse
-	11, // 22: user.UserService.CreateUsersTrip:output_type -> user.UsersTripResponse
-	16, // 23: user.UserService.UpdateUsername:output_type -> user.UserTripResponse
+	11, // 21: user.UserService.CreateUsersTrip:output_type -> user.UsersTripResponse
+	16, // 22: user.UserService.UpdateUsername:output_type -> user.UserTripResponse
+	9,  // 23: user.UserService.GetUsersAvatar:output_type -> user.UsersAvatarResponse
 	17, // 24: user.UserService.GetAllTripsByUserID:output_type -> user.TripIDsResponse
 	0,  // 25: user.UserService.Delete:output_type -> user.SuccessResponse
 	0,  // 26: user.UserService.DeleteByUser:output_type -> user.SuccessResponse

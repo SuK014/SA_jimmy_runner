@@ -24,10 +24,11 @@ func HandlerUsers(handler HTTPHandler, app *fiber.App) {
 	userTrip := app.Group("/userTrip")
 	userTrip.Post("/", middlewares.SetJWtHeaderHandler(), handler.AddUsersToTrip)
 	userTrip.Get("/trips", middlewares.SetJWtHeaderHandler(), handler.GetTripsByUserID)
+	userTrip.Put("/name", middlewares.SetJWtHeaderHandler(), handler.UpdateUsername)
+	userTrip.Get("/avatars", middlewares.SetJWtHeaderHandler(), handler.GetTripUsersAvatar)
 }
 func HandlerPlans(handler HTTPHandler, app *fiber.App) {
 	plan := app.Group("/plan")
-	plan.Get("/participants/pin", middlewares.SetJWtHeaderHandler(), handler.GetParticipantsByPinID)
 
 	pin := plan.Group("/pin")
 	pin.Post("/", middlewares.SetJWtHeaderHandler(), handler.CreatePin) // auto add to whiteboard

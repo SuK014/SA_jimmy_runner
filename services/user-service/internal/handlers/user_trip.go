@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	pb "github.com/SuK014/SA_jimmy_runner/shared/proto/user"
 
 	"context"
@@ -30,6 +32,44 @@ func (h *gRPCHandler) GetAllTripsByUserID(ctx context.Context, req *pb.UserIDReq
 	return &pb.TripIDsResponse{
 		Success: true,
 		TripId:  res.TripID,
+	}, nil
+}
+
+func (h *gRPCHandler) GetUsersAvatar(ctx context.Context, req *pb.UsersAvatarRequest) (*pb.UsersAvatarResponse, error) {
+	userTripRes, err := h.userTripService.FindManyUsersByTripID(req.GetTripId())
+	if err != nil {
+		return nil, err
+	}
+	var user_ids []string
+	for _, ut := range *userTripRes {
+		fmt.Println(ut)
+		user_ids = append(user_ids, ut.UserID)
+	}
+	if len(user_ids) == 0 {
+		return nil, fmt.Errorf("no users found for tripID: %s", req.GetTripId())
+	}
+	userRes, err := h.userService.FindManyUsersByID(user_ids)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("get profile")
+	avatarRes, err := h.userTripService.MergeAvatar(userRes, userTripRes)
+	if err != nil {
+		return nil, err
+	}
+
+	avatars := []*pb.Avatar{}
+	for _, a := range *avatarRes {
+		avatars = append(avatars, &pb.Avatar{
+			UserId:      a.ID,
+			DisplayName: a.Name,
+			Profile:     a.Profile,
+		})
+	}
+
+	return &pb.UsersAvatarResponse{
+		Success: true,
+		Users:   avatars,
 	}, nil
 }
 
