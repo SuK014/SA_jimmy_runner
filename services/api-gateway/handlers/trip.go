@@ -62,7 +62,7 @@ func (h *HTTPHandler) CreateTrip(ctx *fiber.Ctx) error {
 	}
 	if _, err = h.userClient.CreateUsersTrip(context.Background(), userTripReq); err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot insert new user account: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot insert new user trip: " + err.Error()},
 		)
 	}
 
@@ -234,7 +234,7 @@ func (h *HTTPHandler) DeleteTripByID(ctx *fiber.Ctx) error {
 	}
 
 	if res, err := h.userClient.DeleteByTrip(context.Background(), userTripReq); err != nil || !res.GetSuccess() {
-		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "don't have access to trip."})
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "cannot DeleteByTrip."})
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(res)
