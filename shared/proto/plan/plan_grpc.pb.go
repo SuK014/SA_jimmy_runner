@@ -22,6 +22,7 @@ const (
 	PlansService_CreatePin_FullMethodName           = "/plan.PlansService/CreatePin"
 	PlansService_GetPinByID_FullMethodName          = "/plan.PlansService/GetPinByID"
 	PlansService_GetPinByParticipant_FullMethodName = "/plan.PlansService/GetPinByParticipant"
+	PlansService_UpdatePin_FullMethodName           = "/plan.PlansService/UpdatePin"
 )
 
 // PlansServiceClient is the client API for PlansService service.
@@ -34,6 +35,7 @@ type PlansServiceClient interface {
 	CreatePin(ctx context.Context, in *CreatePinRequest, opts ...grpc.CallOption) (*CreatePinResponse, error)
 	GetPinByID(ctx context.Context, in *GetPinByIDRequest, opts ...grpc.CallOption) (*GetPinByIDResponse, error)
 	GetPinByParticipant(ctx context.Context, in *GetPinByParticipantRequest, opts ...grpc.CallOption) (*GetPinsResponse, error)
+	UpdatePin(ctx context.Context, in *UpdatePinRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 }
 
 type plansServiceClient struct {
@@ -74,6 +76,16 @@ func (c *plansServiceClient) GetPinByParticipant(ctx context.Context, in *GetPin
 	return out, nil
 }
 
+func (c *plansServiceClient) UpdatePin(ctx context.Context, in *UpdatePinRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SuccessResponse)
+	err := c.cc.Invoke(ctx, PlansService_UpdatePin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PlansServiceServer is the server API for PlansService service.
 // All implementations must embed UnimplementedPlansServiceServer
 // for forward compatibility.
@@ -84,6 +96,7 @@ type PlansServiceServer interface {
 	CreatePin(context.Context, *CreatePinRequest) (*CreatePinResponse, error)
 	GetPinByID(context.Context, *GetPinByIDRequest) (*GetPinByIDResponse, error)
 	GetPinByParticipant(context.Context, *GetPinByParticipantRequest) (*GetPinsResponse, error)
+	UpdatePin(context.Context, *UpdatePinRequest) (*SuccessResponse, error)
 	mustEmbedUnimplementedPlansServiceServer()
 }
 
@@ -102,6 +115,9 @@ func (UnimplementedPlansServiceServer) GetPinByID(context.Context, *GetPinByIDRe
 }
 func (UnimplementedPlansServiceServer) GetPinByParticipant(context.Context, *GetPinByParticipantRequest) (*GetPinsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPinByParticipant not implemented")
+}
+func (UnimplementedPlansServiceServer) UpdatePin(context.Context, *UpdatePinRequest) (*SuccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePin not implemented")
 }
 func (UnimplementedPlansServiceServer) mustEmbedUnimplementedPlansServiceServer() {}
 func (UnimplementedPlansServiceServer) testEmbeddedByValue()                      {}
@@ -178,6 +194,24 @@ func _PlansService_GetPinByParticipant_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlansService_UpdatePin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePinRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).UpdatePin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_UpdatePin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).UpdatePin(ctx, req.(*UpdatePinRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PlansService_ServiceDesc is the grpc.ServiceDesc for PlansService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -196,6 +230,10 @@ var PlansService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPinByParticipant",
 			Handler:    _PlansService_GetPinByParticipant_Handler,
+		},
+		{
+			MethodName: "UpdatePin",
+			Handler:    _PlansService_UpdatePin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

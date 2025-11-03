@@ -60,3 +60,7 @@ func (ds *UserServiceClient) GetUser(ctx context.Context, req *pb.UserIDRequest)
 func (ds *UserServiceClient) DeleteUser(ctx context.Context, req *pb.UserIDRequest) (*pb.UserResponse, error) {
 	return ds.Client.DeleteUser(ctx, req)
 }
+
+func (ds *UserServiceClient) GetUsersAvatar(ctx context.Context, req *pb.UsersAvatarRequest) (*pb.UsersAvatarResponse, error) {
+	return ds.Client.GetUsersAvatar(ctx, req)
+}

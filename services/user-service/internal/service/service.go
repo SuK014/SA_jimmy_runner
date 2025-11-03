@@ -10,21 +10,24 @@ import (
 )
 
 type usersService struct {
-	UsersRepository repositories.IUsersRepository
+	UsersRepository    repositories.IUsersRepository
+	UserTripRepository repositories.IUserTripRepository
 }
 
 type IUsersService interface {
 	GetAllUsers() (*[]entities.UserDataModel, error)
 	InsertNewUser(data entities.CreatedUserModel) (*entities.UserDataModel, error)
 	GetByID(userID string) (*entities.UserDataModel, error)
+	GetAvatars(tripID string, userID []string) (*[]entities.AvatarUserModel, error)
 	Login(user entities.LoginUserModel) (*entities.UserDataModel, error)
 	UpdateUser(data entities.UpdateUserModel) (*entities.UserDataModel, error)
 	DeleteUser(userID string) error
 }
 
-func NewUsersService(repo0 repositories.IUsersRepository) IUsersService {
+func NewUsersService(repo0 repositories.IUsersRepository, repo1 repositories.IUserTripRepository) IUsersService {
 	return &usersService{
-		UsersRepository: repo0,
+		UsersRepository:    repo0,
+		UserTripRepository: repo1,
 	}
 }
 
@@ -35,7 +38,6 @@ func (sv *usersService) GetAllUsers() (*[]entities.UserDataModel, error) {
 	}
 
 	return data, nil
-
 }
 
 func (sv *usersService) GetByID(userID string) (*entities.UserDataModel, error) {
@@ -45,6 +47,43 @@ func (sv *usersService) GetByID(userID string) (*entities.UserDataModel, error) 
 	}
 
 	return data, nil
+}
+
+func (sv *usersService) GetAvatars(tripID string, userID []string) (*[]entities.AvatarUserModel, error) {
+	profileData, err := sv.UsersRepository.FindManyByID(userID)
+	if err != nil {
+		return nil, err
+	}
+	nameData, err := sv.UserTripRepository.FindManyByID(tripID, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Map for fast lookup by user_id
+	nameMap := make(map[string]entities.UserTripModel)
+	for _, n := range *nameData {
+		nameMap[n.UserID] = n
+	}
+
+	// Merge
+	var result []entities.AvatarUserModel
+	for _, p := range *profileData {
+		u := entities.AvatarUserModel{
+			ID:      p.UserID,
+			Name:    p.Name,
+			Profile: p.Profile,
+		}
+
+		if n, ok := nameMap[p.UserID]; ok {
+			if n.Name != "" {
+				u.Name = n.Name
+			}
+		}
+
+		result = append(result, u)
+	}
+
+	return &result, nil
 }
 
 func (sv *usersService) Login(user entities.LoginUserModel) (*entities.UserDataModel, error) {

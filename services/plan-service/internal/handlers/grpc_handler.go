@@ -24,11 +24,19 @@ func NewGRPCHandler(server *grpc.Server, pinService services.IPinsService) (*gRP
 }
 
 func (h *gRPCHandler) CreatePin(ctx context.Context, req *pb.CreatePinRequest) (*pb.CreatePinResponse, error) {
-
-	pin := entities.CreatedPinGRPCModel{
-		Image:        req.GetImage(),
+	expense := req.GetExpense()
+	var expenseEntities []entities.Expense
+	for _, e := range expense {
+		expenseEntities = append(expenseEntities, entities.Expense{
+			ID:      e.GetId(),
+			Name:    e.GetName(),
+			Expense: e.GetExpense(),
+		})
+	}
+	pin := entities.CreatedPinModel{
+		Name:         req.GetName(),
 		Description:  req.GetDescription(),
-		Expense:      req.GetExpense(),
+		Expenses:     expenseEntities,
 		Location:     req.GetLocation(),
 		Participants: req.GetParticipant(),
 	}
@@ -52,10 +60,21 @@ func (h *gRPCHandler) GetPinByID(ctx context.Context, req *pb.GetPinByIDRequest)
 		return nil, err
 	}
 
+	expenses := []*pb.Expenses{}
+	for _, e := range res.Expenses {
+		expenses = append(expenses, &pb.Expenses{
+			Id:      e.ID,
+			Name:    e.Name,
+			Expense: e.Expense,
+		})
+	}
+
 	return &pb.GetPinByIDResponse{
+		Success:     true,
+		Name:        res.Name,
 		Image:       res.Image,
 		Description: res.Description,
-		Expense:     res.Expense,
+		Expense:     expenses,
 		Location:    res.Location,
 		Participant: res.Participants,
 	}, nil
@@ -73,6 +92,7 @@ func (h *gRPCHandler) GetPinByParticipant(ctx context.Context, req *pb.GetPinByP
 	var pins []*pb.GetPinResponse
 	for _, pinData := range *res {
 		pins = append(pins, &pb.GetPinResponse{
+			Name:        pinData.Name,
 			PinId:       pinData.PinID,
 			Image:       pinData.Image,
 			Participant: pinData.Participants,
@@ -81,5 +101,32 @@ func (h *gRPCHandler) GetPinByParticipant(ctx context.Context, req *pb.GetPinByP
 
 	return &pb.GetPinsResponse{
 		Pins: pins,
+	}, nil
+}
+
+func (h *gRPCHandler) UpdatePin(ctx context.Context, req *pb.UpdatePinRequest) (*pb.SuccessResponse, error) {
+	expense := req.GetExpense()
+	var expenseEntities []entities.Expense
+	for _, e := range expense {
+		expenseEntities = append(expenseEntities, entities.Expense{
+			ID:      e.GetId(),
+			Name:    e.GetName(),
+			Expense: e.GetExpense(),
+		})
+	}
+	pin := entities.UpdatedPinModel{
+		Name:         req.GetName(),
+		Description:  req.GetDescription(),
+		Expenses:     expenseEntities,
+		Location:     req.GetLocation(),
+		Participants: req.GetParticipant(),
+	}
+
+	if err := h.PinService.UpdatePin(req.GetId(), pin); err != nil {
+		return nil, err
+	}
+
+	return &pb.SuccessResponse{
+		Success: true,
 	}, nil
 }

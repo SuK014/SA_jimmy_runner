@@ -13,6 +13,7 @@ service PlansService {
   rpc CreatePin(CreatePinRequest) returns (CreatePinResponse);
   rpc GetPinByID(GetPinByIDRequest) returns (GetPinByIDResponse);
   rpc GetPinByParticipant(GetPinByParticipantRequest) returns (GetPinsResponse);
+  rpc UpdatePin(UpdatePinRequest) returns (SuccessResponse);
 }
 
 // Request message to get a user
@@ -27,9 +28,9 @@ service PlansService {
 
 // Request message to create a user
 message CreatePinRequest {
-  bytes image = 1;
+  string name = 1;
   string description = 2;
-  string expense = 3; //JSON AS a string
+  repeated Expenses expense = 3; //JSON
   float location = 4;
   repeated string participant = 5;
 }
@@ -51,11 +52,13 @@ message GetPinByIDRequest {
 
 // Response message for CreateUser
 message GetPinByIDResponse {
-    bytes image = 1;
-    string description = 2; //JSON AS a string
-    string expense = 3;
-    float location = 4;
-    repeated string participant = 5;
+    bool success = 1;
+    string name = 2;
+    bytes image = 3;
+    string description = 4;
+    repeated Expenses expense = 5; //JSON
+    float location = 6;
+    repeated string participant = 7;
 }
 
 // Request message to create a user
@@ -74,8 +77,9 @@ message GetPinsResponse {
 
 message GetPinResponse {
   string pinId = 1;
-  bytes image = 2;
-  repeated string participant = 3;
+  string name = 2;
+  bytes image = 3;
+  repeated string participant = 4;
 }
 
 // User message
@@ -85,3 +89,22 @@ message GetPinResponse {
 //   string display_name = 3;
 //   string created_at = 4; // ISO8601 string, or you can use google.protobuf.Timestamp
 // }
+
+message UpdatePinRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated Expenses expense = 4; //JSON
+  float location = 5;
+  repeated string participant = 6;
+}
+
+message Expenses {
+  string id = 1;
+  string name = 2;
+  float expense = 3;
+}
+
+message SuccessResponse {
+  bool success = 1;
+}

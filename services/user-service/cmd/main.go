@@ -38,11 +38,12 @@ func main() {
 	defer prismadb.PrismaDB.Prisma.Disconnect()
 
 	userRepo := repo.NewUsersRepository(prismadb)
-	sv := sv.NewUsersService(userRepo)
+	userTripRepo := repo.NewUserTripRepository(prismadb)
+	sv := sv.NewUsersService(userRepo, userTripRepo)
 
 	handlers.NewGRPCHandler(s, sv)
 
-	log.Println("Server listening on :50052")
+	log.Println("Server listening on :50051")
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

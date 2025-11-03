@@ -19,6 +19,7 @@ type IUsersRepository interface {
 	InsertUser(data entities.CreatedUserModel) (*entities.UserDataModel, error)
 	FindAll() (*[]entities.UserDataModel, error)
 	FindByID(userID string) (*entities.UserDataModel, error)
+	FindManyByID(userID []string) (*[]entities.UserDataModel, error)
 	FindByEmail(email string) (*entities.UserDataModel, error)
 	UpdateUser(data entities.UpdateUserModel) (*entities.UserDataModel, error)
 	DeleteUser(userID string) error
@@ -75,6 +76,29 @@ func (repo *usersRepository) FindByID(userID string) (*entities.UserDataModel, e
 	}
 
 	return mapToUserDataModel(user)
+}
+
+func (repo *usersRepository) FindManyByID(userID []string) (*[]entities.UserDataModel, error) {
+	users, err := repo.Collection.User.FindMany(
+		db.User.UserID.In(userID),
+	).Exec(repo.Context)
+	if err != nil {
+		return nil, fmt.Errorf("users -> FindByID: %v", err)
+	}
+	if users == nil {
+		return nil, fmt.Errorf("users -> FindByID: user data is nil")
+	}
+
+	var results []entities.UserDataModel
+	for _, u := range users {
+		result, err := mapToUserDataModel(&u)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, *result)
+	}
+
+	return &results, nil
 }
 
 func (repo *usersRepository) FindByEmail(email string) (*entities.UserDataModel, error) {

@@ -16,4 +16,15 @@ model User {
     email String @unique
     password String
     profile_url String?
+    User_Trip User_Trip[]
+}
+
+model User_Trip {
+    userId String @db.Uuid @map("user_id")
+    tripID String @db.Uuid @map("trip_id")
+    username String?
+
+    User User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+    @@unique([userId, tripID], name: "User_Trip_userId_tripID_key")
 }

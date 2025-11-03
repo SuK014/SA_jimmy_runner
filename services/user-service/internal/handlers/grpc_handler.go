@@ -71,7 +71,7 @@ func (h *gRPCHandler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 
 	profile := req.GetProfile()
 	user_id := req.GetUserId()
-	publicURL, err := utils.UploadToSupabase(
+	publicURL, err := utils.UploadToSupabaseProfile(
 		profile.GetFileData(),
 		profile.GetFilename(),
 		profile.GetContentType(),
@@ -114,6 +114,28 @@ func (h *gRPCHandler) GetUser(ctx context.Context, req *pb.UserIDRequest) (*pb.U
 		DisplayName: res.Name,
 		Email:       res.Email,
 		Profile:     res.Profile,
+	}, nil
+}
+
+func (h *gRPCHandler) GetUsersAvatar(ctx context.Context, req *pb.UsersAvatarRequest) (*pb.UsersAvatarResponse, error) {
+
+	res, err := h.service.GetAvatars(req.GetTripId(), req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+
+	var results []*pb.Avatar
+	for _, r := range *res {
+		results = append(results, &pb.Avatar{
+			UserId:      r.ID,
+			DisplayName: r.Name,
+			Profile:     r.Profile,
+		})
+	}
+
+	return &pb.UsersAvatarResponse{
+		Success: true,
+		Users:   results,
 	}, nil
 }
 

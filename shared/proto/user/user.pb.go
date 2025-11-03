@@ -375,6 +375,170 @@ func (x *UserIDRequest) GetUserId() string {
 	return ""
 }
 
+type UsersAvatarRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TripId        string                 `protobuf:"bytes,1,opt,name=trip_id,json=tripId,proto3" json:"trip_id,omitempty"`
+	UserId        []string               `protobuf:"bytes,2,rep,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UsersAvatarRequest) Reset() {
+	*x = UsersAvatarRequest{}
+	mi := &file_user_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UsersAvatarRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UsersAvatarRequest) ProtoMessage() {}
+
+func (x *UsersAvatarRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UsersAvatarRequest.ProtoReflect.Descriptor instead.
+func (*UsersAvatarRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *UsersAvatarRequest) GetTripId() string {
+	if x != nil {
+		return x.TripId
+	}
+	return ""
+}
+
+func (x *UsersAvatarRequest) GetUserId() []string {
+	if x != nil {
+		return x.UserId
+	}
+	return nil
+}
+
+type Avatar struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	DisplayName   string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	Profile       string                 `protobuf:"bytes,3,opt,name=profile,proto3" json:"profile,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Avatar) Reset() {
+	*x = Avatar{}
+	mi := &file_user_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Avatar) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Avatar) ProtoMessage() {}
+
+func (x *Avatar) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Avatar.ProtoReflect.Descriptor instead.
+func (*Avatar) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *Avatar) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *Avatar) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *Avatar) GetProfile() string {
+	if x != nil {
+		return x.Profile
+	}
+	return ""
+}
+
+type UsersAvatarResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Users         []*Avatar              `protobuf:"bytes,2,rep,name=users,proto3" json:"users,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UsersAvatarResponse) Reset() {
+	*x = UsersAvatarResponse{}
+	mi := &file_user_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UsersAvatarResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UsersAvatarResponse) ProtoMessage() {}
+
+func (x *UsersAvatarResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UsersAvatarResponse.ProtoReflect.Descriptor instead.
+func (*UsersAvatarResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UsersAvatarResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *UsersAvatarResponse) GetUsers() []*Avatar {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
 var File_user_proto protoreflect.FileDescriptor
 
 const file_user_proto_rawDesc = "" +
@@ -403,7 +567,17 @@ const file_user_proto_rawDesc = "" +
 	"\fcontent_type\x18\x02 \x01(\tR\vcontentType\x12\x1b\n" +
 	"\tfile_data\x18\x03 \x01(\fR\bfileData\"(\n" +
 	"\rUserIDRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId2\xa7\x02\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"F\n" +
+	"\x12UsersAvatarRequest\x12\x17\n" +
+	"\atrip_id\x18\x01 \x01(\tR\x06tripId\x12\x17\n" +
+	"\auser_id\x18\x02 \x03(\tR\x06userId\"^\n" +
+	"\x06Avatar\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
+	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x18\n" +
+	"\aprofile\x18\x03 \x01(\tR\aprofile\"S\n" +
+	"\x13UsersAvatarResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\"\n" +
+	"\x05users\x18\x02 \x03(\v2\f.user.AvatarR\x05users2\xee\x02\n" +
 	"\vUserService\x129\n" +
 	"\n" +
 	"CreateUser\x12\x17.user.CreateUserRequest\x1a\x12.user.UserResponse\x127\n" +
@@ -412,7 +586,8 @@ const file_user_proto_rawDesc = "" +
 	"UpdateUser\x12\x17.user.UpdateUserRequest\x1a\x12.user.UserResponse\x122\n" +
 	"\aGetUser\x12\x13.user.UserIDRequest\x1a\x12.user.UserResponse\x125\n" +
 	"\n" +
-	"DeleteUser\x12\x13.user.UserIDRequest\x1a\x12.user.UserResponseB\x13Z\x11shared/proto/userb\x06proto3"
+	"DeleteUser\x12\x13.user.UserIDRequest\x1a\x12.user.UserResponse\x12E\n" +
+	"\x0eGetUsersAvatar\x12\x18.user.UsersAvatarRequest\x1a\x19.user.UsersAvatarResponseB\x13Z\x11shared/proto/userb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -426,32 +601,38 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_user_proto_goTypes = []any{
-	(*CreateUserRequest)(nil), // 0: user.CreateUserRequest
-	(*UserResponse)(nil),      // 1: user.UserResponse
-	(*LoginUserRequest)(nil),  // 2: user.LoginUserRequest
-	(*UpdateUserRequest)(nil), // 3: user.UpdateUserRequest
-	(*UploadFileRequest)(nil), // 4: user.UploadFileRequest
-	(*UserIDRequest)(nil),     // 5: user.UserIDRequest
+	(*CreateUserRequest)(nil),   // 0: user.CreateUserRequest
+	(*UserResponse)(nil),        // 1: user.UserResponse
+	(*LoginUserRequest)(nil),    // 2: user.LoginUserRequest
+	(*UpdateUserRequest)(nil),   // 3: user.UpdateUserRequest
+	(*UploadFileRequest)(nil),   // 4: user.UploadFileRequest
+	(*UserIDRequest)(nil),       // 5: user.UserIDRequest
+	(*UsersAvatarRequest)(nil),  // 6: user.UsersAvatarRequest
+	(*Avatar)(nil),              // 7: user.Avatar
+	(*UsersAvatarResponse)(nil), // 8: user.UsersAvatarResponse
 }
 var file_user_proto_depIdxs = []int32{
 	4, // 0: user.UpdateUserRequest.profile:type_name -> user.UploadFileRequest
-	0, // 1: user.UserService.CreateUser:input_type -> user.CreateUserRequest
-	2, // 2: user.UserService.LoginUser:input_type -> user.LoginUserRequest
-	3, // 3: user.UserService.UpdateUser:input_type -> user.UpdateUserRequest
-	5, // 4: user.UserService.GetUser:input_type -> user.UserIDRequest
-	5, // 5: user.UserService.DeleteUser:input_type -> user.UserIDRequest
-	1, // 6: user.UserService.CreateUser:output_type -> user.UserResponse
-	1, // 7: user.UserService.LoginUser:output_type -> user.UserResponse
-	1, // 8: user.UserService.UpdateUser:output_type -> user.UserResponse
-	1, // 9: user.UserService.GetUser:output_type -> user.UserResponse
-	1, // 10: user.UserService.DeleteUser:output_type -> user.UserResponse
-	6, // [6:11] is the sub-list for method output_type
-	1, // [1:6] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	7, // 1: user.UsersAvatarResponse.users:type_name -> user.Avatar
+	0, // 2: user.UserService.CreateUser:input_type -> user.CreateUserRequest
+	2, // 3: user.UserService.LoginUser:input_type -> user.LoginUserRequest
+	3, // 4: user.UserService.UpdateUser:input_type -> user.UpdateUserRequest
+	5, // 5: user.UserService.GetUser:input_type -> user.UserIDRequest
+	5, // 6: user.UserService.DeleteUser:input_type -> user.UserIDRequest
+	6, // 7: user.UserService.GetUsersAvatar:input_type -> user.UsersAvatarRequest
+	1, // 8: user.UserService.CreateUser:output_type -> user.UserResponse
+	1, // 9: user.UserService.LoginUser:output_type -> user.UserResponse
+	1, // 10: user.UserService.UpdateUser:output_type -> user.UserResponse
+	1, // 11: user.UserService.GetUser:output_type -> user.UserResponse
+	1, // 12: user.UserService.DeleteUser:output_type -> user.UserResponse
+	8, // 13: user.UserService.GetUsersAvatar:output_type -> user.UsersAvatarResponse
+	8, // [8:14] is the sub-list for method output_type
+	2, // [2:8] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_user_proto_init() }
@@ -465,7 +646,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

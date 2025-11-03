@@ -1,7 +1,6 @@
 package services
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/SuK014/SA_jimmy_runner/services/plan-service/internal/repository"
@@ -14,9 +13,10 @@ type pinsService struct {
 }
 
 type IPinsService interface {
-	InsertPin(data entities.CreatedPinGRPCModel) (string, error)
+	InsertPin(data entities.CreatedPinModel) (string, error)
 	FindByID(pinID string) (*entities.PinDataModel, error)
 	FindByParticipant(userID string) (*[]entities.PinDataModel, error)
+	UpdatePin(pinID string, data entities.UpdatedPinModel) error
 }
 
 func NewPinsService(repo0 repository.IPinsRepository) IPinsService {
@@ -47,15 +47,10 @@ func (sv *pinsService) FindByID(pinID string) (*entities.PinDataModel, error) {
 	return data, nil
 }
 
-func (sv *pinsService) InsertPin(data entities.CreatedPinGRPCModel) (string, error) {
-	expense := json.RawMessage(data.Expense)
+func (sv *pinsService) InsertPin(data entities.CreatedPinModel) (string, error) {
+	return sv.PinsRepository.InsertPin(data)
+}
 
-	insertData := entities.CreatedPinModel{
-		Image:        data.Image,
-		Description:  data.Description,
-		Expense:      expense,
-		Location:     data.Location,
-		Participants: data.Participants,
-	}
-	return sv.PinsRepository.InsertPin(insertData)
+func (sv *pinsService) UpdatePin(pinID string, data entities.UpdatedPinModel) error {
+	return sv.PinsRepository.UpdatePin(pinID, data)
 }

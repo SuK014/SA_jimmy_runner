@@ -73,7 +73,7 @@ func DeleteUserPictures(userID string) error {
 	return nil
 }
 
-func UploadToSupabase(fileData []byte, filename, contentType, userID string) (string, error) {
+func UploadToSupabaseProfile(fileData []byte, filename, contentType, userID string) (string, error) {
 	// Optional: delete previous picture
 	if err := DeleteUserPictures(userID); err != nil {
 		fmt.Println("⚠️ Warning: could not delete old pictures:", err)
