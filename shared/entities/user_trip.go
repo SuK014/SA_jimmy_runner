@@ -5,3 +5,15 @@ type UserTripModel struct {
 	TripID string `json:"trip_id"`
 	Name   string `json:"name,omitempty"`
 }
+
+type UsersTripModel struct {
+	UserID []string `json:"user_ids"`
+	TripID string   `json:"trip_id"`
+	Name   string   `json:"name,omitempty"`
+}
+
+type UserTripsModel struct {
+	UserID string   `json:"user_id"`
+	TripID []string `json:"trip_ids"`
+	Name   string   `json:"name,omitempty"`
+}

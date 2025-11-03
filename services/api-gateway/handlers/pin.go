@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"context"
-	"fmt"
+	"io"
 
 	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/middlewares"
 	"github.com/SuK014/SA_jimmy_runner/shared/entities"
@@ -13,6 +13,12 @@ import (
 
 // CreateUser handles REST requests and forwards them to gRPC
 func (h *HTTPHandler) CreatePin(ctx *fiber.Ctx) error {
+	whiteboardID := ctx.Query("whiteboard_id")
+	if whiteboardID == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'whiteboard_id' query parameter"},
+		)
+	}
 	bodyData := entities.CreatedPinModel{}
 	if err := ctx.BodyParser(&bodyData); err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(
@@ -34,13 +40,25 @@ func (h *HTTPHandler) CreatePin(ctx *fiber.Ctx) error {
 		Description: bodyData.Description,
 		Expense:     expenses,
 		Location:    bodyData.Location,
+		Parents:     bodyData.Parents,
 		Participant: bodyData.Participants,
 	}
 
 	res, err := h.planClient.CreatePin(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot insert new user account: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot create new pin: " + err.Error()},
+		)
+	}
+
+	whiteboardReq := &pb.UpdateWhiteboardRequest{
+		Id:            whiteboardID,
+		Pins:          []string{res.GetPinId()},
+		PinChangeType: "add",
+	}
+	if _, err = h.planClient.UpdateWhiteboard(context.Background(), whiteboardReq); err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot auto update whiteboard(add pin): " + err.Error()},
 		)
 	}
 
@@ -55,7 +73,7 @@ func (h *HTTPHandler) GetPinByID(ctx *fiber.Ctx) error {
 		)
 	}
 
-	req := &pb.GetPinByIDRequest{
+	req := &pb.PinIDRequest{
 		PinId: id,
 	}
 
@@ -78,7 +96,7 @@ func (h *HTTPHandler) GetPinByID(ctx *fiber.Ctx) error {
 func (h *HTTPHandler) GetPinByParticipant(ctx *fiber.Ctx) error {
 	tokenDetail, err := middlewares.DecodeJWTToken(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to generate token: %w", err)
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
 	}
 	user_id := tokenDetail.UserID
 
@@ -132,6 +150,7 @@ func (h *HTTPHandler) UpdatePinByID(ctx *fiber.Ctx) error {
 		Description: bodyData.Description,
 		Expense:     expenses,
 		Location:    bodyData.Location,
+		Parents:     bodyData.Parents,
 		Participant: bodyData.Participants,
 	}
 
@@ -139,6 +158,88 @@ func (h *HTTPHandler) UpdatePinByID(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot update pin: " + err.Error()},
+		)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(res)
+}
+
+func (h *HTTPHandler) UpdatePinImageByID(ctx *fiber.Ctx) error {
+	id := ctx.Query("id")
+	if id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'id' query parameter"},
+		)
+	}
+
+	fileHeader, err := ctx.FormFile("image")
+	var imageBytes []byte
+
+	if err == nil && fileHeader != nil {
+		file, err := fileHeader.Open()
+		if err != nil {
+			return ctx.Status(fiber.StatusBadRequest).JSON(
+				entities.ResponseMessage{Message: "failed to open uploaded file"},
+			)
+		}
+		defer file.Close()
+
+		imageBytes, err = io.ReadAll(file)
+		if err != nil {
+			return ctx.Status(fiber.StatusBadRequest).JSON(
+				entities.ResponseMessage{Message: "failed to read uploaded file"},
+			)
+		}
+	}
+
+	req := &pb.UpdatePinImageRequest{
+		Id:    id,
+		Image: imageBytes,
+	}
+
+	res, err := h.planClient.UpdatePinImage(context.Background(), req)
+	if err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot update pin image: " + err.Error()},
+		)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(res)
+}
+
+func (h *HTTPHandler) DeletePinByID(ctx *fiber.Ctx) error {
+	id := ctx.Query("id")
+	if id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'id' query parameter"},
+		)
+	}
+	whiteboardID := ctx.Query("whiteboard_id")
+	if whiteboardID == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'whiteboard_id' query parameter"},
+		)
+	}
+
+	req := &pb.PinIDRequest{
+		PinId: id,
+	}
+
+	res, err := h.planClient.DeletePinByID(context.Background(), req)
+	if err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot delete pin by id: " + err.Error()},
+		)
+	}
+
+	whiteboardReq := &pb.UpdateWhiteboardRequest{
+		Id:            whiteboardID,
+		Pins:          []string{id},
+		PinChangeType: "remove",
+	}
+	if _, err = h.planClient.UpdateWhiteboard(context.Background(), whiteboardReq); err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot auto update whiteboard(remove pin): " + err.Error()},
 		)
 	}
 

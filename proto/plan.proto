@@ -4,107 +4,185 @@ package plan;
 
 option go_package = "shared/proto/plan";
 
-// User service definition
 service PlansService {
-  // Get a single user by ID
-//   rpc GetUser(GetUserRequest) returns (GetUserResponse);
-  
-  // Create a new user
+  // pin
   rpc CreatePin(CreatePinRequest) returns (CreatePinResponse);
-  rpc GetPinByID(GetPinByIDRequest) returns (GetPinByIDResponse);
+  rpc GetPinByID(PinIDRequest) returns (GetPinByIDResponse);
+  rpc GetPinsByWhiteboard(ManyPinIDRequest) returns (GetPinsResponse);
   rpc GetPinByParticipant(GetPinByParticipantRequest) returns (GetPinsResponse);
   rpc UpdatePin(UpdatePinRequest) returns (SuccessResponse);
+  rpc UpdatePinImage(UpdatePinImageRequest) returns (SuccessResponse);
+  rpc DeletePinByID(PinIDRequest) returns (SuccessResponse);
+  rpc DeletePinByWhiteboard(ManyPinIDRequest) returns (SuccessResponse);
+
+  // whiteboard
+  rpc CreateWhiteboard(CreateWhiteboardRequest) returns (CreateWhiteboardResponse);
+  rpc GetWhiteboardByID(WhiteboardIDRequest) returns (GetWhiteboardByIDResponse);
+  rpc GetWhiteboardsByTrip(ManyWhiteboardIDRequest) returns (GetWhiteboardsResponse);
+  rpc UpdateWhiteboard(UpdateWhiteboardRequest) returns (SuccessResponse);
+  rpc DeleteWhiteboardByID(WhiteboardIDRequest) returns (SuccessResponse);
+  rpc DeleteWhiteboardByTrip(ManyWhiteboardIDRequest) returns (SuccessResponse);
+
+  // trip
+  rpc CreateTrip(CreateTripRequest) returns (CreateTripResponse);
+  rpc GetTripByID(TripIDRequest) returns (GetTripByIDResponse);
+  rpc UpdateTrip(UpdateTripRequest) returns (SuccessResponse);
+  rpc UpdateTripImage(UpdateTripImageRequest) returns (SuccessResponse);
+  rpc DeleteTripByID(TripIDRequest) returns (SuccessResponse);
 }
 
-// Request message to get a user
-// message GetUserRequest {
-//   string id = 1;
-// }
+// shared
+message SuccessResponse {
+  bool success = 1;
+}
 
-// // Response message for GetUser
-// message GetUserResponse {
-//   User user = 1;
-// }
-
-// Request message to create a user
+// pin
 message CreatePinRequest {
   string name = 1;
   string description = 2;
-  repeated Expenses expense = 3; //JSON
+  repeated Expenses expense = 3;
   float location = 4;
-  repeated string participant = 5;
+  repeated string parents = 5;
+  repeated string participant = 6;
 }
 
-// Response message for CreateUser
 message CreatePinResponse {
   bool success = 1;
-  string pinId = 2; //uuid AS a string
+  string pinId = 2; //objectId AS a string
 }
 
-// Request message to create a user
-message GetPinByIDRequest {
-  string pinId = 1; //uuid AS a string
-
-  // ไว้เช้ค access ?
-//   string display_name = 2;
-//   string password = 3;
+message PinIDRequest { // for getPinByID and DeletePinByID
+  string pinId = 1;
 }
 
-// Response message for CreateUser
 message GetPinByIDResponse {
     bool success = 1;
     string name = 2;
     bytes image = 3;
     string description = 4;
-    repeated Expenses expense = 5; //JSON
+    repeated Expenses expense = 5;
     float location = 6;
-    repeated string participant = 7;
+    repeated string parents = 7;
+    repeated string participant = 8;
 }
 
-// Request message to create a user
+message ManyPinIDRequest { // for GetPinsByWhiteboard and DeletePinByWhiteboard
+  repeated string pins = 1;
+}
+
 message GetPinByParticipantRequest {
   string userId = 1;
-
-  // ไว้เช้ค access ?
-//   string display_name = 2;
-//   string password = 3; 
 }
 
-// Response message for CreateUser
-message GetPinsResponse {
+message GetPinsResponse { // for GetPinByParticipant and GetPinByParticipant
   repeated GetPinResponse pins = 1;
 }
 
-message GetPinResponse {
+message GetPinResponse { // for GetPinsResponse
   string pinId = 1;
   string name = 2;
   bytes image = 3;
-  repeated string participant = 4;
+  repeated string parents = 4;
+  repeated string participant = 5;
 }
-
-// User message
-// message User {
-//   string id = 1;
-//   string email = 2;
-//   string display_name = 3;
-//   string created_at = 4; // ISO8601 string, or you can use google.protobuf.Timestamp
-// }
 
 message UpdatePinRequest {
   string id = 1;
   string name = 2;
   string description = 3;
-  repeated Expenses expense = 4; //JSON
+  repeated Expenses expense = 4;
   float location = 5;
-  repeated string participant = 6;
+  repeated string parents = 6;
+  repeated string participant = 7;
 }
 
-message Expenses {
+message Expenses { // expense struct
   string id = 1;
   string name = 2;
   float expense = 3;
 }
 
-message SuccessResponse {
+message UpdatePinImageRequest {
+  string id = 1;
+  bytes image = 2;
+}
+
+
+// whiteboard
+message CreateWhiteboardRequest {
+  string pin = 1;
+  int32 day = 2;
+}
+
+message CreateWhiteboardResponse {
   bool success = 1;
+  string whiteboardId = 2; //objectId AS a string
+}
+
+message WhiteboardIDRequest { // for getWhiteboardByID and DeleteWhiteboardByID
+  string whiteboardId = 1;
+}
+
+message GetWhiteboardByIDResponse {
+    bool success = 1;
+    int32 day = 2;
+    repeated string pins = 3;
+}
+
+message ManyWhiteboardIDRequest { // for GetWhiteboardsByTrip and DeleteWhiteboardByTrip
+  repeated string whiteboards = 1;
+}
+
+message GetWhiteboardsResponse { // for GetPinByParticipant
+  repeated GetWhiteboardResponse whiteboards = 1;
+}
+
+message GetWhiteboardResponse { // for GetWhiteboardsResponse
+    int32 day = 1;
+    repeated GetPinResponse pins = 2;
+}
+
+message UpdateWhiteboardRequest {
+  string id = 1;
+  repeated string pins = 2;
+  string pinChangeType = 3; // add, remove, set
+  int32 day = 4;
+}
+
+
+// trip
+message CreateTripRequest {
+  string name = 1;
+  string description = 2;
+  repeated string whiteboards = 3;
+}
+
+message CreateTripResponse {
+  bool success = 1;
+  string TripId = 2; //objectId AS a string
+}
+
+message TripIDRequest { // for getWhiteboardByID and DeleteWhiteboardByID
+  string TripId = 1;
+}
+
+message GetTripByIDResponse {
+    bool success = 1;
+    string name = 2;
+    string description = 3;
+    bytes image = 4;
+    repeated string whiteboards = 5;
+}
+
+message UpdateTripRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated string whiteboards = 4;
+  string whiteboardChangeType = 5; // add, remove, set
+}
+
+message UpdateTripImageRequest {
+  string id = 1;
+  bytes image = 2;
 }

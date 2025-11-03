@@ -4,30 +4,31 @@ package user;
 
 option go_package = "shared/proto/user";
 
-// User service definition
 service UserService {
-  // Get a single user by ID
-//   rpc GetUser(GetUserRequest) returns (GetUserResponse);
-  
-  // Create a new user
+  // user
   rpc CreateUser(CreateUserRequest) returns (UserResponse);
   rpc LoginUser(LoginUserRequest) returns (UserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc GetUser(UserIDRequest) returns (UserResponse);
   rpc DeleteUser(UserIDRequest) returns (UserResponse);
+
+  // user_trip
+  rpc CreateUsersTrip(UsersTripRequest) returns (UsersTripResponse);
+  rpc UpdateUsername(UserTripModel) returns (UserTripResponse);
   rpc GetUsersAvatar(UsersAvatarRequest) returns (UsersAvatarResponse);
+  rpc GetAllTripsByUserID(UserIDRequest) returns (TripIDsResponse);
+  rpc Delete(UserTripRequest) returns (SuccessResponse);
+  rpc DeleteByUser(UserTripRequest) returns (SuccessResponse);
+  rpc DeleteByTrip(UserTripRequest) returns (SuccessResponse);
+  rpc CheckAuthUserTrip(UserTripRequest) returns (UserTripResponse);
 }
 
-// Request message to get a user
-// message GetUserRequest {
-//   string id = 1;
-// }
+// shared
+message SuccessResponse {
+  bool success = 1;
+}
 
-// // Response message for GetUser
-// message GetUserResponse {
-//   User user = 1;
-// }
-
+// user
 // Request message to create a user
 message CreateUserRequest {
   string email = 1;
@@ -43,14 +44,6 @@ message UserResponse {
   string email = 4;
   string profile = 5;
 }
-
-// User message
-// message User {
-//   string id = 1;
-//   string email = 2;
-//   string display_name = 3;
-//   string created_at = 4; // ISO8601 string, or you can use google.protobuf.Timestamp
-// }
 
 message LoginUserRequest {
   string email = 1;
@@ -75,7 +68,6 @@ message UserIDRequest {
 
 message UsersAvatarRequest {
   string trip_id = 1;
-  repeated string user_id = 2;
 }
 
 message Avatar {
@@ -87,4 +79,50 @@ message Avatar {
 message UsersAvatarResponse {
   bool success = 1;
   repeated Avatar users = 2;
+}
+
+
+// user_trip
+message UsersTripRequest {
+  repeated string userIds = 1;
+  string tripId = 2;
+}
+
+message UsersTripResponse {
+  bool success = 1;
+  repeated string userIds = 2;
+  string tripId = 3;
+}
+
+message UserTripsRequest {
+  string userId = 1;
+  repeated string tripIds = 2;
+}
+
+message UserTripRequest {
+  string userId = 1;
+  string tripId = 2;
+}
+
+message UsersTripsResponse {
+  bool success = 1;
+  repeated UserTripModel response = 2;
+}
+
+message UserTripModel {
+  string userId = 1;
+  string tripId = 2;
+  string username = 3;
+}
+
+message UserTripResponse {
+  bool success = 1;
+  string userId = 2;
+  string tripId = 3;
+  string username = 4;
+}
+
+message TripIDsResponse {
+  bool success = 1;
+  repeated string tripId = 2;
 }

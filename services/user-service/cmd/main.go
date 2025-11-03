@@ -39,9 +39,11 @@ func main() {
 
 	userRepo := repo.NewUsersRepository(prismadb)
 	userTripRepo := repo.NewUserTripRepository(prismadb)
-	sv := sv.NewUsersService(userRepo, userTripRepo)
 
-	handlers.NewGRPCHandler(s, sv)
+	userSv := sv.NewUsersService(userRepo)
+	userTripSv := sv.NewUserTripService(userTripRepo)
+
+	handlers.NewGRPCHandler(s, userSv, userTripSv)
 
 	log.Println("Server listening on :50051")
 	if err := s.Serve(lis); err != nil {

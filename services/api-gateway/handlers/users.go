@@ -180,7 +180,7 @@ func (h *HTTPHandler) GetUser(ctx *fiber.Ctx) error {
 	res, err := h.userClient.GetUser(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot update user: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot get user: " + err.Error()},
 		)
 	}
 
@@ -200,8 +200,15 @@ func (h *HTTPHandler) DeleteUser(ctx *fiber.Ctx) error {
 	res, err := h.userClient.DeleteUser(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
-			entities.ResponseMessage{Message: "cannot update user: " + err.Error()},
+			entities.ResponseMessage{Message: "cannot delete user: " + err.Error()},
 		)
+	}
+
+	userTripReq := &pb.UserTripRequest{
+		UserId: token.UserID,
+	}
+	if res, err := h.userClient.DeleteByUser(context.Background(), userTripReq); err != nil || !res.GetSuccess() {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "don't have access to trip."})
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(res)

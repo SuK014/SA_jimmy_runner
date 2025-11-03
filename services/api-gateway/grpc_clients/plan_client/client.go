@@ -41,11 +41,12 @@ func (ds *PlansServiceClient) Close() {
 	}
 }
 
+// pins
 func (ds *PlansServiceClient) CreateUser(ctx context.Context, req *pb.CreatePinRequest) (*pb.CreatePinResponse, error) {
 	return ds.Client.CreatePin(ctx, req)
 }
 
-func (ds *PlansServiceClient) GetPinByID(ctx context.Context, req *pb.GetPinByIDRequest) (*pb.GetPinByIDResponse, error) {
+func (ds *PlansServiceClient) GetPinByID(ctx context.Context, req *pb.PinIDRequest) (*pb.GetPinByIDResponse, error) {
 	return ds.Client.GetPinByID(ctx, req)
 }
 
@@ -53,6 +54,60 @@ func (ds *PlansServiceClient) GetPinByParticipant(ctx context.Context, req *pb.G
 	return ds.Client.GetPinByParticipant(ctx, req)
 }
 
+func (ds *PlansServiceClient) GetPinsByWhiteboard(ctx context.Context, req *pb.ManyPinIDRequest) (*pb.GetPinsResponse, error) {
+	return ds.Client.GetPinsByWhiteboard(ctx, req)
+}
+
 func (ds *PlansServiceClient) UpdatePin(ctx context.Context, req *pb.UpdatePinRequest) (*pb.SuccessResponse, error) {
 	return ds.Client.UpdatePin(ctx, req)
+}
+
+func (ds *PlansServiceClient) UpdatePinImage(ctx context.Context, req *pb.UpdatePinImageRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.UpdatePinImage(ctx, req)
+}
+
+func (ds *PlansServiceClient) DeletePinByID(ctx context.Context, req *pb.PinIDRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.DeletePinByID(ctx, req)
+}
+
+// whiteboards
+func (ds *PlansServiceClient) CreateWhiteboard(ctx context.Context, req *pb.CreateWhiteboardRequest) (*pb.CreateWhiteboardResponse, error) {
+	return ds.Client.CreateWhiteboard(ctx, req)
+}
+
+func (ds *PlansServiceClient) GetWhiteboardByID(ctx context.Context, req *pb.WhiteboardIDRequest) (*pb.GetWhiteboardByIDResponse, error) {
+	return ds.Client.GetWhiteboardByID(ctx, req)
+}
+
+func (ds *PlansServiceClient) UpdateWhiteboard(ctx context.Context, req *pb.UpdateWhiteboardRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.UpdateWhiteboard(ctx, req)
+}
+
+func (ds *PlansServiceClient) DeleteWhiteboardByID(ctx context.Context, req *pb.WhiteboardIDRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.DeleteWhiteboardByID(ctx, req)
+}
+
+// trips
+func (ds *PlansServiceClient) CreateTrip(ctx context.Context, req *pb.CreateTripRequest) (*pb.CreateTripResponse, error) {
+	return ds.Client.CreateTrip(ctx, req)
+}
+
+func (ds *PlansServiceClient) GetTripByID(ctx context.Context, req *pb.TripIDRequest) (*pb.GetTripByIDResponse, error) {
+	return ds.Client.GetTripByID(ctx, req)
+}
+
+func (ds *PlansServiceClient) GetWhiteboardsByTrip(ctx context.Context, req *pb.ManyWhiteboardIDRequest) (*pb.GetWhiteboardsResponse, error) {
+	return ds.Client.GetWhiteboardsByTrip(ctx, req)
+}
+
+func (ds *PlansServiceClient) UpdateTrip(ctx context.Context, req *pb.UpdateTripRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.UpdateTrip(ctx, req)
+}
+
+func (ds *PlansServiceClient) UpdateTripImage(ctx context.Context, req *pb.UpdateTripImageRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.UpdateTripImage(ctx, req)
+}
+
+func (ds *PlansServiceClient) DeleteTripByID(ctx context.Context, req *pb.TripIDRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.DeleteTripByID(ctx, req)
 }

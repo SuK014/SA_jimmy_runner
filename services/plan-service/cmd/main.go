@@ -37,9 +37,14 @@ func main() {
 	mongodb := ds.NewMongoDB(10)
 
 	pinRepo := repo.NewPinsRepository(mongodb)
-	pinSv := sv.NewPinsService(pinRepo)
+	whiteboardRepo := repo.NewWhiteboardsRepository(mongodb)
+	tripRepo := repo.NewTripsRepository(mongodb)
 
-	handlers.NewGRPCHandler(s, pinSv)
+	pinSv := sv.NewPinsService(pinRepo)
+	whiteboardSv := sv.NewWhiteboardsService(whiteboardRepo)
+	tripSv := sv.NewTripsService(tripRepo)
+
+	handlers.NewGRPCHandler(s, pinSv, whiteboardSv, tripSv)
 
 	log.Println("Server listening on :50052")
 	if err := s.Serve(lis); err != nil {

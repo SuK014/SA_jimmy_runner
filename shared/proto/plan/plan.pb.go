@@ -21,21 +21,67 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Request message to create a user
+// shared
+type SuccessResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SuccessResponse) Reset() {
+	*x = SuccessResponse{}
+	mi := &file_plan_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SuccessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SuccessResponse) ProtoMessage() {}
+
+func (x *SuccessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SuccessResponse.ProtoReflect.Descriptor instead.
+func (*SuccessResponse) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *SuccessResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+// pin
 type CreatePinRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Expense       []*Expenses            `protobuf:"bytes,3,rep,name=expense,proto3" json:"expense,omitempty"` //JSON
+	Expense       []*Expenses            `protobuf:"bytes,3,rep,name=expense,proto3" json:"expense,omitempty"`
 	Location      float32                `protobuf:"fixed32,4,opt,name=location,proto3" json:"location,omitempty"`
-	Participant   []string               `protobuf:"bytes,5,rep,name=participant,proto3" json:"participant,omitempty"`
+	Parents       []string               `protobuf:"bytes,5,rep,name=parents,proto3" json:"parents,omitempty"`
+	Participant   []string               `protobuf:"bytes,6,rep,name=participant,proto3" json:"participant,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreatePinRequest) Reset() {
 	*x = CreatePinRequest{}
-	mi := &file_plan_proto_msgTypes[0]
+	mi := &file_plan_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -47,7 +93,7 @@ func (x *CreatePinRequest) String() string {
 func (*CreatePinRequest) ProtoMessage() {}
 
 func (x *CreatePinRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[0]
+	mi := &file_plan_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +106,7 @@ func (x *CreatePinRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePinRequest.ProtoReflect.Descriptor instead.
 func (*CreatePinRequest) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{0}
+	return file_plan_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CreatePinRequest) GetName() string {
@@ -91,6 +137,13 @@ func (x *CreatePinRequest) GetLocation() float32 {
 	return 0
 }
 
+func (x *CreatePinRequest) GetParents() []string {
+	if x != nil {
+		return x.Parents
+	}
+	return nil
+}
+
 func (x *CreatePinRequest) GetParticipant() []string {
 	if x != nil {
 		return x.Participant
@@ -98,18 +151,17 @@ func (x *CreatePinRequest) GetParticipant() []string {
 	return nil
 }
 
-// Response message for CreateUser
 type CreatePinResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	PinId         string                 `protobuf:"bytes,2,opt,name=pinId,proto3" json:"pinId,omitempty"` //uuid AS a string
+	PinId         string                 `protobuf:"bytes,2,opt,name=pinId,proto3" json:"pinId,omitempty"` //objectId AS a string
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreatePinResponse) Reset() {
 	*x = CreatePinResponse{}
-	mi := &file_plan_proto_msgTypes[1]
+	mi := &file_plan_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -121,7 +173,7 @@ func (x *CreatePinResponse) String() string {
 func (*CreatePinResponse) ProtoMessage() {}
 
 func (x *CreatePinResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[1]
+	mi := &file_plan_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -134,7 +186,7 @@ func (x *CreatePinResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePinResponse.ProtoReflect.Descriptor instead.
 func (*CreatePinResponse) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{1}
+	return file_plan_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreatePinResponse) GetSuccess() bool {
@@ -151,29 +203,28 @@ func (x *CreatePinResponse) GetPinId() string {
 	return ""
 }
 
-// Request message to create a user
-type GetPinByIDRequest struct {
+type PinIDRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PinId         string                 `protobuf:"bytes,1,opt,name=pinId,proto3" json:"pinId,omitempty"` //uuid AS a string
+	PinId         string                 `protobuf:"bytes,1,opt,name=pinId,proto3" json:"pinId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetPinByIDRequest) Reset() {
-	*x = GetPinByIDRequest{}
-	mi := &file_plan_proto_msgTypes[2]
+func (x *PinIDRequest) Reset() {
+	*x = PinIDRequest{}
+	mi := &file_plan_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetPinByIDRequest) String() string {
+func (x *PinIDRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetPinByIDRequest) ProtoMessage() {}
+func (*PinIDRequest) ProtoMessage() {}
 
-func (x *GetPinByIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[2]
+func (x *PinIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -184,35 +235,35 @@ func (x *GetPinByIDRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPinByIDRequest.ProtoReflect.Descriptor instead.
-func (*GetPinByIDRequest) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use PinIDRequest.ProtoReflect.Descriptor instead.
+func (*PinIDRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetPinByIDRequest) GetPinId() string {
+func (x *PinIDRequest) GetPinId() string {
 	if x != nil {
 		return x.PinId
 	}
 	return ""
 }
 
-// Response message for CreateUser
 type GetPinByIDResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Image         []byte                 `protobuf:"bytes,3,opt,name=image,proto3" json:"image,omitempty"`
 	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	Expense       []*Expenses            `protobuf:"bytes,5,rep,name=expense,proto3" json:"expense,omitempty"` //JSON
+	Expense       []*Expenses            `protobuf:"bytes,5,rep,name=expense,proto3" json:"expense,omitempty"`
 	Location      float32                `protobuf:"fixed32,6,opt,name=location,proto3" json:"location,omitempty"`
-	Participant   []string               `protobuf:"bytes,7,rep,name=participant,proto3" json:"participant,omitempty"`
+	Parents       []string               `protobuf:"bytes,7,rep,name=parents,proto3" json:"parents,omitempty"`
+	Participant   []string               `protobuf:"bytes,8,rep,name=participant,proto3" json:"participant,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetPinByIDResponse) Reset() {
 	*x = GetPinByIDResponse{}
-	mi := &file_plan_proto_msgTypes[3]
+	mi := &file_plan_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -224,7 +275,7 @@ func (x *GetPinByIDResponse) String() string {
 func (*GetPinByIDResponse) ProtoMessage() {}
 
 func (x *GetPinByIDResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[3]
+	mi := &file_plan_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -237,7 +288,7 @@ func (x *GetPinByIDResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPinByIDResponse.ProtoReflect.Descriptor instead.
 func (*GetPinByIDResponse) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{3}
+	return file_plan_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetPinByIDResponse) GetSuccess() bool {
@@ -282,6 +333,13 @@ func (x *GetPinByIDResponse) GetLocation() float32 {
 	return 0
 }
 
+func (x *GetPinByIDResponse) GetParents() []string {
+	if x != nil {
+		return x.Parents
+	}
+	return nil
+}
+
 func (x *GetPinByIDResponse) GetParticipant() []string {
 	if x != nil {
 		return x.Participant
@@ -289,7 +347,50 @@ func (x *GetPinByIDResponse) GetParticipant() []string {
 	return nil
 }
 
-// Request message to create a user
+type ManyPinIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pins          []string               `protobuf:"bytes,1,rep,name=pins,proto3" json:"pins,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ManyPinIDRequest) Reset() {
+	*x = ManyPinIDRequest{}
+	mi := &file_plan_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ManyPinIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ManyPinIDRequest) ProtoMessage() {}
+
+func (x *ManyPinIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ManyPinIDRequest.ProtoReflect.Descriptor instead.
+func (*ManyPinIDRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ManyPinIDRequest) GetPins() []string {
+	if x != nil {
+		return x.Pins
+	}
+	return nil
+}
+
 type GetPinByParticipantRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=userId,proto3" json:"userId,omitempty"`
@@ -299,7 +400,7 @@ type GetPinByParticipantRequest struct {
 
 func (x *GetPinByParticipantRequest) Reset() {
 	*x = GetPinByParticipantRequest{}
-	mi := &file_plan_proto_msgTypes[4]
+	mi := &file_plan_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -311,7 +412,7 @@ func (x *GetPinByParticipantRequest) String() string {
 func (*GetPinByParticipantRequest) ProtoMessage() {}
 
 func (x *GetPinByParticipantRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[4]
+	mi := &file_plan_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -324,7 +425,7 @@ func (x *GetPinByParticipantRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPinByParticipantRequest.ProtoReflect.Descriptor instead.
 func (*GetPinByParticipantRequest) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{4}
+	return file_plan_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetPinByParticipantRequest) GetUserId() string {
@@ -334,7 +435,6 @@ func (x *GetPinByParticipantRequest) GetUserId() string {
 	return ""
 }
 
-// Response message for CreateUser
 type GetPinsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Pins          []*GetPinResponse      `protobuf:"bytes,1,rep,name=pins,proto3" json:"pins,omitempty"`
@@ -344,7 +444,7 @@ type GetPinsResponse struct {
 
 func (x *GetPinsResponse) Reset() {
 	*x = GetPinsResponse{}
-	mi := &file_plan_proto_msgTypes[5]
+	mi := &file_plan_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -356,7 +456,7 @@ func (x *GetPinsResponse) String() string {
 func (*GetPinsResponse) ProtoMessage() {}
 
 func (x *GetPinsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[5]
+	mi := &file_plan_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -369,7 +469,7 @@ func (x *GetPinsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPinsResponse.ProtoReflect.Descriptor instead.
 func (*GetPinsResponse) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{5}
+	return file_plan_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetPinsResponse) GetPins() []*GetPinResponse {
@@ -384,14 +484,15 @@ type GetPinResponse struct {
 	PinId         string                 `protobuf:"bytes,1,opt,name=pinId,proto3" json:"pinId,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Image         []byte                 `protobuf:"bytes,3,opt,name=image,proto3" json:"image,omitempty"`
-	Participant   []string               `protobuf:"bytes,4,rep,name=participant,proto3" json:"participant,omitempty"`
+	Parents       []string               `protobuf:"bytes,4,rep,name=parents,proto3" json:"parents,omitempty"`
+	Participant   []string               `protobuf:"bytes,5,rep,name=participant,proto3" json:"participant,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetPinResponse) Reset() {
 	*x = GetPinResponse{}
-	mi := &file_plan_proto_msgTypes[6]
+	mi := &file_plan_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -403,7 +504,7 @@ func (x *GetPinResponse) String() string {
 func (*GetPinResponse) ProtoMessage() {}
 
 func (x *GetPinResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[6]
+	mi := &file_plan_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -416,7 +517,7 @@ func (x *GetPinResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPinResponse.ProtoReflect.Descriptor instead.
 func (*GetPinResponse) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{6}
+	return file_plan_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetPinResponse) GetPinId() string {
@@ -440,6 +541,13 @@ func (x *GetPinResponse) GetImage() []byte {
 	return nil
 }
 
+func (x *GetPinResponse) GetParents() []string {
+	if x != nil {
+		return x.Parents
+	}
+	return nil
+}
+
 func (x *GetPinResponse) GetParticipant() []string {
 	if x != nil {
 		return x.Participant
@@ -452,16 +560,17 @@ type UpdatePinRequest struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Expense       []*Expenses            `protobuf:"bytes,4,rep,name=expense,proto3" json:"expense,omitempty"` //JSON
+	Expense       []*Expenses            `protobuf:"bytes,4,rep,name=expense,proto3" json:"expense,omitempty"`
 	Location      float32                `protobuf:"fixed32,5,opt,name=location,proto3" json:"location,omitempty"`
-	Participant   []string               `protobuf:"bytes,6,rep,name=participant,proto3" json:"participant,omitempty"`
+	Parents       []string               `protobuf:"bytes,6,rep,name=parents,proto3" json:"parents,omitempty"`
+	Participant   []string               `protobuf:"bytes,7,rep,name=participant,proto3" json:"participant,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UpdatePinRequest) Reset() {
 	*x = UpdatePinRequest{}
-	mi := &file_plan_proto_msgTypes[7]
+	mi := &file_plan_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -473,7 +582,7 @@ func (x *UpdatePinRequest) String() string {
 func (*UpdatePinRequest) ProtoMessage() {}
 
 func (x *UpdatePinRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[7]
+	mi := &file_plan_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -486,7 +595,7 @@ func (x *UpdatePinRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePinRequest.ProtoReflect.Descriptor instead.
 func (*UpdatePinRequest) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{7}
+	return file_plan_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UpdatePinRequest) GetId() string {
@@ -524,6 +633,13 @@ func (x *UpdatePinRequest) GetLocation() float32 {
 	return 0
 }
 
+func (x *UpdatePinRequest) GetParents() []string {
+	if x != nil {
+		return x.Parents
+	}
+	return nil
+}
+
 func (x *UpdatePinRequest) GetParticipant() []string {
 	if x != nil {
 		return x.Participant
@@ -542,7 +658,7 @@ type Expenses struct {
 
 func (x *Expenses) Reset() {
 	*x = Expenses{}
-	mi := &file_plan_proto_msgTypes[8]
+	mi := &file_plan_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -554,7 +670,7 @@ func (x *Expenses) String() string {
 func (*Expenses) ProtoMessage() {}
 
 func (x *Expenses) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[8]
+	mi := &file_plan_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -567,7 +683,7 @@ func (x *Expenses) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Expenses.ProtoReflect.Descriptor instead.
 func (*Expenses) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{8}
+	return file_plan_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Expenses) GetId() string {
@@ -591,28 +707,29 @@ func (x *Expenses) GetExpense() float32 {
 	return 0
 }
 
-type SuccessResponse struct {
+type UpdatePinImageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Image         []byte                 `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SuccessResponse) Reset() {
-	*x = SuccessResponse{}
-	mi := &file_plan_proto_msgTypes[9]
+func (x *UpdatePinImageRequest) Reset() {
+	*x = UpdatePinImageRequest{}
+	mi := &file_plan_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SuccessResponse) String() string {
+func (x *UpdatePinImageRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SuccessResponse) ProtoMessage() {}
+func (*UpdatePinImageRequest) ProtoMessage() {}
 
-func (x *SuccessResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[9]
+func (x *UpdatePinImageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -623,16 +740,801 @@ func (x *SuccessResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SuccessResponse.ProtoReflect.Descriptor instead.
-func (*SuccessResponse) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{9}
+// Deprecated: Use UpdatePinImageRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePinImageRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *SuccessResponse) GetSuccess() bool {
+func (x *UpdatePinImageRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdatePinImageRequest) GetImage() []byte {
+	if x != nil {
+		return x.Image
+	}
+	return nil
+}
+
+// whiteboard
+type CreateWhiteboardRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pin           string                 `protobuf:"bytes,1,opt,name=pin,proto3" json:"pin,omitempty"`
+	Day           int32                  `protobuf:"varint,2,opt,name=day,proto3" json:"day,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateWhiteboardRequest) Reset() {
+	*x = CreateWhiteboardRequest{}
+	mi := &file_plan_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateWhiteboardRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateWhiteboardRequest) ProtoMessage() {}
+
+func (x *CreateWhiteboardRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateWhiteboardRequest.ProtoReflect.Descriptor instead.
+func (*CreateWhiteboardRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *CreateWhiteboardRequest) GetPin() string {
+	if x != nil {
+		return x.Pin
+	}
+	return ""
+}
+
+func (x *CreateWhiteboardRequest) GetDay() int32 {
+	if x != nil {
+		return x.Day
+	}
+	return 0
+}
+
+type CreateWhiteboardResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	WhiteboardId  string                 `protobuf:"bytes,2,opt,name=whiteboardId,proto3" json:"whiteboardId,omitempty"` //objectId AS a string
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateWhiteboardResponse) Reset() {
+	*x = CreateWhiteboardResponse{}
+	mi := &file_plan_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateWhiteboardResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateWhiteboardResponse) ProtoMessage() {}
+
+func (x *CreateWhiteboardResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateWhiteboardResponse.ProtoReflect.Descriptor instead.
+func (*CreateWhiteboardResponse) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *CreateWhiteboardResponse) GetSuccess() bool {
 	if x != nil {
 		return x.Success
 	}
 	return false
+}
+
+func (x *CreateWhiteboardResponse) GetWhiteboardId() string {
+	if x != nil {
+		return x.WhiteboardId
+	}
+	return ""
+}
+
+type WhiteboardIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WhiteboardId  string                 `protobuf:"bytes,1,opt,name=whiteboardId,proto3" json:"whiteboardId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WhiteboardIDRequest) Reset() {
+	*x = WhiteboardIDRequest{}
+	mi := &file_plan_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WhiteboardIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WhiteboardIDRequest) ProtoMessage() {}
+
+func (x *WhiteboardIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WhiteboardIDRequest.ProtoReflect.Descriptor instead.
+func (*WhiteboardIDRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *WhiteboardIDRequest) GetWhiteboardId() string {
+	if x != nil {
+		return x.WhiteboardId
+	}
+	return ""
+}
+
+type GetWhiteboardByIDResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Day           int32                  `protobuf:"varint,2,opt,name=day,proto3" json:"day,omitempty"`
+	Pins          []string               `protobuf:"bytes,3,rep,name=pins,proto3" json:"pins,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWhiteboardByIDResponse) Reset() {
+	*x = GetWhiteboardByIDResponse{}
+	mi := &file_plan_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWhiteboardByIDResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWhiteboardByIDResponse) ProtoMessage() {}
+
+func (x *GetWhiteboardByIDResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWhiteboardByIDResponse.ProtoReflect.Descriptor instead.
+func (*GetWhiteboardByIDResponse) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetWhiteboardByIDResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetWhiteboardByIDResponse) GetDay() int32 {
+	if x != nil {
+		return x.Day
+	}
+	return 0
+}
+
+func (x *GetWhiteboardByIDResponse) GetPins() []string {
+	if x != nil {
+		return x.Pins
+	}
+	return nil
+}
+
+type ManyWhiteboardIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Whiteboards   []string               `protobuf:"bytes,1,rep,name=whiteboards,proto3" json:"whiteboards,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ManyWhiteboardIDRequest) Reset() {
+	*x = ManyWhiteboardIDRequest{}
+	mi := &file_plan_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ManyWhiteboardIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ManyWhiteboardIDRequest) ProtoMessage() {}
+
+func (x *ManyWhiteboardIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ManyWhiteboardIDRequest.ProtoReflect.Descriptor instead.
+func (*ManyWhiteboardIDRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ManyWhiteboardIDRequest) GetWhiteboards() []string {
+	if x != nil {
+		return x.Whiteboards
+	}
+	return nil
+}
+
+type GetWhiteboardsResponse struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Whiteboards   []*GetWhiteboardResponse `protobuf:"bytes,1,rep,name=whiteboards,proto3" json:"whiteboards,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWhiteboardsResponse) Reset() {
+	*x = GetWhiteboardsResponse{}
+	mi := &file_plan_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWhiteboardsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWhiteboardsResponse) ProtoMessage() {}
+
+func (x *GetWhiteboardsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWhiteboardsResponse.ProtoReflect.Descriptor instead.
+func (*GetWhiteboardsResponse) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetWhiteboardsResponse) GetWhiteboards() []*GetWhiteboardResponse {
+	if x != nil {
+		return x.Whiteboards
+	}
+	return nil
+}
+
+type GetWhiteboardResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Day           int32                  `protobuf:"varint,1,opt,name=day,proto3" json:"day,omitempty"`
+	Pins          []*GetPinResponse      `protobuf:"bytes,2,rep,name=pins,proto3" json:"pins,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWhiteboardResponse) Reset() {
+	*x = GetWhiteboardResponse{}
+	mi := &file_plan_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWhiteboardResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWhiteboardResponse) ProtoMessage() {}
+
+func (x *GetWhiteboardResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWhiteboardResponse.ProtoReflect.Descriptor instead.
+func (*GetWhiteboardResponse) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetWhiteboardResponse) GetDay() int32 {
+	if x != nil {
+		return x.Day
+	}
+	return 0
+}
+
+func (x *GetWhiteboardResponse) GetPins() []*GetPinResponse {
+	if x != nil {
+		return x.Pins
+	}
+	return nil
+}
+
+type UpdateWhiteboardRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Pins          []string               `protobuf:"bytes,2,rep,name=pins,proto3" json:"pins,omitempty"`
+	PinChangeType string                 `protobuf:"bytes,3,opt,name=pinChangeType,proto3" json:"pinChangeType,omitempty"` // add, remove, set
+	Day           int32                  `protobuf:"varint,4,opt,name=day,proto3" json:"day,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateWhiteboardRequest) Reset() {
+	*x = UpdateWhiteboardRequest{}
+	mi := &file_plan_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateWhiteboardRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateWhiteboardRequest) ProtoMessage() {}
+
+func (x *UpdateWhiteboardRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateWhiteboardRequest.ProtoReflect.Descriptor instead.
+func (*UpdateWhiteboardRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *UpdateWhiteboardRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateWhiteboardRequest) GetPins() []string {
+	if x != nil {
+		return x.Pins
+	}
+	return nil
+}
+
+func (x *UpdateWhiteboardRequest) GetPinChangeType() string {
+	if x != nil {
+		return x.PinChangeType
+	}
+	return ""
+}
+
+func (x *UpdateWhiteboardRequest) GetDay() int32 {
+	if x != nil {
+		return x.Day
+	}
+	return 0
+}
+
+// trip
+type CreateTripRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Whiteboards   []string               `protobuf:"bytes,3,rep,name=whiteboards,proto3" json:"whiteboards,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateTripRequest) Reset() {
+	*x = CreateTripRequest{}
+	mi := &file_plan_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateTripRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateTripRequest) ProtoMessage() {}
+
+func (x *CreateTripRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateTripRequest.ProtoReflect.Descriptor instead.
+func (*CreateTripRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *CreateTripRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateTripRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CreateTripRequest) GetWhiteboards() []string {
+	if x != nil {
+		return x.Whiteboards
+	}
+	return nil
+}
+
+type CreateTripResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	TripId        string                 `protobuf:"bytes,2,opt,name=TripId,proto3" json:"TripId,omitempty"` //objectId AS a string
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateTripResponse) Reset() {
+	*x = CreateTripResponse{}
+	mi := &file_plan_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateTripResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateTripResponse) ProtoMessage() {}
+
+func (x *CreateTripResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateTripResponse.ProtoReflect.Descriptor instead.
+func (*CreateTripResponse) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *CreateTripResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *CreateTripResponse) GetTripId() string {
+	if x != nil {
+		return x.TripId
+	}
+	return ""
+}
+
+type TripIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TripId        string                 `protobuf:"bytes,1,opt,name=TripId,proto3" json:"TripId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TripIDRequest) Reset() {
+	*x = TripIDRequest{}
+	mi := &file_plan_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TripIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TripIDRequest) ProtoMessage() {}
+
+func (x *TripIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TripIDRequest.ProtoReflect.Descriptor instead.
+func (*TripIDRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *TripIDRequest) GetTripId() string {
+	if x != nil {
+		return x.TripId
+	}
+	return ""
+}
+
+type GetTripByIDResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Image         []byte                 `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
+	Whiteboards   []string               `protobuf:"bytes,5,rep,name=whiteboards,proto3" json:"whiteboards,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTripByIDResponse) Reset() {
+	*x = GetTripByIDResponse{}
+	mi := &file_plan_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTripByIDResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTripByIDResponse) ProtoMessage() {}
+
+func (x *GetTripByIDResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTripByIDResponse.ProtoReflect.Descriptor instead.
+func (*GetTripByIDResponse) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetTripByIDResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetTripByIDResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *GetTripByIDResponse) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *GetTripByIDResponse) GetImage() []byte {
+	if x != nil {
+		return x.Image
+	}
+	return nil
+}
+
+func (x *GetTripByIDResponse) GetWhiteboards() []string {
+	if x != nil {
+		return x.Whiteboards
+	}
+	return nil
+}
+
+type UpdateTripRequest struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Id                   string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description          string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Whiteboards          []string               `protobuf:"bytes,4,rep,name=whiteboards,proto3" json:"whiteboards,omitempty"`
+	WhiteboardChangeType string                 `protobuf:"bytes,5,opt,name=whiteboardChangeType,proto3" json:"whiteboardChangeType,omitempty"` // add, remove, set
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *UpdateTripRequest) Reset() {
+	*x = UpdateTripRequest{}
+	mi := &file_plan_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateTripRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateTripRequest) ProtoMessage() {}
+
+func (x *UpdateTripRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateTripRequest.ProtoReflect.Descriptor instead.
+func (*UpdateTripRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *UpdateTripRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateTripRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateTripRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateTripRequest) GetWhiteboards() []string {
+	if x != nil {
+		return x.Whiteboards
+	}
+	return nil
+}
+
+func (x *UpdateTripRequest) GetWhiteboardChangeType() string {
+	if x != nil {
+		return x.WhiteboardChangeType
+	}
+	return ""
+}
+
+type UpdateTripImageRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Image         []byte                 `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateTripImageRequest) Reset() {
+	*x = UpdateTripImageRequest{}
+	mi := &file_plan_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateTripImageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateTripImageRequest) ProtoMessage() {}
+
+func (x *UpdateTripImageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateTripImageRequest.ProtoReflect.Descriptor instead.
+func (*UpdateTripImageRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *UpdateTripImageRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateTripImageRequest) GetImage() []byte {
+	if x != nil {
+		return x.Image
+	}
+	return nil
 }
 
 var File_plan_proto protoreflect.FileDescriptor
@@ -640,54 +1542,129 @@ var File_plan_proto protoreflect.FileDescriptor
 const file_plan_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"plan.proto\x12\x04plan\"\xb0\x01\n" +
+	"plan.proto\x12\x04plan\"+\n" +
+	"\x0fSuccessResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"\xca\x01\n" +
 	"\x10CreatePinRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12(\n" +
 	"\aexpense\x18\x03 \x03(\v2\x0e.plan.ExpensesR\aexpense\x12\x1a\n" +
-	"\blocation\x18\x04 \x01(\x02R\blocation\x12 \n" +
-	"\vparticipant\x18\x05 \x03(\tR\vparticipant\"C\n" +
+	"\blocation\x18\x04 \x01(\x02R\blocation\x12\x18\n" +
+	"\aparents\x18\x05 \x03(\tR\aparents\x12 \n" +
+	"\vparticipant\x18\x06 \x03(\tR\vparticipant\"C\n" +
 	"\x11CreatePinResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
-	"\x05pinId\x18\x02 \x01(\tR\x05pinId\")\n" +
-	"\x11GetPinByIDRequest\x12\x14\n" +
-	"\x05pinId\x18\x01 \x01(\tR\x05pinId\"\xe2\x01\n" +
+	"\x05pinId\x18\x02 \x01(\tR\x05pinId\"$\n" +
+	"\fPinIDRequest\x12\x14\n" +
+	"\x05pinId\x18\x01 \x01(\tR\x05pinId\"\xfc\x01\n" +
 	"\x12GetPinByIDResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
 	"\x05image\x18\x03 \x01(\fR\x05image\x12 \n" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x12(\n" +
 	"\aexpense\x18\x05 \x03(\v2\x0e.plan.ExpensesR\aexpense\x12\x1a\n" +
-	"\blocation\x18\x06 \x01(\x02R\blocation\x12 \n" +
-	"\vparticipant\x18\a \x03(\tR\vparticipant\"4\n" +
+	"\blocation\x18\x06 \x01(\x02R\blocation\x12\x18\n" +
+	"\aparents\x18\a \x03(\tR\aparents\x12 \n" +
+	"\vparticipant\x18\b \x03(\tR\vparticipant\"&\n" +
+	"\x10ManyPinIDRequest\x12\x12\n" +
+	"\x04pins\x18\x01 \x03(\tR\x04pins\"4\n" +
 	"\x1aGetPinByParticipantRequest\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\tR\x06userId\";\n" +
 	"\x0fGetPinsResponse\x12(\n" +
-	"\x04pins\x18\x01 \x03(\v2\x14.plan.GetPinResponseR\x04pins\"r\n" +
+	"\x04pins\x18\x01 \x03(\v2\x14.plan.GetPinResponseR\x04pins\"\x8c\x01\n" +
 	"\x0eGetPinResponse\x12\x14\n" +
 	"\x05pinId\x18\x01 \x01(\tR\x05pinId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
-	"\x05image\x18\x03 \x01(\fR\x05image\x12 \n" +
-	"\vparticipant\x18\x04 \x03(\tR\vparticipant\"\xc0\x01\n" +
+	"\x05image\x18\x03 \x01(\fR\x05image\x12\x18\n" +
+	"\aparents\x18\x04 \x03(\tR\aparents\x12 \n" +
+	"\vparticipant\x18\x05 \x03(\tR\vparticipant\"\xda\x01\n" +
 	"\x10UpdatePinRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12(\n" +
 	"\aexpense\x18\x04 \x03(\v2\x0e.plan.ExpensesR\aexpense\x12\x1a\n" +
-	"\blocation\x18\x05 \x01(\x02R\blocation\x12 \n" +
-	"\vparticipant\x18\x06 \x03(\tR\vparticipant\"H\n" +
+	"\blocation\x18\x05 \x01(\x02R\blocation\x12\x18\n" +
+	"\aparents\x18\x06 \x03(\tR\aparents\x12 \n" +
+	"\vparticipant\x18\a \x03(\tR\vparticipant\"H\n" +
 	"\bExpenses\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
-	"\aexpense\x18\x03 \x01(\x02R\aexpense\"+\n" +
-	"\x0fSuccessResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\x99\x02\n" +
-	"\fPlansService\x12<\n" +
-	"\tCreatePin\x12\x16.plan.CreatePinRequest\x1a\x17.plan.CreatePinResponse\x12?\n" +
+	"\aexpense\x18\x03 \x01(\x02R\aexpense\"=\n" +
+	"\x15UpdatePinImageRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05image\x18\x02 \x01(\fR\x05image\"=\n" +
+	"\x17CreateWhiteboardRequest\x12\x10\n" +
+	"\x03pin\x18\x01 \x01(\tR\x03pin\x12\x10\n" +
+	"\x03day\x18\x02 \x01(\x05R\x03day\"X\n" +
+	"\x18CreateWhiteboardResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\"\n" +
+	"\fwhiteboardId\x18\x02 \x01(\tR\fwhiteboardId\"9\n" +
+	"\x13WhiteboardIDRequest\x12\"\n" +
+	"\fwhiteboardId\x18\x01 \x01(\tR\fwhiteboardId\"[\n" +
+	"\x19GetWhiteboardByIDResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x10\n" +
+	"\x03day\x18\x02 \x01(\x05R\x03day\x12\x12\n" +
+	"\x04pins\x18\x03 \x03(\tR\x04pins\";\n" +
+	"\x17ManyWhiteboardIDRequest\x12 \n" +
+	"\vwhiteboards\x18\x01 \x03(\tR\vwhiteboards\"W\n" +
+	"\x16GetWhiteboardsResponse\x12=\n" +
+	"\vwhiteboards\x18\x01 \x03(\v2\x1b.plan.GetWhiteboardResponseR\vwhiteboards\"S\n" +
+	"\x15GetWhiteboardResponse\x12\x10\n" +
+	"\x03day\x18\x01 \x01(\x05R\x03day\x12(\n" +
+	"\x04pins\x18\x02 \x03(\v2\x14.plan.GetPinResponseR\x04pins\"u\n" +
+	"\x17UpdateWhiteboardRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04pins\x18\x02 \x03(\tR\x04pins\x12$\n" +
+	"\rpinChangeType\x18\x03 \x01(\tR\rpinChangeType\x12\x10\n" +
+	"\x03day\x18\x04 \x01(\x05R\x03day\"k\n" +
+	"\x11CreateTripRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12 \n" +
+	"\vwhiteboards\x18\x03 \x03(\tR\vwhiteboards\"F\n" +
+	"\x12CreateTripResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x16\n" +
+	"\x06TripId\x18\x02 \x01(\tR\x06TripId\"'\n" +
+	"\rTripIDRequest\x12\x16\n" +
+	"\x06TripId\x18\x01 \x01(\tR\x06TripId\"\x9d\x01\n" +
+	"\x13GetTripByIDResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x14\n" +
+	"\x05image\x18\x04 \x01(\fR\x05image\x12 \n" +
+	"\vwhiteboards\x18\x05 \x03(\tR\vwhiteboards\"\xaf\x01\n" +
+	"\x11UpdateTripRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12 \n" +
+	"\vwhiteboards\x18\x04 \x03(\tR\vwhiteboards\x122\n" +
+	"\x14whiteboardChangeType\x18\x05 \x01(\tR\x14whiteboardChangeType\">\n" +
+	"\x16UpdateTripImageRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05image\x18\x02 \x01(\fR\x05image2\xc5\n" +
 	"\n" +
-	"GetPinByID\x12\x17.plan.GetPinByIDRequest\x1a\x18.plan.GetPinByIDResponse\x12N\n" +
+	"\fPlansService\x12<\n" +
+	"\tCreatePin\x12\x16.plan.CreatePinRequest\x1a\x17.plan.CreatePinResponse\x12:\n" +
+	"\n" +
+	"GetPinByID\x12\x12.plan.PinIDRequest\x1a\x18.plan.GetPinByIDResponse\x12D\n" +
+	"\x13GetPinsByWhiteboard\x12\x16.plan.ManyPinIDRequest\x1a\x15.plan.GetPinsResponse\x12N\n" +
 	"\x13GetPinByParticipant\x12 .plan.GetPinByParticipantRequest\x1a\x15.plan.GetPinsResponse\x12:\n" +
-	"\tUpdatePin\x12\x16.plan.UpdatePinRequest\x1a\x15.plan.SuccessResponseB\x13Z\x11shared/proto/planb\x06proto3"
+	"\tUpdatePin\x12\x16.plan.UpdatePinRequest\x1a\x15.plan.SuccessResponse\x12D\n" +
+	"\x0eUpdatePinImage\x12\x1b.plan.UpdatePinImageRequest\x1a\x15.plan.SuccessResponse\x12:\n" +
+	"\rDeletePinByID\x12\x12.plan.PinIDRequest\x1a\x15.plan.SuccessResponse\x12F\n" +
+	"\x15DeletePinByWhiteboard\x12\x16.plan.ManyPinIDRequest\x1a\x15.plan.SuccessResponse\x12Q\n" +
+	"\x10CreateWhiteboard\x12\x1d.plan.CreateWhiteboardRequest\x1a\x1e.plan.CreateWhiteboardResponse\x12O\n" +
+	"\x11GetWhiteboardByID\x12\x19.plan.WhiteboardIDRequest\x1a\x1f.plan.GetWhiteboardByIDResponse\x12S\n" +
+	"\x14GetWhiteboardsByTrip\x12\x1d.plan.ManyWhiteboardIDRequest\x1a\x1c.plan.GetWhiteboardsResponse\x12H\n" +
+	"\x10UpdateWhiteboard\x12\x1d.plan.UpdateWhiteboardRequest\x1a\x15.plan.SuccessResponse\x12H\n" +
+	"\x14DeleteWhiteboardByID\x12\x19.plan.WhiteboardIDRequest\x1a\x15.plan.SuccessResponse\x12N\n" +
+	"\x16DeleteWhiteboardByTrip\x12\x1d.plan.ManyWhiteboardIDRequest\x1a\x15.plan.SuccessResponse\x12?\n" +
+	"\n" +
+	"CreateTrip\x12\x17.plan.CreateTripRequest\x1a\x18.plan.CreateTripResponse\x12=\n" +
+	"\vGetTripByID\x12\x13.plan.TripIDRequest\x1a\x19.plan.GetTripByIDResponse\x12<\n" +
+	"\n" +
+	"UpdateTrip\x12\x17.plan.UpdateTripRequest\x1a\x15.plan.SuccessResponse\x12F\n" +
+	"\x0fUpdateTripImage\x12\x1c.plan.UpdateTripImageRequest\x1a\x15.plan.SuccessResponse\x12<\n" +
+	"\x0eDeleteTripByID\x12\x13.plan.TripIDRequest\x1a\x15.plan.SuccessResponseB\x13Z\x11shared/proto/planb\x06proto3"
 
 var (
 	file_plan_proto_rawDescOnce sync.Once
@@ -701,37 +1678,85 @@ func file_plan_proto_rawDescGZIP() []byte {
 	return file_plan_proto_rawDescData
 }
 
-var file_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_plan_proto_goTypes = []any{
-	(*CreatePinRequest)(nil),           // 0: plan.CreatePinRequest
-	(*CreatePinResponse)(nil),          // 1: plan.CreatePinResponse
-	(*GetPinByIDRequest)(nil),          // 2: plan.GetPinByIDRequest
-	(*GetPinByIDResponse)(nil),         // 3: plan.GetPinByIDResponse
-	(*GetPinByParticipantRequest)(nil), // 4: plan.GetPinByParticipantRequest
-	(*GetPinsResponse)(nil),            // 5: plan.GetPinsResponse
-	(*GetPinResponse)(nil),             // 6: plan.GetPinResponse
-	(*UpdatePinRequest)(nil),           // 7: plan.UpdatePinRequest
-	(*Expenses)(nil),                   // 8: plan.Expenses
-	(*SuccessResponse)(nil),            // 9: plan.SuccessResponse
+	(*SuccessResponse)(nil),            // 0: plan.SuccessResponse
+	(*CreatePinRequest)(nil),           // 1: plan.CreatePinRequest
+	(*CreatePinResponse)(nil),          // 2: plan.CreatePinResponse
+	(*PinIDRequest)(nil),               // 3: plan.PinIDRequest
+	(*GetPinByIDResponse)(nil),         // 4: plan.GetPinByIDResponse
+	(*ManyPinIDRequest)(nil),           // 5: plan.ManyPinIDRequest
+	(*GetPinByParticipantRequest)(nil), // 6: plan.GetPinByParticipantRequest
+	(*GetPinsResponse)(nil),            // 7: plan.GetPinsResponse
+	(*GetPinResponse)(nil),             // 8: plan.GetPinResponse
+	(*UpdatePinRequest)(nil),           // 9: plan.UpdatePinRequest
+	(*Expenses)(nil),                   // 10: plan.Expenses
+	(*UpdatePinImageRequest)(nil),      // 11: plan.UpdatePinImageRequest
+	(*CreateWhiteboardRequest)(nil),    // 12: plan.CreateWhiteboardRequest
+	(*CreateWhiteboardResponse)(nil),   // 13: plan.CreateWhiteboardResponse
+	(*WhiteboardIDRequest)(nil),        // 14: plan.WhiteboardIDRequest
+	(*GetWhiteboardByIDResponse)(nil),  // 15: plan.GetWhiteboardByIDResponse
+	(*ManyWhiteboardIDRequest)(nil),    // 16: plan.ManyWhiteboardIDRequest
+	(*GetWhiteboardsResponse)(nil),     // 17: plan.GetWhiteboardsResponse
+	(*GetWhiteboardResponse)(nil),      // 18: plan.GetWhiteboardResponse
+	(*UpdateWhiteboardRequest)(nil),    // 19: plan.UpdateWhiteboardRequest
+	(*CreateTripRequest)(nil),          // 20: plan.CreateTripRequest
+	(*CreateTripResponse)(nil),         // 21: plan.CreateTripResponse
+	(*TripIDRequest)(nil),              // 22: plan.TripIDRequest
+	(*GetTripByIDResponse)(nil),        // 23: plan.GetTripByIDResponse
+	(*UpdateTripRequest)(nil),          // 24: plan.UpdateTripRequest
+	(*UpdateTripImageRequest)(nil),     // 25: plan.UpdateTripImageRequest
 }
 var file_plan_proto_depIdxs = []int32{
-	8, // 0: plan.CreatePinRequest.expense:type_name -> plan.Expenses
-	8, // 1: plan.GetPinByIDResponse.expense:type_name -> plan.Expenses
-	6, // 2: plan.GetPinsResponse.pins:type_name -> plan.GetPinResponse
-	8, // 3: plan.UpdatePinRequest.expense:type_name -> plan.Expenses
-	0, // 4: plan.PlansService.CreatePin:input_type -> plan.CreatePinRequest
-	2, // 5: plan.PlansService.GetPinByID:input_type -> plan.GetPinByIDRequest
-	4, // 6: plan.PlansService.GetPinByParticipant:input_type -> plan.GetPinByParticipantRequest
-	7, // 7: plan.PlansService.UpdatePin:input_type -> plan.UpdatePinRequest
-	1, // 8: plan.PlansService.CreatePin:output_type -> plan.CreatePinResponse
-	3, // 9: plan.PlansService.GetPinByID:output_type -> plan.GetPinByIDResponse
-	5, // 10: plan.PlansService.GetPinByParticipant:output_type -> plan.GetPinsResponse
-	9, // 11: plan.PlansService.UpdatePin:output_type -> plan.SuccessResponse
-	8, // [8:12] is the sub-list for method output_type
-	4, // [4:8] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	10, // 0: plan.CreatePinRequest.expense:type_name -> plan.Expenses
+	10, // 1: plan.GetPinByIDResponse.expense:type_name -> plan.Expenses
+	8,  // 2: plan.GetPinsResponse.pins:type_name -> plan.GetPinResponse
+	10, // 3: plan.UpdatePinRequest.expense:type_name -> plan.Expenses
+	18, // 4: plan.GetWhiteboardsResponse.whiteboards:type_name -> plan.GetWhiteboardResponse
+	8,  // 5: plan.GetWhiteboardResponse.pins:type_name -> plan.GetPinResponse
+	1,  // 6: plan.PlansService.CreatePin:input_type -> plan.CreatePinRequest
+	3,  // 7: plan.PlansService.GetPinByID:input_type -> plan.PinIDRequest
+	5,  // 8: plan.PlansService.GetPinsByWhiteboard:input_type -> plan.ManyPinIDRequest
+	6,  // 9: plan.PlansService.GetPinByParticipant:input_type -> plan.GetPinByParticipantRequest
+	9,  // 10: plan.PlansService.UpdatePin:input_type -> plan.UpdatePinRequest
+	11, // 11: plan.PlansService.UpdatePinImage:input_type -> plan.UpdatePinImageRequest
+	3,  // 12: plan.PlansService.DeletePinByID:input_type -> plan.PinIDRequest
+	5,  // 13: plan.PlansService.DeletePinByWhiteboard:input_type -> plan.ManyPinIDRequest
+	12, // 14: plan.PlansService.CreateWhiteboard:input_type -> plan.CreateWhiteboardRequest
+	14, // 15: plan.PlansService.GetWhiteboardByID:input_type -> plan.WhiteboardIDRequest
+	16, // 16: plan.PlansService.GetWhiteboardsByTrip:input_type -> plan.ManyWhiteboardIDRequest
+	19, // 17: plan.PlansService.UpdateWhiteboard:input_type -> plan.UpdateWhiteboardRequest
+	14, // 18: plan.PlansService.DeleteWhiteboardByID:input_type -> plan.WhiteboardIDRequest
+	16, // 19: plan.PlansService.DeleteWhiteboardByTrip:input_type -> plan.ManyWhiteboardIDRequest
+	20, // 20: plan.PlansService.CreateTrip:input_type -> plan.CreateTripRequest
+	22, // 21: plan.PlansService.GetTripByID:input_type -> plan.TripIDRequest
+	24, // 22: plan.PlansService.UpdateTrip:input_type -> plan.UpdateTripRequest
+	25, // 23: plan.PlansService.UpdateTripImage:input_type -> plan.UpdateTripImageRequest
+	22, // 24: plan.PlansService.DeleteTripByID:input_type -> plan.TripIDRequest
+	2,  // 25: plan.PlansService.CreatePin:output_type -> plan.CreatePinResponse
+	4,  // 26: plan.PlansService.GetPinByID:output_type -> plan.GetPinByIDResponse
+	7,  // 27: plan.PlansService.GetPinsByWhiteboard:output_type -> plan.GetPinsResponse
+	7,  // 28: plan.PlansService.GetPinByParticipant:output_type -> plan.GetPinsResponse
+	0,  // 29: plan.PlansService.UpdatePin:output_type -> plan.SuccessResponse
+	0,  // 30: plan.PlansService.UpdatePinImage:output_type -> plan.SuccessResponse
+	0,  // 31: plan.PlansService.DeletePinByID:output_type -> plan.SuccessResponse
+	0,  // 32: plan.PlansService.DeletePinByWhiteboard:output_type -> plan.SuccessResponse
+	13, // 33: plan.PlansService.CreateWhiteboard:output_type -> plan.CreateWhiteboardResponse
+	15, // 34: plan.PlansService.GetWhiteboardByID:output_type -> plan.GetWhiteboardByIDResponse
+	17, // 35: plan.PlansService.GetWhiteboardsByTrip:output_type -> plan.GetWhiteboardsResponse
+	0,  // 36: plan.PlansService.UpdateWhiteboard:output_type -> plan.SuccessResponse
+	0,  // 37: plan.PlansService.DeleteWhiteboardByID:output_type -> plan.SuccessResponse
+	0,  // 38: plan.PlansService.DeleteWhiteboardByTrip:output_type -> plan.SuccessResponse
+	21, // 39: plan.PlansService.CreateTrip:output_type -> plan.CreateTripResponse
+	23, // 40: plan.PlansService.GetTripByID:output_type -> plan.GetTripByIDResponse
+	0,  // 41: plan.PlansService.UpdateTrip:output_type -> plan.SuccessResponse
+	0,  // 42: plan.PlansService.UpdateTripImage:output_type -> plan.SuccessResponse
+	0,  // 43: plan.PlansService.DeleteTripByID:output_type -> plan.SuccessResponse
+	25, // [25:44] is the sub-list for method output_type
+	6,  // [6:25] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_plan_proto_init() }
@@ -745,7 +1770,7 @@ func file_plan_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_plan_proto_rawDesc), len(file_plan_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
