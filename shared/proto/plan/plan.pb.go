@@ -635,6 +635,58 @@ func (x *SuccessResponse) GetSuccess() bool {
 	return false
 }
 
+type UpdatePinImageRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Image         []byte                 `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePinImageRequest) Reset() {
+	*x = UpdatePinImageRequest{}
+	mi := &file_plan_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePinImageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePinImageRequest) ProtoMessage() {}
+
+func (x *UpdatePinImageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePinImageRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePinImageRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UpdatePinImageRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdatePinImageRequest) GetImage() []byte {
+	if x != nil {
+		return x.Image
+	}
+	return nil
+}
+
 var File_plan_proto protoreflect.FileDescriptor
 
 const file_plan_proto_rawDesc = "" +
@@ -681,13 +733,17 @@ const file_plan_proto_rawDesc = "" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
 	"\aexpense\x18\x03 \x01(\x02R\aexpense\"+\n" +
 	"\x0fSuccessResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\x99\x02\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"=\n" +
+	"\x15UpdatePinImageRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05image\x18\x02 \x01(\fR\x05image2\xdf\x02\n" +
 	"\fPlansService\x12<\n" +
 	"\tCreatePin\x12\x16.plan.CreatePinRequest\x1a\x17.plan.CreatePinResponse\x12?\n" +
 	"\n" +
 	"GetPinByID\x12\x17.plan.GetPinByIDRequest\x1a\x18.plan.GetPinByIDResponse\x12N\n" +
 	"\x13GetPinByParticipant\x12 .plan.GetPinByParticipantRequest\x1a\x15.plan.GetPinsResponse\x12:\n" +
-	"\tUpdatePin\x12\x16.plan.UpdatePinRequest\x1a\x15.plan.SuccessResponseB\x13Z\x11shared/proto/planb\x06proto3"
+	"\tUpdatePin\x12\x16.plan.UpdatePinRequest\x1a\x15.plan.SuccessResponse\x12D\n" +
+	"\x0eUpdatePinImage\x12\x1b.plan.UpdatePinImageRequest\x1a\x15.plan.SuccessResponseB\x13Z\x11shared/proto/planb\x06proto3"
 
 var (
 	file_plan_proto_rawDescOnce sync.Once
@@ -701,7 +757,7 @@ func file_plan_proto_rawDescGZIP() []byte {
 	return file_plan_proto_rawDescData
 }
 
-var file_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_plan_proto_goTypes = []any{
 	(*CreatePinRequest)(nil),           // 0: plan.CreatePinRequest
 	(*CreatePinResponse)(nil),          // 1: plan.CreatePinResponse
@@ -713,25 +769,28 @@ var file_plan_proto_goTypes = []any{
 	(*UpdatePinRequest)(nil),           // 7: plan.UpdatePinRequest
 	(*Expenses)(nil),                   // 8: plan.Expenses
 	(*SuccessResponse)(nil),            // 9: plan.SuccessResponse
+	(*UpdatePinImageRequest)(nil),      // 10: plan.UpdatePinImageRequest
 }
 var file_plan_proto_depIdxs = []int32{
-	8, // 0: plan.CreatePinRequest.expense:type_name -> plan.Expenses
-	8, // 1: plan.GetPinByIDResponse.expense:type_name -> plan.Expenses
-	6, // 2: plan.GetPinsResponse.pins:type_name -> plan.GetPinResponse
-	8, // 3: plan.UpdatePinRequest.expense:type_name -> plan.Expenses
-	0, // 4: plan.PlansService.CreatePin:input_type -> plan.CreatePinRequest
-	2, // 5: plan.PlansService.GetPinByID:input_type -> plan.GetPinByIDRequest
-	4, // 6: plan.PlansService.GetPinByParticipant:input_type -> plan.GetPinByParticipantRequest
-	7, // 7: plan.PlansService.UpdatePin:input_type -> plan.UpdatePinRequest
-	1, // 8: plan.PlansService.CreatePin:output_type -> plan.CreatePinResponse
-	3, // 9: plan.PlansService.GetPinByID:output_type -> plan.GetPinByIDResponse
-	5, // 10: plan.PlansService.GetPinByParticipant:output_type -> plan.GetPinsResponse
-	9, // 11: plan.PlansService.UpdatePin:output_type -> plan.SuccessResponse
-	8, // [8:12] is the sub-list for method output_type
-	4, // [4:8] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	8,  // 0: plan.CreatePinRequest.expense:type_name -> plan.Expenses
+	8,  // 1: plan.GetPinByIDResponse.expense:type_name -> plan.Expenses
+	6,  // 2: plan.GetPinsResponse.pins:type_name -> plan.GetPinResponse
+	8,  // 3: plan.UpdatePinRequest.expense:type_name -> plan.Expenses
+	0,  // 4: plan.PlansService.CreatePin:input_type -> plan.CreatePinRequest
+	2,  // 5: plan.PlansService.GetPinByID:input_type -> plan.GetPinByIDRequest
+	4,  // 6: plan.PlansService.GetPinByParticipant:input_type -> plan.GetPinByParticipantRequest
+	7,  // 7: plan.PlansService.UpdatePin:input_type -> plan.UpdatePinRequest
+	10, // 8: plan.PlansService.UpdatePinImage:input_type -> plan.UpdatePinImageRequest
+	1,  // 9: plan.PlansService.CreatePin:output_type -> plan.CreatePinResponse
+	3,  // 10: plan.PlansService.GetPinByID:output_type -> plan.GetPinByIDResponse
+	5,  // 11: plan.PlansService.GetPinByParticipant:output_type -> plan.GetPinsResponse
+	9,  // 12: plan.PlansService.UpdatePin:output_type -> plan.SuccessResponse
+	9,  // 13: plan.PlansService.UpdatePinImage:output_type -> plan.SuccessResponse
+	9,  // [9:14] is the sub-list for method output_type
+	4,  // [4:9] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_plan_proto_init() }
@@ -745,7 +804,7 @@ func file_plan_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_plan_proto_rawDesc), len(file_plan_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

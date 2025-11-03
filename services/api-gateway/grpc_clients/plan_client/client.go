@@ -56,3 +56,7 @@ func (ds *PlansServiceClient) GetPinByParticipant(ctx context.Context, req *pb.G
 func (ds *PlansServiceClient) UpdatePin(ctx context.Context, req *pb.UpdatePinRequest) (*pb.SuccessResponse, error) {
 	return ds.Client.UpdatePin(ctx, req)
 }
+
+func (ds *PlansServiceClient) UpdatePinImage(ctx context.Context, req *pb.UpdatePinImageRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.UpdatePinImage(ctx, req)
+}

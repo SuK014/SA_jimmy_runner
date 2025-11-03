@@ -17,6 +17,7 @@ type IPinsService interface {
 	FindByID(pinID string) (*entities.PinDataModel, error)
 	FindByParticipant(userID string) (*[]entities.PinDataModel, error)
 	UpdatePin(pinID string, data entities.UpdatedPinModel) error
+	UpdatePinImage(pinID string, image []byte) error
 }
 
 func NewPinsService(repo0 repository.IPinsRepository) IPinsService {
@@ -53,4 +54,8 @@ func (sv *pinsService) InsertPin(data entities.CreatedPinModel) (string, error) 
 
 func (sv *pinsService) UpdatePin(pinID string, data entities.UpdatedPinModel) error {
 	return sv.PinsRepository.UpdatePin(pinID, data)
+}
+
+func (sv *pinsService) UpdatePinImage(pinID string, image []byte) error {
+	return sv.PinsRepository.UpdatePinImage(pinID, image)
 }

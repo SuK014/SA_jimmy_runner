@@ -130,3 +130,14 @@ func (h *gRPCHandler) UpdatePin(ctx context.Context, req *pb.UpdatePinRequest) (
 		Success: true,
 	}, nil
 }
+
+func (h *gRPCHandler) UpdatePinImage(ctx context.Context, req *pb.UpdatePinImageRequest) (*pb.SuccessResponse, error) {
+
+	if err := h.PinService.UpdatePinImage(req.GetId(), req.GetImage()); err != nil {
+		return nil, err
+	}
+
+	return &pb.SuccessResponse{
+		Success: true,
+	}, nil
+}

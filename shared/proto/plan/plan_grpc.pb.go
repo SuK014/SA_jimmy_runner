@@ -23,6 +23,7 @@ const (
 	PlansService_GetPinByID_FullMethodName          = "/plan.PlansService/GetPinByID"
 	PlansService_GetPinByParticipant_FullMethodName = "/plan.PlansService/GetPinByParticipant"
 	PlansService_UpdatePin_FullMethodName           = "/plan.PlansService/UpdatePin"
+	PlansService_UpdatePinImage_FullMethodName      = "/plan.PlansService/UpdatePinImage"
 )
 
 // PlansServiceClient is the client API for PlansService service.
@@ -36,6 +37,7 @@ type PlansServiceClient interface {
 	GetPinByID(ctx context.Context, in *GetPinByIDRequest, opts ...grpc.CallOption) (*GetPinByIDResponse, error)
 	GetPinByParticipant(ctx context.Context, in *GetPinByParticipantRequest, opts ...grpc.CallOption) (*GetPinsResponse, error)
 	UpdatePin(ctx context.Context, in *UpdatePinRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	UpdatePinImage(ctx context.Context, in *UpdatePinImageRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 }
 
 type plansServiceClient struct {
@@ -86,6 +88,16 @@ func (c *plansServiceClient) UpdatePin(ctx context.Context, in *UpdatePinRequest
 	return out, nil
 }
 
+func (c *plansServiceClient) UpdatePinImage(ctx context.Context, in *UpdatePinImageRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SuccessResponse)
+	err := c.cc.Invoke(ctx, PlansService_UpdatePinImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PlansServiceServer is the server API for PlansService service.
 // All implementations must embed UnimplementedPlansServiceServer
 // for forward compatibility.
@@ -97,6 +109,7 @@ type PlansServiceServer interface {
 	GetPinByID(context.Context, *GetPinByIDRequest) (*GetPinByIDResponse, error)
 	GetPinByParticipant(context.Context, *GetPinByParticipantRequest) (*GetPinsResponse, error)
 	UpdatePin(context.Context, *UpdatePinRequest) (*SuccessResponse, error)
+	UpdatePinImage(context.Context, *UpdatePinImageRequest) (*SuccessResponse, error)
 	mustEmbedUnimplementedPlansServiceServer()
 }
 
@@ -118,6 +131,9 @@ func (UnimplementedPlansServiceServer) GetPinByParticipant(context.Context, *Get
 }
 func (UnimplementedPlansServiceServer) UpdatePin(context.Context, *UpdatePinRequest) (*SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePin not implemented")
+}
+func (UnimplementedPlansServiceServer) UpdatePinImage(context.Context, *UpdatePinImageRequest) (*SuccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePinImage not implemented")
 }
 func (UnimplementedPlansServiceServer) mustEmbedUnimplementedPlansServiceServer() {}
 func (UnimplementedPlansServiceServer) testEmbeddedByValue()                      {}
@@ -212,6 +228,24 @@ func _PlansService_UpdatePin_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlansService_UpdatePinImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePinImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).UpdatePinImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_UpdatePinImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).UpdatePinImage(ctx, req.(*UpdatePinImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PlansService_ServiceDesc is the grpc.ServiceDesc for PlansService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -234,6 +268,10 @@ var PlansService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdatePin",
 			Handler:    _PlansService_UpdatePin_Handler,
+		},
+		{
+			MethodName: "UpdatePinImage",
+			Handler:    _PlansService_UpdatePinImage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

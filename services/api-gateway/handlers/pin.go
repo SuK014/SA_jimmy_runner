@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/middlewares"
 	"github.com/SuK014/SA_jimmy_runner/shared/entities"
@@ -136,6 +137,49 @@ func (h *HTTPHandler) UpdatePinByID(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.planClient.UpdatePin(context.Background(), req)
+	if err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot update pin: " + err.Error()},
+		)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(res)
+}
+
+func (h *HTTPHandler) UpdatePinImageByID(ctx *fiber.Ctx) error {
+	id := ctx.Query("id")
+	if id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'id' query parameter"},
+		)
+	}
+
+	fileHeader, err := ctx.FormFile("image")
+	var imageBytes []byte
+
+	if err == nil && fileHeader != nil {
+		file, err := fileHeader.Open()
+		if err != nil {
+			return ctx.Status(fiber.StatusBadRequest).JSON(
+				entities.ResponseMessage{Message: "failed to open uploaded file"},
+			)
+		}
+		defer file.Close()
+
+		imageBytes, err = io.ReadAll(file)
+		if err != nil {
+			return ctx.Status(fiber.StatusBadRequest).JSON(
+				entities.ResponseMessage{Message: "failed to read uploaded file"},
+			)
+		}
+	}
+
+	req := &pb.UpdatePinImageRequest{
+		Id:    id,
+		Image: imageBytes,
+	}
+
+	res, err := h.planClient.UpdatePinImage(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot update pin: " + err.Error()},

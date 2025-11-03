@@ -28,4 +28,5 @@ func HandlerPlans(handler HTTPHandler, app *fiber.App) {
 	plan.Get("/pin/participants", middlewares.SetJWtHeaderHandler(), handler.GetPinByParticipant)
 	plan.Get("/participants", middlewares.SetJWtHeaderHandler(), handler.GetParticipantsByPinID)
 	plan.Put("/pin", middlewares.SetJWtHeaderHandler(), handler.UpdatePinByID)
+	plan.Put("/pin/image", middlewares.SetJWtHeaderHandler(), handler.UpdatePinImageByID)
 }
