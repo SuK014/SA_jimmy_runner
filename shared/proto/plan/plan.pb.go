@@ -152,27 +152,27 @@ func (x *CreatePinResponse) GetPinId() string {
 }
 
 // Request message to create a user
-type GetPinByIDRequest struct {
+type PinIDRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PinId         string                 `protobuf:"bytes,1,opt,name=pinId,proto3" json:"pinId,omitempty"` //uuid AS a string
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetPinByIDRequest) Reset() {
-	*x = GetPinByIDRequest{}
+func (x *PinIDRequest) Reset() {
+	*x = PinIDRequest{}
 	mi := &file_plan_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetPinByIDRequest) String() string {
+func (x *PinIDRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetPinByIDRequest) ProtoMessage() {}
+func (*PinIDRequest) ProtoMessage() {}
 
-func (x *GetPinByIDRequest) ProtoReflect() protoreflect.Message {
+func (x *PinIDRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_plan_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -184,12 +184,12 @@ func (x *GetPinByIDRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPinByIDRequest.ProtoReflect.Descriptor instead.
-func (*GetPinByIDRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use PinIDRequest.ProtoReflect.Descriptor instead.
+func (*PinIDRequest) Descriptor() ([]byte, []int) {
 	return file_plan_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *GetPinByIDRequest) GetPinId() string {
+func (x *PinIDRequest) GetPinId() string {
 	if x != nil {
 		return x.PinId
 	}
@@ -701,8 +701,8 @@ const file_plan_proto_rawDesc = "" +
 	"\vparticipant\x18\x05 \x03(\tR\vparticipant\"C\n" +
 	"\x11CreatePinResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
-	"\x05pinId\x18\x02 \x01(\tR\x05pinId\")\n" +
-	"\x11GetPinByIDRequest\x12\x14\n" +
+	"\x05pinId\x18\x02 \x01(\tR\x05pinId\"$\n" +
+	"\fPinIDRequest\x12\x14\n" +
 	"\x05pinId\x18\x01 \x01(\tR\x05pinId\"\xe2\x01\n" +
 	"\x12GetPinByIDResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x12\n" +
@@ -736,14 +736,15 @@ const file_plan_proto_rawDesc = "" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\"=\n" +
 	"\x15UpdatePinImageRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05image\x18\x02 \x01(\fR\x05image2\xdf\x02\n" +
+	"\x05image\x18\x02 \x01(\fR\x05image2\x96\x03\n" +
 	"\fPlansService\x12<\n" +
-	"\tCreatePin\x12\x16.plan.CreatePinRequest\x1a\x17.plan.CreatePinResponse\x12?\n" +
+	"\tCreatePin\x12\x16.plan.CreatePinRequest\x1a\x17.plan.CreatePinResponse\x12:\n" +
 	"\n" +
-	"GetPinByID\x12\x17.plan.GetPinByIDRequest\x1a\x18.plan.GetPinByIDResponse\x12N\n" +
+	"GetPinByID\x12\x12.plan.PinIDRequest\x1a\x18.plan.GetPinByIDResponse\x12N\n" +
 	"\x13GetPinByParticipant\x12 .plan.GetPinByParticipantRequest\x1a\x15.plan.GetPinsResponse\x12:\n" +
 	"\tUpdatePin\x12\x16.plan.UpdatePinRequest\x1a\x15.plan.SuccessResponse\x12D\n" +
-	"\x0eUpdatePinImage\x12\x1b.plan.UpdatePinImageRequest\x1a\x15.plan.SuccessResponseB\x13Z\x11shared/proto/planb\x06proto3"
+	"\x0eUpdatePinImage\x12\x1b.plan.UpdatePinImageRequest\x1a\x15.plan.SuccessResponse\x12:\n" +
+	"\rDeletePinByID\x12\x12.plan.PinIDRequest\x1a\x15.plan.SuccessResponseB\x13Z\x11shared/proto/planb\x06proto3"
 
 var (
 	file_plan_proto_rawDescOnce sync.Once
@@ -761,7 +762,7 @@ var file_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_plan_proto_goTypes = []any{
 	(*CreatePinRequest)(nil),           // 0: plan.CreatePinRequest
 	(*CreatePinResponse)(nil),          // 1: plan.CreatePinResponse
-	(*GetPinByIDRequest)(nil),          // 2: plan.GetPinByIDRequest
+	(*PinIDRequest)(nil),               // 2: plan.PinIDRequest
 	(*GetPinByIDResponse)(nil),         // 3: plan.GetPinByIDResponse
 	(*GetPinByParticipantRequest)(nil), // 4: plan.GetPinByParticipantRequest
 	(*GetPinsResponse)(nil),            // 5: plan.GetPinsResponse
@@ -777,17 +778,19 @@ var file_plan_proto_depIdxs = []int32{
 	6,  // 2: plan.GetPinsResponse.pins:type_name -> plan.GetPinResponse
 	8,  // 3: plan.UpdatePinRequest.expense:type_name -> plan.Expenses
 	0,  // 4: plan.PlansService.CreatePin:input_type -> plan.CreatePinRequest
-	2,  // 5: plan.PlansService.GetPinByID:input_type -> plan.GetPinByIDRequest
+	2,  // 5: plan.PlansService.GetPinByID:input_type -> plan.PinIDRequest
 	4,  // 6: plan.PlansService.GetPinByParticipant:input_type -> plan.GetPinByParticipantRequest
 	7,  // 7: plan.PlansService.UpdatePin:input_type -> plan.UpdatePinRequest
 	10, // 8: plan.PlansService.UpdatePinImage:input_type -> plan.UpdatePinImageRequest
-	1,  // 9: plan.PlansService.CreatePin:output_type -> plan.CreatePinResponse
-	3,  // 10: plan.PlansService.GetPinByID:output_type -> plan.GetPinByIDResponse
-	5,  // 11: plan.PlansService.GetPinByParticipant:output_type -> plan.GetPinsResponse
-	9,  // 12: plan.PlansService.UpdatePin:output_type -> plan.SuccessResponse
-	9,  // 13: plan.PlansService.UpdatePinImage:output_type -> plan.SuccessResponse
-	9,  // [9:14] is the sub-list for method output_type
-	4,  // [4:9] is the sub-list for method input_type
+	2,  // 9: plan.PlansService.DeletePinByID:input_type -> plan.PinIDRequest
+	1,  // 10: plan.PlansService.CreatePin:output_type -> plan.CreatePinResponse
+	3,  // 11: plan.PlansService.GetPinByID:output_type -> plan.GetPinByIDResponse
+	5,  // 12: plan.PlansService.GetPinByParticipant:output_type -> plan.GetPinsResponse
+	9,  // 13: plan.PlansService.UpdatePin:output_type -> plan.SuccessResponse
+	9,  // 14: plan.PlansService.UpdatePinImage:output_type -> plan.SuccessResponse
+	9,  // 15: plan.PlansService.DeletePinByID:output_type -> plan.SuccessResponse
+	10, // [10:16] is the sub-list for method output_type
+	4,  // [4:10] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
 	4,  // [4:4] is the sub-list for extension extendee
 	0,  // [0:4] is the sub-list for field type_name

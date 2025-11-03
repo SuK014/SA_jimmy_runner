@@ -45,7 +45,7 @@ func (ds *PlansServiceClient) CreateUser(ctx context.Context, req *pb.CreatePinR
 	return ds.Client.CreatePin(ctx, req)
 }
 
-func (ds *PlansServiceClient) GetPinByID(ctx context.Context, req *pb.GetPinByIDRequest) (*pb.GetPinByIDResponse, error) {
+func (ds *PlansServiceClient) GetPinByID(ctx context.Context, req *pb.PinIDRequest) (*pb.GetPinByIDResponse, error) {
 	return ds.Client.GetPinByID(ctx, req)
 }
 
@@ -59,4 +59,8 @@ func (ds *PlansServiceClient) UpdatePin(ctx context.Context, req *pb.UpdatePinRe
 
 func (ds *PlansServiceClient) UpdatePinImage(ctx context.Context, req *pb.UpdatePinImageRequest) (*pb.SuccessResponse, error) {
 	return ds.Client.UpdatePinImage(ctx, req)
+}
+
+func (ds *PlansServiceClient) DeletePinByID(ctx context.Context, req *pb.PinIDRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.DeletePinByID(ctx, req)
 }

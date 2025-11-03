@@ -18,6 +18,7 @@ type IPinsService interface {
 	FindByParticipant(userID string) (*[]entities.PinDataModel, error)
 	UpdatePin(pinID string, data entities.UpdatedPinModel) error
 	UpdatePinImage(pinID string, image []byte) error
+	DeletePinByID(pinID string) error
 }
 
 func NewPinsService(repo0 repository.IPinsRepository) IPinsService {
@@ -53,9 +54,25 @@ func (sv *pinsService) InsertPin(data entities.CreatedPinModel) (string, error) 
 }
 
 func (sv *pinsService) UpdatePin(pinID string, data entities.UpdatedPinModel) error {
-	return sv.PinsRepository.UpdatePin(pinID, data)
+	mongoPinID, err := primitive.ObjectIDFromHex(pinID)
+	if err != nil {
+		return fmt.Errorf("invalid userID: %v", err)
+	}
+	return sv.PinsRepository.UpdatePin(mongoPinID, data)
 }
 
 func (sv *pinsService) UpdatePinImage(pinID string, image []byte) error {
-	return sv.PinsRepository.UpdatePinImage(pinID, image)
+	mongoPinID, err := primitive.ObjectIDFromHex(pinID)
+	if err != nil {
+		return fmt.Errorf("invalid userID: %v", err)
+	}
+	return sv.PinsRepository.UpdatePinImage(mongoPinID, image)
+}
+
+func (sv *pinsService) DeletePinByID(pinID string) error {
+	mongoPinID, err := primitive.ObjectIDFromHex(pinID)
+	if err != nil {
+		return fmt.Errorf("invalid userID: %v", err)
+	}
+	return sv.PinsRepository.DeletePinByID(mongoPinID)
 }

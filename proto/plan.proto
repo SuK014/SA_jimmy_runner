@@ -11,10 +11,11 @@ service PlansService {
   
   // Create a new user
   rpc CreatePin(CreatePinRequest) returns (CreatePinResponse);
-  rpc GetPinByID(GetPinByIDRequest) returns (GetPinByIDResponse);
+  rpc GetPinByID(PinIDRequest) returns (GetPinByIDResponse);
   rpc GetPinByParticipant(GetPinByParticipantRequest) returns (GetPinsResponse);
   rpc UpdatePin(UpdatePinRequest) returns (SuccessResponse);
   rpc UpdatePinImage(UpdatePinImageRequest) returns (SuccessResponse);
+  rpc DeletePinByID(PinIDRequest) returns (SuccessResponse);
 }
 
 // Request message to get a user
@@ -43,7 +44,7 @@ message CreatePinResponse {
 }
 
 // Request message to create a user
-message GetPinByIDRequest {
+message PinIDRequest {
   string pinId = 1; //uuid AS a string
 
   // ไว้เช้ค access ?

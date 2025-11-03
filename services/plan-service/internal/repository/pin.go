@@ -24,8 +24,9 @@ type IPinsRepository interface {
 	InsertPin(data entities.CreatedPinModel) (string, error)
 	FindByID(pinID primitive.ObjectID) (*entities.PinDataModel, error)
 	FindByParticipant(userID string) (*[]entities.PinDataModel, error)
-	UpdatePin(pinID string, data entities.UpdatedPinModel) error
-	UpdatePinImage(pinID string, image []byte) error
+	UpdatePin(pinID primitive.ObjectID, data entities.UpdatedPinModel) error
+	UpdatePinImage(pinID primitive.ObjectID, image []byte) error
+	DeletePinByID(pinID primitive.ObjectID) error
 }
 
 func NewPinsRepository(db *MongoDB) IPinsRepository {
@@ -75,14 +76,9 @@ func (repo *pinsRepository) FindByParticipant(userID string) (*[]entities.PinDat
 	return &pins, nil
 }
 
-func (repo *pinsRepository) UpdatePin(pinID string, data entities.UpdatedPinModel) error {
-	objectID, err := primitive.ObjectIDFromHex(pinID)
-	if err != nil {
-		fiberlog.Errorf("Users -> UpdateUserFields: Invalid ObjectID format: %s \n", err)
-		return err
-	}
+func (repo *pinsRepository) UpdatePin(pinID primitive.ObjectID, data entities.UpdatedPinModel) error {
 
-	filter := bson.M{"_id": objectID}
+	filter := bson.M{"_id": pinID}
 	update := bson.M{"$set": data}
 
 	// Perform the update operation
@@ -101,14 +97,9 @@ func (repo *pinsRepository) UpdatePin(pinID string, data entities.UpdatedPinMode
 	return nil
 }
 
-func (repo *pinsRepository) UpdatePinImage(pinID string, image []byte) error {
-	objectID, err := primitive.ObjectIDFromHex(pinID)
-	if err != nil {
-		fiberlog.Errorf("Users -> UpdateUserFields: Invalid ObjectID format: %s \n", err)
-		return err
-	}
+func (repo *pinsRepository) UpdatePinImage(pinID primitive.ObjectID, image []byte) error {
 
-	filter := bson.M{"_id": objectID}
+	filter := bson.M{"_id": pinID}
 	update := bson.M{"$set": bson.M{"image": image}}
 
 	// Perform the update operation
@@ -124,5 +115,20 @@ func (repo *pinsRepository) UpdatePinImage(pinID string, image []byte) error {
 		return errors.New("user not found")
 	}
 
+	return nil
+}
+
+func (repo *pinsRepository) DeletePinByID(pinID primitive.ObjectID) error {
+	filter := bson.M{"_id": pinID}
+	result, err := repo.Collection.DeleteOne(repo.Context, filter)
+	if err != nil {
+		fiberlog.Errorf("Pins -> DeletePinByID: %s \n", err)
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		fiberlog.Warnf("Pins -> DeletePinByID: No document found with ID: %s \n", pinID.Hex())
+		return errors.New("pin not found")
+	}
 	return nil
 }

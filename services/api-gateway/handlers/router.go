@@ -23,10 +23,13 @@ func HandlerUsers(handler HTTPHandler, app *fiber.App) {
 }
 func HandlerPlans(handler HTTPHandler, app *fiber.App) {
 	plan := app.Group("/plan")
-	plan.Post("/pin", middlewares.SetJWtHeaderHandler(), handler.CreatePin)
-	plan.Get("/pin", middlewares.SetJWtHeaderHandler(), handler.GetPinByID)
-	plan.Get("/pin/participants", middlewares.SetJWtHeaderHandler(), handler.GetPinByParticipant)
 	plan.Get("/participants", middlewares.SetJWtHeaderHandler(), handler.GetParticipantsByPinID)
-	plan.Put("/pin", middlewares.SetJWtHeaderHandler(), handler.UpdatePinByID)
-	plan.Put("/pin/image", middlewares.SetJWtHeaderHandler(), handler.UpdatePinImageByID)
+
+	pin := plan.Group("/pin")
+	pin.Post("/", middlewares.SetJWtHeaderHandler(), handler.CreatePin)
+	pin.Get("/", middlewares.SetJWtHeaderHandler(), handler.GetPinByID)
+	pin.Get("/participants", middlewares.SetJWtHeaderHandler(), handler.GetPinByParticipant)
+	pin.Put("/", middlewares.SetJWtHeaderHandler(), handler.UpdatePinByID)
+	pin.Put("/image", middlewares.SetJWtHeaderHandler(), handler.UpdatePinImageByID)
+	pin.Delete("/", middlewares.SetJWtHeaderHandler(), handler.DeletePinByID)
 }

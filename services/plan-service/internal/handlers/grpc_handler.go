@@ -52,7 +52,7 @@ func (h *gRPCHandler) CreatePin(ctx context.Context, req *pb.CreatePinRequest) (
 	}, nil
 }
 
-func (h *gRPCHandler) GetPinByID(ctx context.Context, req *pb.GetPinByIDRequest) (*pb.GetPinByIDResponse, error) {
+func (h *gRPCHandler) GetPinByID(ctx context.Context, req *pb.PinIDRequest) (*pb.GetPinByIDResponse, error) {
 	pin := req.PinId
 
 	res, err := h.PinService.FindByID(pin)
@@ -134,6 +134,16 @@ func (h *gRPCHandler) UpdatePin(ctx context.Context, req *pb.UpdatePinRequest) (
 func (h *gRPCHandler) UpdatePinImage(ctx context.Context, req *pb.UpdatePinImageRequest) (*pb.SuccessResponse, error) {
 
 	if err := h.PinService.UpdatePinImage(req.GetId(), req.GetImage()); err != nil {
+		return nil, err
+	}
+
+	return &pb.SuccessResponse{
+		Success: true,
+	}, nil
+}
+
+func (h *gRPCHandler) DeletePinByID(ctx context.Context, req *pb.PinIDRequest) (*pb.SuccessResponse, error) {
+	if err := h.PinService.DeletePinByID(req.GetPinId()); err != nil {
 		return nil, err
 	}
 

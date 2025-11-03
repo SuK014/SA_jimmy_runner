@@ -56,7 +56,7 @@ func (h *HTTPHandler) GetPinByID(ctx *fiber.Ctx) error {
 		)
 	}
 
-	req := &pb.GetPinByIDRequest{
+	req := &pb.PinIDRequest{
 		PinId: id,
 	}
 
@@ -183,6 +183,28 @@ func (h *HTTPHandler) UpdatePinImageByID(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot update pin: " + err.Error()},
+		)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(res)
+}
+
+func (h *HTTPHandler) DeletePinByID(ctx *fiber.Ctx) error {
+	id := ctx.Query("id")
+	if id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or empty 'id' query parameter"},
+		)
+	}
+
+	req := &pb.PinIDRequest{
+		PinId: id,
+	}
+
+	res, err := h.planClient.DeletePinByID(context.Background(), req)
+	if err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot get pin by id: " + err.Error()},
 		)
 	}
 
