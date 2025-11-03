@@ -35,6 +35,7 @@ func (h *HTTPHandler) CreatePin(ctx *fiber.Ctx) error {
 		Description: bodyData.Description,
 		Expense:     expenses,
 		Location:    bodyData.Location,
+		Parents:     bodyData.Parents,
 		Participant: bodyData.Participants,
 	}
 
@@ -133,6 +134,7 @@ func (h *HTTPHandler) UpdatePinByID(ctx *fiber.Ctx) error {
 		Description: bodyData.Description,
 		Expense:     expenses,
 		Location:    bodyData.Location,
+		Parents:     bodyData.Parents,
 		Participant: bodyData.Participants,
 	}
 

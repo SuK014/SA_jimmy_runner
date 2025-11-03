@@ -46,14 +46,14 @@ func (repo *pinsRepository) InsertPin(data entities.CreatedPinModel) (string, er
 }
 
 func (repo *pinsRepository) FindByID(pinID primitive.ObjectID) (*entities.PinDataModel, error) {
-	var user entities.PinDataModel
+	var pin entities.PinDataModel
 	filter := bson.M{"_id": pinID}
-	err := repo.Collection.FindOne(repo.Context, filter).Decode(&user)
+	err := repo.Collection.FindOne(repo.Context, filter).Decode(&pin)
 	// if err != nil || user == (entities.PinDataModel{}) {
 	if err != nil {
-		return &user, err
+		return &pin, err
 	}
-	return &user, nil
+	return &pin, nil
 }
 
 func (repo *pinsRepository) FindByParticipant(userID string) (*[]entities.PinDataModel, error) {

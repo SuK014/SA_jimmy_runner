@@ -34,7 +34,8 @@ message CreatePinRequest {
   string description = 2;
   repeated Expenses expense = 3; //JSON
   float location = 4;
-  repeated string participant = 5;
+  repeated string parents = 5;
+  repeated string participant = 6;
 }
 
 // Response message for CreateUser
@@ -60,7 +61,8 @@ message GetPinByIDResponse {
     string description = 4;
     repeated Expenses expense = 5; //JSON
     float location = 6;
-    repeated string participant = 7;
+    repeated string parents = 7;
+    repeated string participant = 8;
 }
 
 // Request message to create a user
@@ -81,7 +83,8 @@ message GetPinResponse {
   string pinId = 1;
   string name = 2;
   bytes image = 3;
-  repeated string participant = 4;
+  repeated string parents = 4;
+  repeated string participant = 5;
 }
 
 // User message
@@ -98,7 +101,8 @@ message UpdatePinRequest {
   string description = 3;
   repeated Expenses expense = 4; //JSON
   float location = 5;
-  repeated string participant = 6;
+  repeated string parents = 6;
+  repeated string participant = 7;
 }
 
 message Expenses {

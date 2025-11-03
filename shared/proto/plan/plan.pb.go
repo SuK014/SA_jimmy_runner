@@ -28,7 +28,8 @@ type CreatePinRequest struct {
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	Expense       []*Expenses            `protobuf:"bytes,3,rep,name=expense,proto3" json:"expense,omitempty"` //JSON
 	Location      float32                `protobuf:"fixed32,4,opt,name=location,proto3" json:"location,omitempty"`
-	Participant   []string               `protobuf:"bytes,5,rep,name=participant,proto3" json:"participant,omitempty"`
+	Parents       []string               `protobuf:"bytes,5,rep,name=parents,proto3" json:"parents,omitempty"`
+	Participant   []string               `protobuf:"bytes,6,rep,name=participant,proto3" json:"participant,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -89,6 +90,13 @@ func (x *CreatePinRequest) GetLocation() float32 {
 		return x.Location
 	}
 	return 0
+}
+
+func (x *CreatePinRequest) GetParents() []string {
+	if x != nil {
+		return x.Parents
+	}
+	return nil
 }
 
 func (x *CreatePinRequest) GetParticipant() []string {
@@ -205,7 +213,8 @@ type GetPinByIDResponse struct {
 	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
 	Expense       []*Expenses            `protobuf:"bytes,5,rep,name=expense,proto3" json:"expense,omitempty"` //JSON
 	Location      float32                `protobuf:"fixed32,6,opt,name=location,proto3" json:"location,omitempty"`
-	Participant   []string               `protobuf:"bytes,7,rep,name=participant,proto3" json:"participant,omitempty"`
+	Parents       []string               `protobuf:"bytes,7,rep,name=parents,proto3" json:"parents,omitempty"`
+	Participant   []string               `protobuf:"bytes,8,rep,name=participant,proto3" json:"participant,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -280,6 +289,13 @@ func (x *GetPinByIDResponse) GetLocation() float32 {
 		return x.Location
 	}
 	return 0
+}
+
+func (x *GetPinByIDResponse) GetParents() []string {
+	if x != nil {
+		return x.Parents
+	}
+	return nil
 }
 
 func (x *GetPinByIDResponse) GetParticipant() []string {
@@ -384,7 +400,8 @@ type GetPinResponse struct {
 	PinId         string                 `protobuf:"bytes,1,opt,name=pinId,proto3" json:"pinId,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Image         []byte                 `protobuf:"bytes,3,opt,name=image,proto3" json:"image,omitempty"`
-	Participant   []string               `protobuf:"bytes,4,rep,name=participant,proto3" json:"participant,omitempty"`
+	Parents       []string               `protobuf:"bytes,4,rep,name=parents,proto3" json:"parents,omitempty"`
+	Participant   []string               `protobuf:"bytes,5,rep,name=participant,proto3" json:"participant,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -440,6 +457,13 @@ func (x *GetPinResponse) GetImage() []byte {
 	return nil
 }
 
+func (x *GetPinResponse) GetParents() []string {
+	if x != nil {
+		return x.Parents
+	}
+	return nil
+}
+
 func (x *GetPinResponse) GetParticipant() []string {
 	if x != nil {
 		return x.Participant
@@ -454,7 +478,8 @@ type UpdatePinRequest struct {
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Expense       []*Expenses            `protobuf:"bytes,4,rep,name=expense,proto3" json:"expense,omitempty"` //JSON
 	Location      float32                `protobuf:"fixed32,5,opt,name=location,proto3" json:"location,omitempty"`
-	Participant   []string               `protobuf:"bytes,6,rep,name=participant,proto3" json:"participant,omitempty"`
+	Parents       []string               `protobuf:"bytes,6,rep,name=parents,proto3" json:"parents,omitempty"`
+	Participant   []string               `protobuf:"bytes,7,rep,name=participant,proto3" json:"participant,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -522,6 +547,13 @@ func (x *UpdatePinRequest) GetLocation() float32 {
 		return x.Location
 	}
 	return 0
+}
+
+func (x *UpdatePinRequest) GetParents() []string {
+	if x != nil {
+		return x.Parents
+	}
+	return nil
 }
 
 func (x *UpdatePinRequest) GetParticipant() []string {
@@ -692,42 +724,46 @@ var File_plan_proto protoreflect.FileDescriptor
 const file_plan_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"plan.proto\x12\x04plan\"\xb0\x01\n" +
+	"plan.proto\x12\x04plan\"\xca\x01\n" +
 	"\x10CreatePinRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12(\n" +
 	"\aexpense\x18\x03 \x03(\v2\x0e.plan.ExpensesR\aexpense\x12\x1a\n" +
-	"\blocation\x18\x04 \x01(\x02R\blocation\x12 \n" +
-	"\vparticipant\x18\x05 \x03(\tR\vparticipant\"C\n" +
+	"\blocation\x18\x04 \x01(\x02R\blocation\x12\x18\n" +
+	"\aparents\x18\x05 \x03(\tR\aparents\x12 \n" +
+	"\vparticipant\x18\x06 \x03(\tR\vparticipant\"C\n" +
 	"\x11CreatePinResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
 	"\x05pinId\x18\x02 \x01(\tR\x05pinId\"$\n" +
 	"\fPinIDRequest\x12\x14\n" +
-	"\x05pinId\x18\x01 \x01(\tR\x05pinId\"\xe2\x01\n" +
+	"\x05pinId\x18\x01 \x01(\tR\x05pinId\"\xfc\x01\n" +
 	"\x12GetPinByIDResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
 	"\x05image\x18\x03 \x01(\fR\x05image\x12 \n" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x12(\n" +
 	"\aexpense\x18\x05 \x03(\v2\x0e.plan.ExpensesR\aexpense\x12\x1a\n" +
-	"\blocation\x18\x06 \x01(\x02R\blocation\x12 \n" +
-	"\vparticipant\x18\a \x03(\tR\vparticipant\"4\n" +
+	"\blocation\x18\x06 \x01(\x02R\blocation\x12\x18\n" +
+	"\aparents\x18\a \x03(\tR\aparents\x12 \n" +
+	"\vparticipant\x18\b \x03(\tR\vparticipant\"4\n" +
 	"\x1aGetPinByParticipantRequest\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\tR\x06userId\";\n" +
 	"\x0fGetPinsResponse\x12(\n" +
-	"\x04pins\x18\x01 \x03(\v2\x14.plan.GetPinResponseR\x04pins\"r\n" +
+	"\x04pins\x18\x01 \x03(\v2\x14.plan.GetPinResponseR\x04pins\"\x8c\x01\n" +
 	"\x0eGetPinResponse\x12\x14\n" +
 	"\x05pinId\x18\x01 \x01(\tR\x05pinId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
-	"\x05image\x18\x03 \x01(\fR\x05image\x12 \n" +
-	"\vparticipant\x18\x04 \x03(\tR\vparticipant\"\xc0\x01\n" +
+	"\x05image\x18\x03 \x01(\fR\x05image\x12\x18\n" +
+	"\aparents\x18\x04 \x03(\tR\aparents\x12 \n" +
+	"\vparticipant\x18\x05 \x03(\tR\vparticipant\"\xda\x01\n" +
 	"\x10UpdatePinRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12(\n" +
 	"\aexpense\x18\x04 \x03(\v2\x0e.plan.ExpensesR\aexpense\x12\x1a\n" +
-	"\blocation\x18\x05 \x01(\x02R\blocation\x12 \n" +
-	"\vparticipant\x18\x06 \x03(\tR\vparticipant\"H\n" +
+	"\blocation\x18\x05 \x01(\x02R\blocation\x12\x18\n" +
+	"\aparents\x18\x06 \x03(\tR\aparents\x12 \n" +
+	"\vparticipant\x18\a \x03(\tR\vparticipant\"H\n" +
 	"\bExpenses\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +

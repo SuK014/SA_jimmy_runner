@@ -27,13 +27,8 @@ func NewPinsService(repo0 repository.IPinsRepository) IPinsService {
 	}
 }
 
-func (sv *pinsService) FindByParticipant(userID string) (*[]entities.PinDataModel, error) {
-	data, err := sv.PinsRepository.FindByParticipant(userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
+func (sv *pinsService) InsertPin(data entities.CreatedPinModel) (string, error) {
+	return sv.PinsRepository.InsertPin(data)
 }
 
 func (sv *pinsService) FindByID(pinID string) (*entities.PinDataModel, error) {
@@ -49,8 +44,13 @@ func (sv *pinsService) FindByID(pinID string) (*entities.PinDataModel, error) {
 	return data, nil
 }
 
-func (sv *pinsService) InsertPin(data entities.CreatedPinModel) (string, error) {
-	return sv.PinsRepository.InsertPin(data)
+func (sv *pinsService) FindByParticipant(userID string) (*[]entities.PinDataModel, error) {
+	data, err := sv.PinsRepository.FindByParticipant(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func (sv *pinsService) UpdatePin(pinID string, data entities.UpdatedPinModel) error {
