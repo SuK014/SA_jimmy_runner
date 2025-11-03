@@ -204,5 +204,12 @@ func (h *HTTPHandler) DeleteUser(ctx *fiber.Ctx) error {
 		)
 	}
 
+	userTripReq := &pb.UserTripRequest{
+		UserId: token.UserID,
+	}
+	if res, err := h.userClient.DeleteByUser(context.Background(), userTripReq); err != nil || !res.GetSuccess() {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "don't have access to trip."})
+	}
+
 	return ctx.Status(fiber.StatusOK).JSON(res)
 }

@@ -21,6 +21,52 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// shared
+type SuccessResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SuccessResponse) Reset() {
+	*x = SuccessResponse{}
+	mi := &file_user_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SuccessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SuccessResponse) ProtoMessage() {}
+
+func (x *SuccessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SuccessResponse.ProtoReflect.Descriptor instead.
+func (*SuccessResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *SuccessResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+// user
 // Request message to create a user
 type CreateUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -33,7 +79,7 @@ type CreateUserRequest struct {
 
 func (x *CreateUserRequest) Reset() {
 	*x = CreateUserRequest{}
-	mi := &file_user_proto_msgTypes[0]
+	mi := &file_user_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +91,7 @@ func (x *CreateUserRequest) String() string {
 func (*CreateUserRequest) ProtoMessage() {}
 
 func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[0]
+	mi := &file_user_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +104,7 @@ func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
 func (*CreateUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{0}
+	return file_user_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CreateUserRequest) GetEmail() string {
@@ -96,7 +142,7 @@ type UserResponse struct {
 
 func (x *UserResponse) Reset() {
 	*x = UserResponse{}
-	mi := &file_user_proto_msgTypes[1]
+	mi := &file_user_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -108,7 +154,7 @@ func (x *UserResponse) String() string {
 func (*UserResponse) ProtoMessage() {}
 
 func (x *UserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[1]
+	mi := &file_user_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -121,7 +167,7 @@ func (x *UserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserResponse.ProtoReflect.Descriptor instead.
 func (*UserResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{1}
+	return file_user_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *UserResponse) GetSuccess() bool {
@@ -169,7 +215,7 @@ type LoginUserRequest struct {
 
 func (x *LoginUserRequest) Reset() {
 	*x = LoginUserRequest{}
-	mi := &file_user_proto_msgTypes[2]
+	mi := &file_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -181,7 +227,7 @@ func (x *LoginUserRequest) String() string {
 func (*LoginUserRequest) ProtoMessage() {}
 
 func (x *LoginUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[2]
+	mi := &file_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -194,7 +240,7 @@ func (x *LoginUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginUserRequest.ProtoReflect.Descriptor instead.
 func (*LoginUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{2}
+	return file_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *LoginUserRequest) GetEmail() string {
@@ -222,7 +268,7 @@ type UpdateUserRequest struct {
 
 func (x *UpdateUserRequest) Reset() {
 	*x = UpdateUserRequest{}
-	mi := &file_user_proto_msgTypes[3]
+	mi := &file_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -234,7 +280,7 @@ func (x *UpdateUserRequest) String() string {
 func (*UpdateUserRequest) ProtoMessage() {}
 
 func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[3]
+	mi := &file_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -247,7 +293,7 @@ func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{3}
+	return file_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UpdateUserRequest) GetUserId() string {
@@ -282,7 +328,7 @@ type UploadFileRequest struct {
 
 func (x *UploadFileRequest) Reset() {
 	*x = UploadFileRequest{}
-	mi := &file_user_proto_msgTypes[4]
+	mi := &file_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -294,7 +340,7 @@ func (x *UploadFileRequest) String() string {
 func (*UploadFileRequest) ProtoMessage() {}
 
 func (x *UploadFileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[4]
+	mi := &file_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -307,7 +353,7 @@ func (x *UploadFileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadFileRequest.ProtoReflect.Descriptor instead.
 func (*UploadFileRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{4}
+	return file_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UploadFileRequest) GetFilename() string {
@@ -340,7 +386,7 @@ type UserIDRequest struct {
 
 func (x *UserIDRequest) Reset() {
 	*x = UserIDRequest{}
-	mi := &file_user_proto_msgTypes[5]
+	mi := &file_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -352,7 +398,7 @@ func (x *UserIDRequest) String() string {
 func (*UserIDRequest) ProtoMessage() {}
 
 func (x *UserIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[5]
+	mi := &file_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -365,7 +411,7 @@ func (x *UserIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserIDRequest.ProtoReflect.Descriptor instead.
 func (*UserIDRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{5}
+	return file_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UserIDRequest) GetUserId() string {
@@ -385,7 +431,7 @@ type UsersAvatarRequest struct {
 
 func (x *UsersAvatarRequest) Reset() {
 	*x = UsersAvatarRequest{}
-	mi := &file_user_proto_msgTypes[6]
+	mi := &file_user_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -397,7 +443,7 @@ func (x *UsersAvatarRequest) String() string {
 func (*UsersAvatarRequest) ProtoMessage() {}
 
 func (x *UsersAvatarRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[6]
+	mi := &file_user_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -410,7 +456,7 @@ func (x *UsersAvatarRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UsersAvatarRequest.ProtoReflect.Descriptor instead.
 func (*UsersAvatarRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{6}
+	return file_user_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UsersAvatarRequest) GetTripId() string {
@@ -438,7 +484,7 @@ type Avatar struct {
 
 func (x *Avatar) Reset() {
 	*x = Avatar{}
-	mi := &file_user_proto_msgTypes[7]
+	mi := &file_user_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -450,7 +496,7 @@ func (x *Avatar) String() string {
 func (*Avatar) ProtoMessage() {}
 
 func (x *Avatar) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[7]
+	mi := &file_user_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -463,7 +509,7 @@ func (x *Avatar) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Avatar.ProtoReflect.Descriptor instead.
 func (*Avatar) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{7}
+	return file_user_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Avatar) GetUserId() string {
@@ -497,7 +543,7 @@ type UsersAvatarResponse struct {
 
 func (x *UsersAvatarResponse) Reset() {
 	*x = UsersAvatarResponse{}
-	mi := &file_user_proto_msgTypes[8]
+	mi := &file_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -509,7 +555,7 @@ func (x *UsersAvatarResponse) String() string {
 func (*UsersAvatarResponse) ProtoMessage() {}
 
 func (x *UsersAvatarResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[8]
+	mi := &file_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -522,7 +568,7 @@ func (x *UsersAvatarResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UsersAvatarResponse.ProtoReflect.Descriptor instead.
 func (*UsersAvatarResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{8}
+	return file_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UsersAvatarResponse) GetSuccess() bool {
@@ -539,12 +585,463 @@ func (x *UsersAvatarResponse) GetUsers() []*Avatar {
 	return nil
 }
 
+// user_trip
+type UsersTripRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserIds       []string               `protobuf:"bytes,1,rep,name=userIds,proto3" json:"userIds,omitempty"`
+	TripId        string                 `protobuf:"bytes,2,opt,name=tripId,proto3" json:"tripId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UsersTripRequest) Reset() {
+	*x = UsersTripRequest{}
+	mi := &file_user_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UsersTripRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UsersTripRequest) ProtoMessage() {}
+
+func (x *UsersTripRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UsersTripRequest.ProtoReflect.Descriptor instead.
+func (*UsersTripRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UsersTripRequest) GetUserIds() []string {
+	if x != nil {
+		return x.UserIds
+	}
+	return nil
+}
+
+func (x *UsersTripRequest) GetTripId() string {
+	if x != nil {
+		return x.TripId
+	}
+	return ""
+}
+
+type UsersTripResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	UserIds       []string               `protobuf:"bytes,2,rep,name=userIds,proto3" json:"userIds,omitempty"`
+	TripId        string                 `protobuf:"bytes,3,opt,name=tripId,proto3" json:"tripId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UsersTripResponse) Reset() {
+	*x = UsersTripResponse{}
+	mi := &file_user_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UsersTripResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UsersTripResponse) ProtoMessage() {}
+
+func (x *UsersTripResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UsersTripResponse.ProtoReflect.Descriptor instead.
+func (*UsersTripResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *UsersTripResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *UsersTripResponse) GetUserIds() []string {
+	if x != nil {
+		return x.UserIds
+	}
+	return nil
+}
+
+func (x *UsersTripResponse) GetTripId() string {
+	if x != nil {
+		return x.TripId
+	}
+	return ""
+}
+
+type UserTripsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=userId,proto3" json:"userId,omitempty"`
+	TripIds       []string               `protobuf:"bytes,2,rep,name=tripIds,proto3" json:"tripIds,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserTripsRequest) Reset() {
+	*x = UserTripsRequest{}
+	mi := &file_user_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserTripsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserTripsRequest) ProtoMessage() {}
+
+func (x *UserTripsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserTripsRequest.ProtoReflect.Descriptor instead.
+func (*UserTripsRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *UserTripsRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UserTripsRequest) GetTripIds() []string {
+	if x != nil {
+		return x.TripIds
+	}
+	return nil
+}
+
+type UserTripRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=userId,proto3" json:"userId,omitempty"`
+	TripId        string                 `protobuf:"bytes,2,opt,name=tripId,proto3" json:"tripId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserTripRequest) Reset() {
+	*x = UserTripRequest{}
+	mi := &file_user_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserTripRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserTripRequest) ProtoMessage() {}
+
+func (x *UserTripRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserTripRequest.ProtoReflect.Descriptor instead.
+func (*UserTripRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *UserTripRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UserTripRequest) GetTripId() string {
+	if x != nil {
+		return x.TripId
+	}
+	return ""
+}
+
+type UsersTripsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Response      []*UserTripModel       `protobuf:"bytes,2,rep,name=response,proto3" json:"response,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UsersTripsResponse) Reset() {
+	*x = UsersTripsResponse{}
+	mi := &file_user_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UsersTripsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UsersTripsResponse) ProtoMessage() {}
+
+func (x *UsersTripsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UsersTripsResponse.ProtoReflect.Descriptor instead.
+func (*UsersTripsResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *UsersTripsResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *UsersTripsResponse) GetResponse() []*UserTripModel {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+type UserTripModel struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=userId,proto3" json:"userId,omitempty"`
+	TripId        string                 `protobuf:"bytes,2,opt,name=tripId,proto3" json:"tripId,omitempty"`
+	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserTripModel) Reset() {
+	*x = UserTripModel{}
+	mi := &file_user_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserTripModel) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserTripModel) ProtoMessage() {}
+
+func (x *UserTripModel) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserTripModel.ProtoReflect.Descriptor instead.
+func (*UserTripModel) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *UserTripModel) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UserTripModel) GetTripId() string {
+	if x != nil {
+		return x.TripId
+	}
+	return ""
+}
+
+func (x *UserTripModel) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+type UserTripResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=userId,proto3" json:"userId,omitempty"`
+	TripId        string                 `protobuf:"bytes,3,opt,name=tripId,proto3" json:"tripId,omitempty"`
+	Username      string                 `protobuf:"bytes,4,opt,name=username,proto3" json:"username,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserTripResponse) Reset() {
+	*x = UserTripResponse{}
+	mi := &file_user_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserTripResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserTripResponse) ProtoMessage() {}
+
+func (x *UserTripResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserTripResponse.ProtoReflect.Descriptor instead.
+func (*UserTripResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *UserTripResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *UserTripResponse) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UserTripResponse) GetTripId() string {
+	if x != nil {
+		return x.TripId
+	}
+	return ""
+}
+
+func (x *UserTripResponse) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+type TripIDsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	TripId        []string               `protobuf:"bytes,2,rep,name=tripId,proto3" json:"tripId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TripIDsResponse) Reset() {
+	*x = TripIDsResponse{}
+	mi := &file_user_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TripIDsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TripIDsResponse) ProtoMessage() {}
+
+func (x *TripIDsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TripIDsResponse.ProtoReflect.Descriptor instead.
+func (*TripIDsResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *TripIDsResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *TripIDsResponse) GetTripId() []string {
+	if x != nil {
+		return x.TripId
+	}
+	return nil
+}
+
 var File_user_proto protoreflect.FileDescriptor
 
 const file_user_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"user.proto\x12\x04user\"h\n" +
+	"user.proto\x12\x04user\"+\n" +
+	"\x0fSuccessResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"h\n" +
 	"\x11CreateUserRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x1a\n" +
@@ -577,7 +1074,35 @@ const file_user_proto_rawDesc = "" +
 	"\aprofile\x18\x03 \x01(\tR\aprofile\"S\n" +
 	"\x13UsersAvatarResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\"\n" +
-	"\x05users\x18\x02 \x03(\v2\f.user.AvatarR\x05users2\xee\x02\n" +
+	"\x05users\x18\x02 \x03(\v2\f.user.AvatarR\x05users\"D\n" +
+	"\x10UsersTripRequest\x12\x18\n" +
+	"\auserIds\x18\x01 \x03(\tR\auserIds\x12\x16\n" +
+	"\x06tripId\x18\x02 \x01(\tR\x06tripId\"_\n" +
+	"\x11UsersTripResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\auserIds\x18\x02 \x03(\tR\auserIds\x12\x16\n" +
+	"\x06tripId\x18\x03 \x01(\tR\x06tripId\"D\n" +
+	"\x10UserTripsRequest\x12\x16\n" +
+	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x18\n" +
+	"\atripIds\x18\x02 \x03(\tR\atripIds\"A\n" +
+	"\x0fUserTripRequest\x12\x16\n" +
+	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x16\n" +
+	"\x06tripId\x18\x02 \x01(\tR\x06tripId\"_\n" +
+	"\x12UsersTripsResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12/\n" +
+	"\bresponse\x18\x02 \x03(\v2\x13.user.UserTripModelR\bresponse\"[\n" +
+	"\rUserTripModel\x12\x16\n" +
+	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x16\n" +
+	"\x06tripId\x18\x02 \x01(\tR\x06tripId\x12\x1a\n" +
+	"\busername\x18\x03 \x01(\tR\busername\"x\n" +
+	"\x10UserTripResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x16\n" +
+	"\x06userId\x18\x02 \x01(\tR\x06userId\x12\x16\n" +
+	"\x06tripId\x18\x03 \x01(\tR\x06tripId\x12\x1a\n" +
+	"\busername\x18\x04 \x01(\tR\busername\"C\n" +
+	"\x0fTripIDsResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x16\n" +
+	"\x06tripId\x18\x02 \x03(\tR\x06tripId2\xac\x06\n" +
 	"\vUserService\x129\n" +
 	"\n" +
 	"CreateUser\x12\x17.user.CreateUserRequest\x1a\x12.user.UserResponse\x127\n" +
@@ -587,7 +1112,14 @@ const file_user_proto_rawDesc = "" +
 	"\aGetUser\x12\x13.user.UserIDRequest\x1a\x12.user.UserResponse\x125\n" +
 	"\n" +
 	"DeleteUser\x12\x13.user.UserIDRequest\x1a\x12.user.UserResponse\x12E\n" +
-	"\x0eGetUsersAvatar\x12\x18.user.UsersAvatarRequest\x1a\x19.user.UsersAvatarResponseB\x13Z\x11shared/proto/userb\x06proto3"
+	"\x0eGetUsersAvatar\x12\x18.user.UsersAvatarRequest\x1a\x19.user.UsersAvatarResponse\x12B\n" +
+	"\x0fCreateUsersTrip\x12\x16.user.UsersTripRequest\x1a\x17.user.UsersTripResponse\x12=\n" +
+	"\x0eUpdateUsername\x12\x13.user.UserTripModel\x1a\x16.user.UserTripResponse\x12A\n" +
+	"\x13GetAllTripsByUserID\x12\x13.user.UserIDRequest\x1a\x15.user.TripIDsResponse\x126\n" +
+	"\x06Delete\x12\x15.user.UserTripRequest\x1a\x15.user.SuccessResponse\x12<\n" +
+	"\fDeleteByUser\x12\x15.user.UserTripRequest\x1a\x15.user.SuccessResponse\x12<\n" +
+	"\fDeleteByTrip\x12\x15.user.UserTripRequest\x1a\x15.user.SuccessResponse\x12B\n" +
+	"\x11CheckAuthUserTrip\x12\x15.user.UserTripRequest\x1a\x16.user.UserTripResponseB\x13Z\x11shared/proto/userb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -601,38 +1133,62 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_user_proto_goTypes = []any{
-	(*CreateUserRequest)(nil),   // 0: user.CreateUserRequest
-	(*UserResponse)(nil),        // 1: user.UserResponse
-	(*LoginUserRequest)(nil),    // 2: user.LoginUserRequest
-	(*UpdateUserRequest)(nil),   // 3: user.UpdateUserRequest
-	(*UploadFileRequest)(nil),   // 4: user.UploadFileRequest
-	(*UserIDRequest)(nil),       // 5: user.UserIDRequest
-	(*UsersAvatarRequest)(nil),  // 6: user.UsersAvatarRequest
-	(*Avatar)(nil),              // 7: user.Avatar
-	(*UsersAvatarResponse)(nil), // 8: user.UsersAvatarResponse
+	(*SuccessResponse)(nil),     // 0: user.SuccessResponse
+	(*CreateUserRequest)(nil),   // 1: user.CreateUserRequest
+	(*UserResponse)(nil),        // 2: user.UserResponse
+	(*LoginUserRequest)(nil),    // 3: user.LoginUserRequest
+	(*UpdateUserRequest)(nil),   // 4: user.UpdateUserRequest
+	(*UploadFileRequest)(nil),   // 5: user.UploadFileRequest
+	(*UserIDRequest)(nil),       // 6: user.UserIDRequest
+	(*UsersAvatarRequest)(nil),  // 7: user.UsersAvatarRequest
+	(*Avatar)(nil),              // 8: user.Avatar
+	(*UsersAvatarResponse)(nil), // 9: user.UsersAvatarResponse
+	(*UsersTripRequest)(nil),    // 10: user.UsersTripRequest
+	(*UsersTripResponse)(nil),   // 11: user.UsersTripResponse
+	(*UserTripsRequest)(nil),    // 12: user.UserTripsRequest
+	(*UserTripRequest)(nil),     // 13: user.UserTripRequest
+	(*UsersTripsResponse)(nil),  // 14: user.UsersTripsResponse
+	(*UserTripModel)(nil),       // 15: user.UserTripModel
+	(*UserTripResponse)(nil),    // 16: user.UserTripResponse
+	(*TripIDsResponse)(nil),     // 17: user.TripIDsResponse
 }
 var file_user_proto_depIdxs = []int32{
-	4, // 0: user.UpdateUserRequest.profile:type_name -> user.UploadFileRequest
-	7, // 1: user.UsersAvatarResponse.users:type_name -> user.Avatar
-	0, // 2: user.UserService.CreateUser:input_type -> user.CreateUserRequest
-	2, // 3: user.UserService.LoginUser:input_type -> user.LoginUserRequest
-	3, // 4: user.UserService.UpdateUser:input_type -> user.UpdateUserRequest
-	5, // 5: user.UserService.GetUser:input_type -> user.UserIDRequest
-	5, // 6: user.UserService.DeleteUser:input_type -> user.UserIDRequest
-	6, // 7: user.UserService.GetUsersAvatar:input_type -> user.UsersAvatarRequest
-	1, // 8: user.UserService.CreateUser:output_type -> user.UserResponse
-	1, // 9: user.UserService.LoginUser:output_type -> user.UserResponse
-	1, // 10: user.UserService.UpdateUser:output_type -> user.UserResponse
-	1, // 11: user.UserService.GetUser:output_type -> user.UserResponse
-	1, // 12: user.UserService.DeleteUser:output_type -> user.UserResponse
-	8, // 13: user.UserService.GetUsersAvatar:output_type -> user.UsersAvatarResponse
-	8, // [8:14] is the sub-list for method output_type
-	2, // [2:8] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	5,  // 0: user.UpdateUserRequest.profile:type_name -> user.UploadFileRequest
+	8,  // 1: user.UsersAvatarResponse.users:type_name -> user.Avatar
+	15, // 2: user.UsersTripsResponse.response:type_name -> user.UserTripModel
+	1,  // 3: user.UserService.CreateUser:input_type -> user.CreateUserRequest
+	3,  // 4: user.UserService.LoginUser:input_type -> user.LoginUserRequest
+	4,  // 5: user.UserService.UpdateUser:input_type -> user.UpdateUserRequest
+	6,  // 6: user.UserService.GetUser:input_type -> user.UserIDRequest
+	6,  // 7: user.UserService.DeleteUser:input_type -> user.UserIDRequest
+	7,  // 8: user.UserService.GetUsersAvatar:input_type -> user.UsersAvatarRequest
+	10, // 9: user.UserService.CreateUsersTrip:input_type -> user.UsersTripRequest
+	15, // 10: user.UserService.UpdateUsername:input_type -> user.UserTripModel
+	6,  // 11: user.UserService.GetAllTripsByUserID:input_type -> user.UserIDRequest
+	13, // 12: user.UserService.Delete:input_type -> user.UserTripRequest
+	13, // 13: user.UserService.DeleteByUser:input_type -> user.UserTripRequest
+	13, // 14: user.UserService.DeleteByTrip:input_type -> user.UserTripRequest
+	13, // 15: user.UserService.CheckAuthUserTrip:input_type -> user.UserTripRequest
+	2,  // 16: user.UserService.CreateUser:output_type -> user.UserResponse
+	2,  // 17: user.UserService.LoginUser:output_type -> user.UserResponse
+	2,  // 18: user.UserService.UpdateUser:output_type -> user.UserResponse
+	2,  // 19: user.UserService.GetUser:output_type -> user.UserResponse
+	2,  // 20: user.UserService.DeleteUser:output_type -> user.UserResponse
+	9,  // 21: user.UserService.GetUsersAvatar:output_type -> user.UsersAvatarResponse
+	11, // 22: user.UserService.CreateUsersTrip:output_type -> user.UsersTripResponse
+	16, // 23: user.UserService.UpdateUsername:output_type -> user.UserTripResponse
+	17, // 24: user.UserService.GetAllTripsByUserID:output_type -> user.TripIDsResponse
+	0,  // 25: user.UserService.Delete:output_type -> user.SuccessResponse
+	0,  // 26: user.UserService.DeleteByUser:output_type -> user.SuccessResponse
+	0,  // 27: user.UserService.DeleteByTrip:output_type -> user.SuccessResponse
+	16, // 28: user.UserService.CheckAuthUserTrip:output_type -> user.UserTripResponse
+	16, // [16:29] is the sub-list for method output_type
+	3,  // [3:16] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_user_proto_init() }
@@ -646,7 +1202,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

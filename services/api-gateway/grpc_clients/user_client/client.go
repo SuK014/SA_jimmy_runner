@@ -64,3 +64,31 @@ func (ds *UserServiceClient) DeleteUser(ctx context.Context, req *pb.UserIDReque
 func (ds *UserServiceClient) GetUsersAvatar(ctx context.Context, req *pb.UsersAvatarRequest) (*pb.UsersAvatarResponse, error) {
 	return ds.Client.GetUsersAvatar(ctx, req)
 }
+
+func (ds *UserServiceClient) CreateUsersTrip(ctx context.Context, req *pb.UsersTripRequest) (*pb.UsersTripResponse, error) {
+	return ds.Client.CreateUsersTrip(ctx, req)
+}
+
+func (ds *UserServiceClient) UpdateUsername(ctx context.Context, req *pb.UserTripModel) (*pb.UserTripResponse, error) {
+	return ds.Client.UpdateUsername(ctx, req)
+}
+
+func (ds *UserServiceClient) GetAllTripsByUserID(ctx context.Context, req *pb.UserIDRequest) (*pb.TripIDsResponse, error) {
+	return ds.Client.GetAllTripsByUserID(ctx, req)
+}
+
+func (ds *UserServiceClient) Delete(ctx context.Context, req *pb.UserTripRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.Delete(ctx, req)
+}
+
+func (ds *UserServiceClient) DeleteByUser(ctx context.Context, req *pb.UserTripRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.DeleteByUser(ctx, req)
+}
+
+func (ds *UserServiceClient) DeleteByTrip(ctx context.Context, req *pb.UserTripRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.DeleteByTrip(ctx, req)
+}
+
+func (ds *UserServiceClient) CheckAuthUserTrip(ctx context.Context, req *pb.UserTripRequest) (*pb.UserTripResponse, error) {
+	return ds.Client.CheckAuthUserTrip(ctx, req)
+}

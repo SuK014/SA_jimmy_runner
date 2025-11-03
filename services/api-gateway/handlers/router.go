@@ -20,6 +20,10 @@ func HandlerUsers(handler HTTPHandler, app *fiber.App) {
 	// auth.Post("/register", handler.Register)
 	user.Post("/login", handler.Login)
 	// auth.Post("/logout", middlewares.SetJWtHeaderHandler(), handler.Logout)
+
+	userTrip := app.Group("/userTrip")
+	userTrip.Post("/", middlewares.SetJWtHeaderHandler(), handler.AddUsersToTrip)
+	userTrip.Get("/trips", middlewares.SetJWtHeaderHandler(), handler.GetTripsByUserID)
 }
 func HandlerPlans(handler HTTPHandler, app *fiber.App) {
 	plan := app.Group("/plan")

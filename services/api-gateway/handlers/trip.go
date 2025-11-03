@@ -4,14 +4,21 @@ import (
 	"context"
 	"io"
 
+	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/middlewares"
 	"github.com/SuK014/SA_jimmy_runner/shared/entities"
 	pb "github.com/SuK014/SA_jimmy_runner/shared/proto/plan"
+	userPb "github.com/SuK014/SA_jimmy_runner/shared/proto/user"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 // CreateUser handles REST requests and forwards them to gRPC
 func (h *HTTPHandler) CreateTrip(ctx *fiber.Ctx) error {
+	token, err := middlewares.DecodeJWTToken(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
+	}
+
 	bodyData := entities.CreatedTripModel{}
 	if err := ctx.BodyParser(&bodyData); err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(
@@ -37,20 +44,29 @@ func (h *HTTPHandler) CreateTrip(ctx *fiber.Ctx) error {
 		)
 	}
 
-	req := &pb.CreateTripRequest{
+	tripReq := &pb.CreateTripRequest{
 		Name:        bodyData.Name,
 		Description: bodyData.Description,
 		Whiteboards: []string{whiteboardRes.GetWhiteboardId()},
 	}
-
-	res, err := h.planClient.CreateTrip(context.Background(), req)
+	tripRes, err := h.planClient.CreateTrip(context.Background(), tripReq)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot create trip: " + err.Error()},
 		)
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(res)
+	userTripReq := &userPb.UsersTripRequest{
+		UserIds: []string{token.UserID},
+		TripId:  tripRes.GetTripId(),
+	}
+	if _, err = h.userClient.CreateUsersTrip(context.Background(), userTripReq); err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot insert new user account: " + err.Error()},
+		)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(tripRes)
 }
 
 func (h *HTTPHandler) GetTripByID(ctx *fiber.Ctx) error {
@@ -169,11 +185,22 @@ func (h *HTTPHandler) UpdateTripImageByID(ctx *fiber.Ctx) error {
 }
 
 func (h *HTTPHandler) DeleteTripByID(ctx *fiber.Ctx) error {
+	token, err := middlewares.DecodeJWTToken(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
+	}
 	id := ctx.Query("id")
 	if id == "" {
 		return ctx.Status(fiber.StatusBadRequest).JSON(
 			entities.ResponseMessage{Message: "missing or empty 'id' query parameter"},
 		)
+	}
+	userTripReq := &userPb.UserTripRequest{
+		UserId: token.UserID,
+		TripId: id,
+	}
+	if res, err := h.userClient.CheckAuthUserTrip(context.Background(), userTripReq); err != nil || !res.GetSuccess() {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "don't have access to trip."})
 	}
 
 	getWhiteboardIDReq := &pb.TripIDRequest{
@@ -204,6 +231,10 @@ func (h *HTTPHandler) DeleteTripByID(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot DeleteTripByID: " + err.Error()},
 		)
+	}
+
+	if res, err := h.userClient.DeleteByTrip(context.Background(), userTripReq); err != nil || !res.GetSuccess() {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "don't have access to trip."})
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(res)
