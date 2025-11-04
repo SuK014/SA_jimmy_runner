@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/SuK014/SA_jimmy_runner/shared/entities"
 	pb "github.com/SuK014/SA_jimmy_runner/shared/proto/plan"
 
@@ -28,9 +30,11 @@ func (h *gRPCHandler) CreatePin(ctx context.Context, req *pb.CreatePinRequest) (
 
 	res, err := h.PinService.InsertPin(pin)
 	if err != nil {
+		fmt.Println("CreatePin at plan-service failed:", err.Error())
 		return nil, err
 	}
 
+	fmt.Println("CreatePin at plan-service success")
 	return &pb.CreatePinResponse{
 		Success: true,
 		PinId:   res,
@@ -42,6 +46,7 @@ func (h *gRPCHandler) GetPinByID(ctx context.Context, req *pb.PinIDRequest) (*pb
 
 	res, err := h.PinService.FindByID(pin)
 	if err != nil {
+		fmt.Println("GetPinByID at plan-service failed:", err.Error())
 		return nil, err
 	}
 
@@ -54,6 +59,7 @@ func (h *gRPCHandler) GetPinByID(ctx context.Context, req *pb.PinIDRequest) (*pb
 		})
 	}
 
+	fmt.Println("GetPinByID at plan-service success")
 	return &pb.GetPinByIDResponse{
 		Success:     true,
 		Name:        res.Name,
@@ -72,6 +78,7 @@ func (h *gRPCHandler) GetPinByParticipant(ctx context.Context, req *pb.GetPinByP
 
 	res, err := h.PinService.FindByParticipant(pin)
 	if err != nil {
+		fmt.Println("GetPinByParticipant at plan-service failed:", err.Error())
 		return nil, err
 	}
 
@@ -86,6 +93,7 @@ func (h *gRPCHandler) GetPinByParticipant(ctx context.Context, req *pb.GetPinByP
 		})
 	}
 
+	fmt.Println("GetPinByParticipant at plan-service success")
 	return &pb.GetPinsResponse{
 		Pins: pins,
 	}, nil
@@ -95,6 +103,7 @@ func (h *gRPCHandler) GetPinsByWhiteboard(ctx context.Context, req *pb.ManyPinID
 
 	res, err := h.PinService.FindManyByID(req.GetPins())
 	if err != nil {
+		fmt.Println("GetPinsByWhiteboard at plan-service failed:", err.Error())
 		return nil, err
 	}
 
@@ -109,6 +118,7 @@ func (h *gRPCHandler) GetPinsByWhiteboard(ctx context.Context, req *pb.ManyPinID
 		})
 	}
 
+	fmt.Println("GetPinsByWhiteboard at plan-service success")
 	return &pb.GetPinsResponse{
 		Pins: pins,
 	}, nil
@@ -134,9 +144,11 @@ func (h *gRPCHandler) UpdatePin(ctx context.Context, req *pb.UpdatePinRequest) (
 	}
 
 	if err := h.PinService.UpdatePin(req.GetId(), pin); err != nil {
+		fmt.Println("UpdatePin at plan-service failed:", err.Error())
 		return nil, err
 	}
 
+	fmt.Println("UpdatePin at plan-service success")
 	return &pb.SuccessResponse{
 		Success: true,
 	}, nil
@@ -145,9 +157,11 @@ func (h *gRPCHandler) UpdatePin(ctx context.Context, req *pb.UpdatePinRequest) (
 func (h *gRPCHandler) UpdatePinImage(ctx context.Context, req *pb.UpdatePinImageRequest) (*pb.SuccessResponse, error) {
 
 	if err := h.PinService.UpdatePinImage(req.GetId(), req.GetImage()); err != nil {
+		fmt.Println("UpdatePinImage at plan-service failed:", err.Error())
 		return nil, err
 	}
 
+	fmt.Println("UpdatePinImage at plan-service success")
 	return &pb.SuccessResponse{
 		Success: true,
 	}, nil
@@ -155,9 +169,11 @@ func (h *gRPCHandler) UpdatePinImage(ctx context.Context, req *pb.UpdatePinImage
 
 func (h *gRPCHandler) DeletePinByID(ctx context.Context, req *pb.PinIDRequest) (*pb.SuccessResponse, error) {
 	if err := h.PinService.DeletePinByID(req.GetPinId()); err != nil {
+		fmt.Println("DeletePinByID at plan-service failed:", err.Error())
 		return nil, err
 	}
 
+	fmt.Println("DeletePinByID at plan-service success")
 	return &pb.SuccessResponse{
 		Success: true,
 	}, nil
@@ -165,9 +181,11 @@ func (h *gRPCHandler) DeletePinByID(ctx context.Context, req *pb.PinIDRequest) (
 
 func (h *gRPCHandler) DeletePinByWhiteboard(ctx context.Context, req *pb.ManyPinIDRequest) (*pb.SuccessResponse, error) {
 	if err := h.PinService.DeleteManyByID(req.GetPins()); err != nil {
+		fmt.Println("DeletePinByWhiteboard at plan-service failed:", err.Error())
 		return nil, err
 	}
 
+	fmt.Println("DeletePinByWhiteboard at plan-service success")
 	return &pb.SuccessResponse{
 		Success: true,
 	}, nil
