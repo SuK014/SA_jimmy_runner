@@ -19,6 +19,9 @@ spec:
       - name: noti-service
         image: noti-service:latest
         imagePullPolicy: Never  # For local development with Tilt
+        ports:
+        - containerPort: 50053
+          name: grpc
         env:
         - name: RABBITMQ_URL
           valueFrom:
@@ -42,3 +45,18 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: noti-service
+  namespace: default
+spec:
+  selector:
+    app: noti-service
+  ports:
+  - protocol: TCP
+    port: 50053
+    targetPort: 50053
+    name: grpc
+  type: ClusterIP

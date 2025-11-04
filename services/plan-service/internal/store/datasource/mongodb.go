@@ -16,12 +16,19 @@ type MongoDB struct {
 }
 
 func NewMongoDB(maxPoolSize uint64) *MongoDB {
-	option := options.Client().ApplyURI(os.Getenv("MONGODB_URI")).SetMonitor(apmmongo.CommandMonitor()).SetMaxPoolSize(maxPoolSize)
+	mongoURI := os.Getenv("MONGODB_URI")
+	if mongoURI == "" {
+		log.Fatal("❌ MONGODB_URI environment variable is not set")
+	}
+
+	option := options.Client().ApplyURI(mongoURI).SetMonitor(apmmongo.CommandMonitor()).SetMaxPoolSize(maxPoolSize)
 	client, err0 := mongo.Connect(context.Background(), option)
 
 	if err0 != nil {
-		log.Fatal("error connection : ", err0)
+		log.Fatalf("❌ Failed to connect to MongoDB: %v\nMake sure MONGODB_URI is correct: %s", err0, mongoURI)
 	}
+
+	log.Println("✅ Connected to MongoDB successfully")
 
 	return &MongoDB{
 		Context: context.Background(),

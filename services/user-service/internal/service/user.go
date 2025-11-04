@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/mail"
 
+	notiClient "github.com/SuK014/SA_jimmy_runner/services/user-service/grpc_clients/noti_client"
 	repositories "github.com/SuK014/SA_jimmy_runner/services/user-service/internal/repository"
 	"github.com/SuK014/SA_jimmy_runner/shared/entities"
 	"github.com/SuK014/SA_jimmy_runner/shared/utils"
@@ -11,6 +12,7 @@ import (
 
 type usersService struct {
 	UsersRepository repositories.IUsersRepository
+	NotiClient      *notiClient.NotiClient
 }
 
 type IUsersService interface {
@@ -23,9 +25,10 @@ type IUsersService interface {
 	DeleteUser(userID string) error
 }
 
-func NewUsersService(repo0 repositories.IUsersRepository) IUsersService {
+func NewUsersService(repo0 repositories.IUsersRepository, notiClient *notiClient.NotiClient) IUsersService {
 	return &usersService{
 		UsersRepository: repo0,
+		NotiClient:      notiClient,
 	}
 }
 
@@ -69,12 +72,29 @@ func (sv *usersService) Login(user entities.LoginUserModel) (*entities.UserDataM
 }
 
 func (sv *usersService) InsertNewUser(data entities.CreatedUserModel) (*entities.UserDataModel, error) {
+	fmt.Printf("🔵 InsertNewUser called for email: %s\n", data.Email)
+
 	//check email format
 	if _, err := mail.ParseAddress(data.Email); err != nil {
+		fmt.Printf("❌ Invalid email format: %s\n", data.Email)
 		return nil, err
 	}
 
-	return sv.UsersRepository.InsertUser(data)
+	// Insert user into database
+	fmt.Println("🔵 Inserting user into database...")
+	user, err := sv.UsersRepository.InsertUser(data)
+	if err != nil {
+		fmt.Printf("❌ Failed to insert user: %v\n", err)
+		return nil, err
+	}
+	fmt.Printf("✅ User inserted successfully: %s (ID: %s)\n", user.Email, user.UserID)
+
+	// Send welcome email notification
+	fmt.Println("🔵 Calling sendWelcomeEmail...")
+	go sv.sendWelcomeEmail(user)
+	fmt.Println("🔵 done sendWelcomeEmail...")
+
+	return user, nil
 }
 
 func (sv *usersService) UpdateUser(data entities.UpdateUserModel) (*entities.UserDataModel, error) {
@@ -87,4 +107,23 @@ func (sv *usersService) DeleteUser(userID string) error {
 	}
 
 	return sv.UsersRepository.DeleteUser(userID)
+}
+
+// sendWelcomeEmail sends email via gRPC to notification service
+func (sv *usersService) sendWelcomeEmail(user *entities.UserDataModel) {
+	if sv.NotiClient == nil {
+		fmt.Println("⚠️  Warning: Notification client is not configured, skipping email notification")
+		return
+	}
+
+	subject := "Welcome to SA Jimmy Runner! 🎉"
+	body := fmt.Sprintf("Hi %s,\n\nThank you for registering with SA Jimmy Runner! We're excited to have you on board.\n\nBest regards,\nThe SA Jimmy Runner Team", user.Name)
+
+	fmt.Printf("📤 Sending welcome email via gRPC for user: %s (email: %s)\n", user.Name, user.Email)
+
+	if err := sv.NotiClient.SendEmail(user.Email, subject, body); err != nil {
+		fmt.Printf("❌ Failed to send welcome email for user %s: %v\n", user.Email, err)
+	} else {
+		fmt.Printf("✅ Welcome email request sent successfully via gRPC for user: %s (email: %s)\n", user.Name, user.Email)
+	}
 }

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/configuration"
 	httpHandler "github.com/SuK014/SA_jimmy_runner/services/api-gateway/handlers"
@@ -9,9 +11,18 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load .env file for local development (optional in Kubernetes)
+	envPath := filepath.Join("../../../shared/env", ".env")
+	if err := godotenv.Load(envPath); err != nil {
+		log.Printf("⚠️  No .env file found at %s, using system environment variables", envPath)
+	} else {
+		log.Printf("✅ Loaded .env from %s", envPath)
+	}
+
 	app := fiber.New(configuration.NewFiberConfiguration())
 	middlewares.Logger(app)
 	app.Use(recover.New())
@@ -37,5 +48,6 @@ func main() {
 		PORT = "8080"
 	}
 
+	log.Printf("🚀 Starting API Gateway on port %s...", PORT)
 	app.Listen(":" + PORT)
 }

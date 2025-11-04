@@ -3,8 +3,10 @@ package main
 import (
 	"log"
 	"net"
+	"os"
 	"path/filepath"
 
+	"github.com/SuK014/SA_jimmy_runner/services/user-service/grpc_clients/noti_client"
 	"github.com/SuK014/SA_jimmy_runner/services/user-service/internal/handlers"
 	repo "github.com/SuK014/SA_jimmy_runner/services/user-service/internal/repository"
 	sv "github.com/SuK014/SA_jimmy_runner/services/user-service/internal/service"
@@ -28,7 +30,24 @@ func main() {
 	// Load .env file for local development (optional in Kubernetes)
 	envPath := filepath.Join("../../../shared/env", ".env")
 	if err := godotenv.Load(envPath); err != nil {
-		log.Printf("Warning: .env file not found (using environment variables): %v", err)
+		log.Printf("⚠️  No .env file found at %s, using system environment variables", envPath)
+	} else {
+		log.Printf("✅ Loaded .env from %s", envPath)
+	}
+
+	// Connect to Notification Service via gRPC
+	var notiClient *noti_client.NotiClient
+	notiServiceURL := os.Getenv("NOTI_SERVICE_URL")
+	if notiServiceURL == "" {
+		notiServiceURL = "localhost:50053" // default for local development
+	}
+
+	notiClient, err = noti_client.NewNotiClient(notiServiceURL)
+	if err != nil {
+		log.Printf("⚠️  Failed to connect to Notification Service: %v (email notifications disabled)", err)
+		notiClient = nil
+	} else {
+		defer notiClient.Close()
 	}
 
 	s := grpc.NewServer()
@@ -40,12 +59,12 @@ func main() {
 	userRepo := repo.NewUsersRepository(prismadb)
 	userTripRepo := repo.NewUserTripRepository(prismadb)
 
-	userSv := sv.NewUsersService(userRepo)
+	userSv := sv.NewUsersService(userRepo, notiClient)
 	userTripSv := sv.NewUserTripService(userTripRepo)
 
 	handlers.NewGRPCHandler(s, userSv, userTripSv)
 
-	log.Println("Server listening on :50051")
+	log.Println("🚀 Server listening on :50051")
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

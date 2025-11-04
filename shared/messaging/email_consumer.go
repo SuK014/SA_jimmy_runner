@@ -46,20 +46,22 @@ func (ec *EmailConsumer) Start() error {
 		for msg := range msgs {
 			var event EmailEvent
 			if err := json.Unmarshal(msg.Body, &event); err != nil {
-				log.Println("Failed to unmarshal EmailEvent:", err)
+				log.Printf("❌ Failed to unmarshal EmailEvent: %v", err)
 				continue
 			}
+
+			log.Printf("📧 Attempting to send email to: %s | Subject: %s", event.To, event.Subject)
 
 			if err := ec.sendEmail(&event); err != nil {
-				log.Printf("Failed to send email to %s: %v", event.To, err)
+				log.Printf("❌ Failed to send email to %s: %v", event.To, err)
 				continue
 			}
 
-			log.Printf("Email sent to %s successfully!", event.To)
+			log.Printf("✅ Email sent successfully to: %s | Subject: %s", event.To, event.Subject)
 		}
 	}()
 
-	log.Printf(" [*] EmailConsumer listening on queue: %s", ec.queueName)
+	log.Printf("📬 [*] EmailConsumer listening on queue: %s", ec.queueName)
 	return nil
 }
 

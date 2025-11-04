@@ -28,7 +28,9 @@ func main() {
 	// Load .env file for local development (optional in Kubernetes)
 	envPath := filepath.Join("../../../shared/env", ".env")
 	if err := godotenv.Load(envPath); err != nil {
-		log.Printf("Warning: .env file not found (using environment variables): %v", err)
+		log.Printf("⚠️  No .env file found at %s, using system environment variables", envPath)
+	} else {
+		log.Printf("✅ Loaded .env from %s", envPath)
 	}
 
 	s := grpc.NewServer()
@@ -46,7 +48,7 @@ func main() {
 
 	handlers.NewGRPCHandler(s, pinSv, whiteboardSv, tripSv)
 
-	log.Println("Server listening on :50052")
+	log.Println("🚀 Server listening on :50052")
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

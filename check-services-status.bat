@@ -28,6 +28,13 @@ if %errorlevel% == 0 (
     echo [✗] Plan Service NOT running on port 50052
 )
 
+netstat -ano | findstr ":50053.*LISTENING" > nul
+if %errorlevel% == 0 (
+    echo [✓] Plan Service running on port 50053
+) else (
+    echo [✗] Plan Service NOT running on port 50053
+)
+
 echo.
 echo ========================================
 echo Testing API Gateway Health...
