@@ -22,8 +22,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = async () => {
     try {
       const response = await authApi.getCurrentUser();
-      if (response.data) {
-        setUser(response.data as User);
+      if (response && response.user_id) {
+        setUser(response);
+      } else {
+        setUser(null);
       }
     } catch (error) {
       setUser(null);
@@ -31,7 +33,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     checkAuth();
   }, []);
@@ -40,7 +41,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const response = await authApi.login({ email, password });
     if (response.user_id) {
       setUser(response);
-      await checkAuth();
+      // Don't call checkAuth immediately - the cookie might not be ready yet
+      // The user is already set from the login response
+      setLoading(false);
     }
   };
 
@@ -51,7 +54,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Registration failed: Invalid response from server');
       }
       setUser(response);
-      await checkAuth();
+      // Don't call checkAuth immediately - the cookie might not be ready yet
+      // The user is already set from the register response
+      setLoading(false);
     } catch (error: any) {
       // Re-throw so the page can display the error
       if (error.response) {

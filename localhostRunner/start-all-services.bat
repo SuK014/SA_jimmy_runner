@@ -12,16 +12,17 @@ echo.
 echo Press any key to continue...
 pause > nul
 
-start "User Service" cmd /k "cd /d d:\cp\chula\SA\project\SA_jimmy_runner\services\user-service\cmd && go run main.go"
+set "PROJECT_ROOT=%~dp0.."
+start "User Service" cmd /k "cd /d "%PROJECT_ROOT%\services\user-service\cmd" && go run main.go"
 timeout /t 3 > nul
 
-start "Plan Service" cmd /k "cd /d d:\cp\chula\SA\project\SA_jimmy_runner\services\plan-service\cmd && go run main.go"
+start "Plan Service" cmd /k "cd /d "%PROJECT_ROOT%\services\plan-service\cmd" && go run main.go"
 timeout /t 3 > nul
 
-start "Notification Service" cmd /k "cd /d d:\cp\chula\SA\project\SA_jimmy_runner\services\noti-service\cmd && go run main.go"
+start "Notification Service" cmd /k "cd /d "%PROJECT_ROOT%\services\noti-service\cmd" && go run main.go"
 timeout /t 2 > nul
 
-start "API Gateway" cmd /k "cd /d d:\cp\chula\SA\project\SA_jimmy_runner\services\api-gateway\cmd && go run main.go"
+start "API Gateway" cmd /k "cd /d "%PROJECT_ROOT%\services\api-gateway\cmd" && go run main.go"
 
 echo.
 echo ========================================

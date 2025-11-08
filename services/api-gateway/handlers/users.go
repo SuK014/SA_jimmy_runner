@@ -55,13 +55,22 @@ func (h *HTTPHandler) CreateUser(ctx *fiber.Ctx) error {
 	}
 
 	//tmp: change config later
+	// ctx.Cookie(&fiber.Cookie{
+	// 	Name:     "cookies",
+	// 	Value:    *tokenDetail.Token,
+	// 	Expires:  time.Now().Add(24 * time.Hour), // expires in 1 day
+	// 	HTTPOnly: true,                           // not accessible via JavaScript
+	// 	Secure:   true,                           // only sent over HTTPS
+	// 	Path:     "/",
+	// })
 	ctx.Cookie(&fiber.Cookie{
 		Name:     "cookies",
 		Value:    *tokenDetail.Token,
 		Expires:  time.Now().Add(24 * time.Hour), // expires in 1 day
 		HTTPOnly: true,                           // not accessible via JavaScript
-		Secure:   true,                           // only sent over HTTPS
+		Secure:   false,                          // Set to false for local development (HTTP)
 		Path:     "/",
+		SameSite: "Lax", // Add SameSite for CORS
 	})
 
 	fmt.Println("set cookies success")
@@ -101,13 +110,22 @@ func (h *HTTPHandler) Login(ctx *fiber.Ctx) error {
 	}
 
 	//tmp: change config later
+	// ctx.Cookie(&fiber.Cookie{
+	// 	Name:     "cookies",
+	// 	Value:    *tokenDetail.Token,
+	// 	Expires:  time.Now().Add(24 * time.Hour), // expires in 1 day
+	// 	HTTPOnly: true,                           // not accessible via JavaScript
+	// 	Secure:   true,                           // only sent over HTTPS
+	// 	Path:     "/",
+	// })
 	ctx.Cookie(&fiber.Cookie{
 		Name:     "cookies",
 		Value:    *tokenDetail.Token,
 		Expires:  time.Now().Add(24 * time.Hour), // expires in 1 day
 		HTTPOnly: true,                           // not accessible via JavaScript
-		Secure:   true,                           // only sent over HTTPS
+		Secure:   false,                          // Allow over HTTP for local dev (set to true in production)
 		Path:     "/",
+		SameSite: "Lax", // Add SameSite for CORS
 	})
 
 	fmt.Println("set cookies success")
