@@ -15,6 +15,7 @@ type tripsService struct {
 type ITripsService interface {
 	InsertTrip(data entities.CreatedTripModel) (string, error)
 	FindByID(tripID string) (*entities.TripDataModel, error)
+	FindManyByID(tripIDs []string) (*[]entities.TripDataModel, error)
 	UpdateTrip(tripID string, data entities.UpdatedTripModel) error
 	UpdateTripImage(tripID string, image []byte) error
 	DeleteTripByID(tripID string) error
@@ -36,6 +37,24 @@ func (sv *tripsService) FindByID(tripID string) (*entities.TripDataModel, error)
 		return nil, fmt.Errorf("invalid tripID: %v", err)
 	}
 	data, err := sv.TripsRepository.FindByID(mongoID)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func (sv *tripsService) FindManyByID(tripIDs []string) (*[]entities.TripDataModel, error) {
+
+	mongoIDs := []primitive.ObjectID{}
+	for _, p := range tripIDs {
+		mongoID, err := primitive.ObjectIDFromHex(p)
+		if err != nil {
+			return nil, fmt.Errorf("invalid pinID: %v", err)
+		}
+		mongoIDs = append(mongoIDs, mongoID)
+	}
+	data, err := sv.TripsRepository.FindManyByID(mongoIDs)
 	if err != nil {
 		return nil, err
 	}

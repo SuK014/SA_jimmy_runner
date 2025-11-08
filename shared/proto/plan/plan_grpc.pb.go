@@ -35,6 +35,7 @@ const (
 	PlansService_DeleteWhiteboardByTrip_FullMethodName = "/plan.PlansService/DeleteWhiteboardByTrip"
 	PlansService_CreateTrip_FullMethodName             = "/plan.PlansService/CreateTrip"
 	PlansService_GetTripByID_FullMethodName            = "/plan.PlansService/GetTripByID"
+	PlansService_GetManyTripsByID_FullMethodName       = "/plan.PlansService/GetManyTripsByID"
 	PlansService_UpdateTrip_FullMethodName             = "/plan.PlansService/UpdateTrip"
 	PlansService_UpdateTripImage_FullMethodName        = "/plan.PlansService/UpdateTripImage"
 	PlansService_DeleteTripByID_FullMethodName         = "/plan.PlansService/DeleteTripByID"
@@ -63,6 +64,7 @@ type PlansServiceClient interface {
 	// trip
 	CreateTrip(ctx context.Context, in *CreateTripRequest, opts ...grpc.CallOption) (*CreateTripResponse, error)
 	GetTripByID(ctx context.Context, in *TripIDRequest, opts ...grpc.CallOption) (*GetTripByIDResponse, error)
+	GetManyTripsByID(ctx context.Context, in *ManyTripIDRequest, opts ...grpc.CallOption) (*GetTripsResponse, error)
 	UpdateTrip(ctx context.Context, in *UpdateTripRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	UpdateTripImage(ctx context.Context, in *UpdateTripImageRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	DeleteTripByID(ctx context.Context, in *TripIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
@@ -236,6 +238,16 @@ func (c *plansServiceClient) GetTripByID(ctx context.Context, in *TripIDRequest,
 	return out, nil
 }
 
+func (c *plansServiceClient) GetManyTripsByID(ctx context.Context, in *ManyTripIDRequest, opts ...grpc.CallOption) (*GetTripsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetTripsResponse)
+	err := c.cc.Invoke(ctx, PlansService_GetManyTripsByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *plansServiceClient) UpdateTrip(ctx context.Context, in *UpdateTripRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SuccessResponse)
@@ -289,6 +301,7 @@ type PlansServiceServer interface {
 	// trip
 	CreateTrip(context.Context, *CreateTripRequest) (*CreateTripResponse, error)
 	GetTripByID(context.Context, *TripIDRequest) (*GetTripByIDResponse, error)
+	GetManyTripsByID(context.Context, *ManyTripIDRequest) (*GetTripsResponse, error)
 	UpdateTrip(context.Context, *UpdateTripRequest) (*SuccessResponse, error)
 	UpdateTripImage(context.Context, *UpdateTripImageRequest) (*SuccessResponse, error)
 	DeleteTripByID(context.Context, *TripIDRequest) (*SuccessResponse, error)
@@ -349,6 +362,9 @@ func (UnimplementedPlansServiceServer) CreateTrip(context.Context, *CreateTripRe
 }
 func (UnimplementedPlansServiceServer) GetTripByID(context.Context, *TripIDRequest) (*GetTripByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTripByID not implemented")
+}
+func (UnimplementedPlansServiceServer) GetManyTripsByID(context.Context, *ManyTripIDRequest) (*GetTripsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetManyTripsByID not implemented")
 }
 func (UnimplementedPlansServiceServer) UpdateTrip(context.Context, *UpdateTripRequest) (*SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTrip not implemented")
@@ -668,6 +684,24 @@ func _PlansService_GetTripByID_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlansService_GetManyTripsByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ManyTripIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlansServiceServer).GetManyTripsByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlansService_GetManyTripsByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlansServiceServer).GetManyTripsByID(ctx, req.(*ManyTripIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PlansService_UpdateTrip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateTripRequest)
 	if err := dec(in); err != nil {
@@ -792,6 +826,10 @@ var PlansService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTripByID",
 			Handler:    _PlansService_GetTripByID_Handler,
+		},
+		{
+			MethodName: "GetManyTripsByID",
+			Handler:    _PlansService_GetManyTripsByID_Handler,
 		},
 		{
 			MethodName: "UpdateTrip",

@@ -1333,6 +1333,170 @@ func (x *TripIDRequest) GetTripId() string {
 	return ""
 }
 
+type ManyTripIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Trips         []string               `protobuf:"bytes,1,rep,name=trips,proto3" json:"trips,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ManyTripIDRequest) Reset() {
+	*x = ManyTripIDRequest{}
+	mi := &file_plan_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ManyTripIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ManyTripIDRequest) ProtoMessage() {}
+
+func (x *ManyTripIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ManyTripIDRequest.ProtoReflect.Descriptor instead.
+func (*ManyTripIDRequest) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ManyTripIDRequest) GetTrips() []string {
+	if x != nil {
+		return x.Trips
+	}
+	return nil
+}
+
+type GetTripsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Trips         []*GetTripResponse     `protobuf:"bytes,1,rep,name=trips,proto3" json:"trips,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTripsResponse) Reset() {
+	*x = GetTripsResponse{}
+	mi := &file_plan_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTripsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTripsResponse) ProtoMessage() {}
+
+func (x *GetTripsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTripsResponse.ProtoReflect.Descriptor instead.
+func (*GetTripsResponse) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *GetTripsResponse) GetTrips() []*GetTripResponse {
+	if x != nil {
+		return x.Trips
+	}
+	return nil
+}
+
+type GetTripResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TripId        string                 `protobuf:"bytes,1,opt,name=tripId,proto3" json:"tripId,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Image         []byte                 `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
+	Whiteboards   []string               `protobuf:"bytes,5,rep,name=whiteboards,proto3" json:"whiteboards,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTripResponse) Reset() {
+	*x = GetTripResponse{}
+	mi := &file_plan_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTripResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTripResponse) ProtoMessage() {}
+
+func (x *GetTripResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_plan_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTripResponse.ProtoReflect.Descriptor instead.
+func (*GetTripResponse) Descriptor() ([]byte, []int) {
+	return file_plan_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GetTripResponse) GetTripId() string {
+	if x != nil {
+		return x.TripId
+	}
+	return ""
+}
+
+func (x *GetTripResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *GetTripResponse) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *GetTripResponse) GetImage() []byte {
+	if x != nil {
+		return x.Image
+	}
+	return nil
+}
+
+func (x *GetTripResponse) GetWhiteboards() []string {
+	if x != nil {
+		return x.Whiteboards
+	}
+	return nil
+}
+
 type GetTripByIDResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
@@ -1346,7 +1510,7 @@ type GetTripByIDResponse struct {
 
 func (x *GetTripByIDResponse) Reset() {
 	*x = GetTripByIDResponse{}
-	mi := &file_plan_proto_msgTypes[23]
+	mi := &file_plan_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1358,7 +1522,7 @@ func (x *GetTripByIDResponse) String() string {
 func (*GetTripByIDResponse) ProtoMessage() {}
 
 func (x *GetTripByIDResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[23]
+	mi := &file_plan_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1371,7 +1535,7 @@ func (x *GetTripByIDResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTripByIDResponse.ProtoReflect.Descriptor instead.
 func (*GetTripByIDResponse) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{23}
+	return file_plan_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *GetTripByIDResponse) GetSuccess() bool {
@@ -1422,7 +1586,7 @@ type UpdateTripRequest struct {
 
 func (x *UpdateTripRequest) Reset() {
 	*x = UpdateTripRequest{}
-	mi := &file_plan_proto_msgTypes[24]
+	mi := &file_plan_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1434,7 +1598,7 @@ func (x *UpdateTripRequest) String() string {
 func (*UpdateTripRequest) ProtoMessage() {}
 
 func (x *UpdateTripRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[24]
+	mi := &file_plan_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1447,7 +1611,7 @@ func (x *UpdateTripRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateTripRequest.ProtoReflect.Descriptor instead.
 func (*UpdateTripRequest) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{24}
+	return file_plan_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *UpdateTripRequest) GetId() string {
@@ -1495,7 +1659,7 @@ type UpdateTripImageRequest struct {
 
 func (x *UpdateTripImageRequest) Reset() {
 	*x = UpdateTripImageRequest{}
-	mi := &file_plan_proto_msgTypes[25]
+	mi := &file_plan_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1507,7 +1671,7 @@ func (x *UpdateTripImageRequest) String() string {
 func (*UpdateTripImageRequest) ProtoMessage() {}
 
 func (x *UpdateTripImageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_plan_proto_msgTypes[25]
+	mi := &file_plan_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1520,7 +1684,7 @@ func (x *UpdateTripImageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateTripImageRequest.ProtoReflect.Descriptor instead.
 func (*UpdateTripImageRequest) Descriptor() ([]byte, []int) {
-	return file_plan_proto_rawDescGZIP(), []int{25}
+	return file_plan_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *UpdateTripImageRequest) GetId() string {
@@ -1625,7 +1789,17 @@ const file_plan_proto_rawDesc = "" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x16\n" +
 	"\x06TripId\x18\x02 \x01(\tR\x06TripId\"'\n" +
 	"\rTripIDRequest\x12\x16\n" +
-	"\x06TripId\x18\x01 \x01(\tR\x06TripId\"\x9d\x01\n" +
+	"\x06TripId\x18\x01 \x01(\tR\x06TripId\")\n" +
+	"\x11ManyTripIDRequest\x12\x14\n" +
+	"\x05trips\x18\x01 \x03(\tR\x05trips\"?\n" +
+	"\x10GetTripsResponse\x12+\n" +
+	"\x05trips\x18\x01 \x03(\v2\x15.plan.GetTripResponseR\x05trips\"\x97\x01\n" +
+	"\x0fGetTripResponse\x12\x16\n" +
+	"\x06tripId\x18\x01 \x01(\tR\x06tripId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x14\n" +
+	"\x05image\x18\x04 \x01(\fR\x05image\x12 \n" +
+	"\vwhiteboards\x18\x05 \x03(\tR\vwhiteboards\"\x9d\x01\n" +
 	"\x13GetTripByIDResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -1640,8 +1814,7 @@ const file_plan_proto_rawDesc = "" +
 	"\x14whiteboardChangeType\x18\x05 \x01(\tR\x14whiteboardChangeType\">\n" +
 	"\x16UpdateTripImageRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05image\x18\x02 \x01(\fR\x05image2\xc5\n" +
-	"\n" +
+	"\x05image\x18\x02 \x01(\fR\x05image2\x8a\v\n" +
 	"\fPlansService\x12<\n" +
 	"\tCreatePin\x12\x16.plan.CreatePinRequest\x1a\x17.plan.CreatePinResponse\x12:\n" +
 	"\n" +
@@ -1660,7 +1833,8 @@ const file_plan_proto_rawDesc = "" +
 	"\x16DeleteWhiteboardByTrip\x12\x1d.plan.ManyWhiteboardIDRequest\x1a\x15.plan.SuccessResponse\x12?\n" +
 	"\n" +
 	"CreateTrip\x12\x17.plan.CreateTripRequest\x1a\x18.plan.CreateTripResponse\x12=\n" +
-	"\vGetTripByID\x12\x13.plan.TripIDRequest\x1a\x19.plan.GetTripByIDResponse\x12<\n" +
+	"\vGetTripByID\x12\x13.plan.TripIDRequest\x1a\x19.plan.GetTripByIDResponse\x12C\n" +
+	"\x10GetManyTripsByID\x12\x17.plan.ManyTripIDRequest\x1a\x16.plan.GetTripsResponse\x12<\n" +
 	"\n" +
 	"UpdateTrip\x12\x17.plan.UpdateTripRequest\x1a\x15.plan.SuccessResponse\x12F\n" +
 	"\x0fUpdateTripImage\x12\x1c.plan.UpdateTripImageRequest\x1a\x15.plan.SuccessResponse\x12<\n" +
@@ -1678,7 +1852,7 @@ func file_plan_proto_rawDescGZIP() []byte {
 	return file_plan_proto_rawDescData
 }
 
-var file_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_plan_proto_goTypes = []any{
 	(*SuccessResponse)(nil),            // 0: plan.SuccessResponse
 	(*CreatePinRequest)(nil),           // 1: plan.CreatePinRequest
@@ -1703,9 +1877,12 @@ var file_plan_proto_goTypes = []any{
 	(*CreateTripRequest)(nil),          // 20: plan.CreateTripRequest
 	(*CreateTripResponse)(nil),         // 21: plan.CreateTripResponse
 	(*TripIDRequest)(nil),              // 22: plan.TripIDRequest
-	(*GetTripByIDResponse)(nil),        // 23: plan.GetTripByIDResponse
-	(*UpdateTripRequest)(nil),          // 24: plan.UpdateTripRequest
-	(*UpdateTripImageRequest)(nil),     // 25: plan.UpdateTripImageRequest
+	(*ManyTripIDRequest)(nil),          // 23: plan.ManyTripIDRequest
+	(*GetTripsResponse)(nil),           // 24: plan.GetTripsResponse
+	(*GetTripResponse)(nil),            // 25: plan.GetTripResponse
+	(*GetTripByIDResponse)(nil),        // 26: plan.GetTripByIDResponse
+	(*UpdateTripRequest)(nil),          // 27: plan.UpdateTripRequest
+	(*UpdateTripImageRequest)(nil),     // 28: plan.UpdateTripImageRequest
 }
 var file_plan_proto_depIdxs = []int32{
 	10, // 0: plan.CreatePinRequest.expense:type_name -> plan.Expenses
@@ -1714,49 +1891,52 @@ var file_plan_proto_depIdxs = []int32{
 	10, // 3: plan.UpdatePinRequest.expense:type_name -> plan.Expenses
 	18, // 4: plan.GetWhiteboardsResponse.whiteboards:type_name -> plan.GetWhiteboardResponse
 	8,  // 5: plan.GetWhiteboardResponse.pins:type_name -> plan.GetPinResponse
-	1,  // 6: plan.PlansService.CreatePin:input_type -> plan.CreatePinRequest
-	3,  // 7: plan.PlansService.GetPinByID:input_type -> plan.PinIDRequest
-	5,  // 8: plan.PlansService.GetPinsByWhiteboard:input_type -> plan.ManyPinIDRequest
-	6,  // 9: plan.PlansService.GetPinByParticipant:input_type -> plan.GetPinByParticipantRequest
-	9,  // 10: plan.PlansService.UpdatePin:input_type -> plan.UpdatePinRequest
-	11, // 11: plan.PlansService.UpdatePinImage:input_type -> plan.UpdatePinImageRequest
-	3,  // 12: plan.PlansService.DeletePinByID:input_type -> plan.PinIDRequest
-	5,  // 13: plan.PlansService.DeletePinByWhiteboard:input_type -> plan.ManyPinIDRequest
-	12, // 14: plan.PlansService.CreateWhiteboard:input_type -> plan.CreateWhiteboardRequest
-	14, // 15: plan.PlansService.GetWhiteboardByID:input_type -> plan.WhiteboardIDRequest
-	16, // 16: plan.PlansService.GetWhiteboardsByTrip:input_type -> plan.ManyWhiteboardIDRequest
-	19, // 17: plan.PlansService.UpdateWhiteboard:input_type -> plan.UpdateWhiteboardRequest
-	14, // 18: plan.PlansService.DeleteWhiteboardByID:input_type -> plan.WhiteboardIDRequest
-	16, // 19: plan.PlansService.DeleteWhiteboardByTrip:input_type -> plan.ManyWhiteboardIDRequest
-	20, // 20: plan.PlansService.CreateTrip:input_type -> plan.CreateTripRequest
-	22, // 21: plan.PlansService.GetTripByID:input_type -> plan.TripIDRequest
-	24, // 22: plan.PlansService.UpdateTrip:input_type -> plan.UpdateTripRequest
-	25, // 23: plan.PlansService.UpdateTripImage:input_type -> plan.UpdateTripImageRequest
-	22, // 24: plan.PlansService.DeleteTripByID:input_type -> plan.TripIDRequest
-	2,  // 25: plan.PlansService.CreatePin:output_type -> plan.CreatePinResponse
-	4,  // 26: plan.PlansService.GetPinByID:output_type -> plan.GetPinByIDResponse
-	7,  // 27: plan.PlansService.GetPinsByWhiteboard:output_type -> plan.GetPinsResponse
-	7,  // 28: plan.PlansService.GetPinByParticipant:output_type -> plan.GetPinsResponse
-	0,  // 29: plan.PlansService.UpdatePin:output_type -> plan.SuccessResponse
-	0,  // 30: plan.PlansService.UpdatePinImage:output_type -> plan.SuccessResponse
-	0,  // 31: plan.PlansService.DeletePinByID:output_type -> plan.SuccessResponse
-	0,  // 32: plan.PlansService.DeletePinByWhiteboard:output_type -> plan.SuccessResponse
-	13, // 33: plan.PlansService.CreateWhiteboard:output_type -> plan.CreateWhiteboardResponse
-	15, // 34: plan.PlansService.GetWhiteboardByID:output_type -> plan.GetWhiteboardByIDResponse
-	17, // 35: plan.PlansService.GetWhiteboardsByTrip:output_type -> plan.GetWhiteboardsResponse
-	0,  // 36: plan.PlansService.UpdateWhiteboard:output_type -> plan.SuccessResponse
-	0,  // 37: plan.PlansService.DeleteWhiteboardByID:output_type -> plan.SuccessResponse
-	0,  // 38: plan.PlansService.DeleteWhiteboardByTrip:output_type -> plan.SuccessResponse
-	21, // 39: plan.PlansService.CreateTrip:output_type -> plan.CreateTripResponse
-	23, // 40: plan.PlansService.GetTripByID:output_type -> plan.GetTripByIDResponse
-	0,  // 41: plan.PlansService.UpdateTrip:output_type -> plan.SuccessResponse
-	0,  // 42: plan.PlansService.UpdateTripImage:output_type -> plan.SuccessResponse
-	0,  // 43: plan.PlansService.DeleteTripByID:output_type -> plan.SuccessResponse
-	25, // [25:44] is the sub-list for method output_type
-	6,  // [6:25] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	25, // 6: plan.GetTripsResponse.trips:type_name -> plan.GetTripResponse
+	1,  // 7: plan.PlansService.CreatePin:input_type -> plan.CreatePinRequest
+	3,  // 8: plan.PlansService.GetPinByID:input_type -> plan.PinIDRequest
+	5,  // 9: plan.PlansService.GetPinsByWhiteboard:input_type -> plan.ManyPinIDRequest
+	6,  // 10: plan.PlansService.GetPinByParticipant:input_type -> plan.GetPinByParticipantRequest
+	9,  // 11: plan.PlansService.UpdatePin:input_type -> plan.UpdatePinRequest
+	11, // 12: plan.PlansService.UpdatePinImage:input_type -> plan.UpdatePinImageRequest
+	3,  // 13: plan.PlansService.DeletePinByID:input_type -> plan.PinIDRequest
+	5,  // 14: plan.PlansService.DeletePinByWhiteboard:input_type -> plan.ManyPinIDRequest
+	12, // 15: plan.PlansService.CreateWhiteboard:input_type -> plan.CreateWhiteboardRequest
+	14, // 16: plan.PlansService.GetWhiteboardByID:input_type -> plan.WhiteboardIDRequest
+	16, // 17: plan.PlansService.GetWhiteboardsByTrip:input_type -> plan.ManyWhiteboardIDRequest
+	19, // 18: plan.PlansService.UpdateWhiteboard:input_type -> plan.UpdateWhiteboardRequest
+	14, // 19: plan.PlansService.DeleteWhiteboardByID:input_type -> plan.WhiteboardIDRequest
+	16, // 20: plan.PlansService.DeleteWhiteboardByTrip:input_type -> plan.ManyWhiteboardIDRequest
+	20, // 21: plan.PlansService.CreateTrip:input_type -> plan.CreateTripRequest
+	22, // 22: plan.PlansService.GetTripByID:input_type -> plan.TripIDRequest
+	23, // 23: plan.PlansService.GetManyTripsByID:input_type -> plan.ManyTripIDRequest
+	27, // 24: plan.PlansService.UpdateTrip:input_type -> plan.UpdateTripRequest
+	28, // 25: plan.PlansService.UpdateTripImage:input_type -> plan.UpdateTripImageRequest
+	22, // 26: plan.PlansService.DeleteTripByID:input_type -> plan.TripIDRequest
+	2,  // 27: plan.PlansService.CreatePin:output_type -> plan.CreatePinResponse
+	4,  // 28: plan.PlansService.GetPinByID:output_type -> plan.GetPinByIDResponse
+	7,  // 29: plan.PlansService.GetPinsByWhiteboard:output_type -> plan.GetPinsResponse
+	7,  // 30: plan.PlansService.GetPinByParticipant:output_type -> plan.GetPinsResponse
+	0,  // 31: plan.PlansService.UpdatePin:output_type -> plan.SuccessResponse
+	0,  // 32: plan.PlansService.UpdatePinImage:output_type -> plan.SuccessResponse
+	0,  // 33: plan.PlansService.DeletePinByID:output_type -> plan.SuccessResponse
+	0,  // 34: plan.PlansService.DeletePinByWhiteboard:output_type -> plan.SuccessResponse
+	13, // 35: plan.PlansService.CreateWhiteboard:output_type -> plan.CreateWhiteboardResponse
+	15, // 36: plan.PlansService.GetWhiteboardByID:output_type -> plan.GetWhiteboardByIDResponse
+	17, // 37: plan.PlansService.GetWhiteboardsByTrip:output_type -> plan.GetWhiteboardsResponse
+	0,  // 38: plan.PlansService.UpdateWhiteboard:output_type -> plan.SuccessResponse
+	0,  // 39: plan.PlansService.DeleteWhiteboardByID:output_type -> plan.SuccessResponse
+	0,  // 40: plan.PlansService.DeleteWhiteboardByTrip:output_type -> plan.SuccessResponse
+	21, // 41: plan.PlansService.CreateTrip:output_type -> plan.CreateTripResponse
+	26, // 42: plan.PlansService.GetTripByID:output_type -> plan.GetTripByIDResponse
+	24, // 43: plan.PlansService.GetManyTripsByID:output_type -> plan.GetTripsResponse
+	0,  // 44: plan.PlansService.UpdateTrip:output_type -> plan.SuccessResponse
+	0,  // 45: plan.PlansService.UpdateTripImage:output_type -> plan.SuccessResponse
+	0,  // 46: plan.PlansService.DeleteTripByID:output_type -> plan.SuccessResponse
+	27, // [27:47] is the sub-list for method output_type
+	7,  // [7:27] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_plan_proto_init() }
@@ -1770,7 +1950,7 @@ func file_plan_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_plan_proto_rawDesc), len(file_plan_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   26,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

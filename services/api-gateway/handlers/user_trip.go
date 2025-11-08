@@ -5,6 +5,7 @@ import (
 
 	"github.com/SuK014/SA_jimmy_runner/services/api-gateway/middlewares"
 	"github.com/SuK014/SA_jimmy_runner/shared/entities"
+	planPb "github.com/SuK014/SA_jimmy_runner/shared/proto/plan"
 	pb "github.com/SuK014/SA_jimmy_runner/shared/proto/user"
 
 	"github.com/gofiber/fiber/v2"
@@ -44,18 +45,28 @@ func (h *HTTPHandler) GetTripsByUserID(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
 	}
 
-	req := &pb.UserIDRequest{
+	tripIdReq := &pb.UserIDRequest{
 		UserId: token.UserID,
 	}
 
-	res, err := h.userClient.GetAllTripsByUserID(context.Background(), req)
+	tripIdRes, err := h.userClient.GetAllTripsByUserID(context.Background(), tripIdReq)
+	if err != nil {
+		return ctx.Status(fiber.StatusForbidden).JSON(
+			entities.ResponseMessage{Message: "cannot GetAllTripsIDByUserID: " + err.Error()},
+		)
+	}
+
+	tripsReq := &planPb.ManyTripIDRequest{
+		Trips: tripIdRes.GetTripId(),
+	}
+	tripsRes, err := h.planClient.GetManyTripsByID(context.Background(), tripsReq)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot GetAllTripsByUserID: " + err.Error()},
 		)
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(res)
+	return ctx.Status(fiber.StatusOK).JSON(tripsRes)
 }
 
 func (h *HTTPHandler) GetTripUsersAvatar(ctx *fiber.Ctx) error {
