@@ -26,7 +26,15 @@ func main() {
 	app := fiber.New(configuration.NewFiberConfiguration())
 	middlewares.Logger(app)
 	app.Use(recover.New())
-	app.Use(cors.New())
+	// app.Use(cors.New())
+	// TEST
+	// tmp: change back later
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:3000", // Specific origin, not wildcard
+		AllowCredentials: true,                    // Required when withCredentials is true
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
+	}))
 
 	// Get service URLs from environment variables or use defaults for local development
 	userServiceURL := os.Getenv("USER_SERVICE_URL")
