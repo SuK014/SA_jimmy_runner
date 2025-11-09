@@ -13,6 +13,8 @@ export interface User {
     description?: string;
     image?: string;
     whiteboards: string[];
+    dateRange?: string; // Date range like "Day 1 - Day 5" or "Day 1"
+    created_at?: string; // Or use created_at if available
   }
   
   export interface Whiteboard {
@@ -45,6 +47,7 @@ export interface User {
   export interface WhiteboardWithPins {
     day: number;
     pins: Pin[];
+    whiteboard_id?: string; // Add whiteboard_id
   }
   
   export interface LoginRequest {
@@ -61,6 +64,8 @@ export interface User {
   export interface CreatePlanRequest {
     name: string;
     description?: string;
+    startDate?: string; // ISO date string
+    endDate?: string; // ISO date string
   }
   
   export interface AddFriendRequest {
@@ -72,4 +77,10 @@ export interface User {
     message?: string;
     data?: T;
     status?: number;
+  }
+
+  export interface Participant {
+    user_id: string;
+    display_name?: string;
+    profile?: string;
   }

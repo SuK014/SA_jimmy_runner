@@ -10,7 +10,7 @@ interface AddFriendModalProps {
 }
 
 export function AddFriendModal({ planId, onClose, onSuccess }: AddFriendModalProps) {
-  const [userIds, setUserIds] = useState('');
+  const [emails, setEmails] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,14 +20,54 @@ export function AddFriendModal({ planId, onClose, onSuccess }: AddFriendModalPro
     setLoading(true);
 
     try {
-      // Split comma-separated user IDs
-      const userIdArray = userIds
+      // Split comma-separated emails
+      const emailArray = emails
         .split(',')
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0);
+        .map((email) => email.trim())
+        .filter((email) => email.length > 0);
+
+      if (emailArray.length === 0) {
+        setError('Please enter at least one email address');
+        setLoading(false);
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const invalidEmails = emailArray.filter(email => !emailRegex.test(email));
+      if (invalidEmails.length > 0) {
+        setError(`Invalid email format: ${invalidEmails.join(', ')}`);
+        setLoading(false);
+        return;
+      }
+
+      // TODO: Convert emails to user IDs
+      // For now, we'll need to add a backend API endpoint to get user IDs from emails
+      // Or modify the backend to accept emails directly
+      // For now, assuming we have an API to get user by email
+      // This is a placeholder - you'll need to implement getUserByEmail API
+      const userIdArray: string[] = [];
+      for (const email of emailArray) {
+        try {
+          // This would need a new API endpoint: getUserByEmail
+          // For now, we'll need to add this to the backend
+          // const user = await authApi.getUserByEmail(email);
+          // userIdArray.push(user.user_id);
+          
+          // Temporary: If backend accepts emails, we can modify AddFriendRequest
+          // For now, showing error that this needs backend support
+          setError('Email lookup not yet implemented. Please use user IDs for now, or add getUserByEmail API endpoint.');
+          setLoading(false);
+          return;
+        } catch (err: any) {
+          setError(`User not found for email: ${email}`);
+          setLoading(false);
+          return;
+        }
+      }
 
       if (userIdArray.length === 0) {
-        setError('Please enter at least one user ID');
+        setError('No valid users found');
         setLoading(false);
         return;
       }
@@ -57,20 +97,20 @@ export function AddFriendModal({ planId, onClose, onSuccess }: AddFriendModalPro
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="user-ids" className="block text-sm font-medium text-gray-700 mb-1">
-              User IDs (comma-separated) *
+            <label htmlFor="emails" className="block text-sm font-medium text-gray-700 mb-1">
+              Email Addresses (comma-separated) *
             </label>
             <input
-              id="user-ids"
+              id="emails"
               type="text"
-              value={userIds}
-              onChange={(e) => setUserIds(e.target.value)}
+              value={emails}
+              onChange={(e) => setEmails(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="user_id1, user_id2, user_id3"
+              placeholder="user1@example.com, user2@example.com"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Enter user IDs separated by commas
+              Enter email addresses separated by commas
             </p>
           </div>
 
