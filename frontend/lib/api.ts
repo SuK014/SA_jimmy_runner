@@ -9,6 +9,8 @@ import type {
   AddFriendRequest,
   ApiResponse,
   Pin,
+  Expense,
+  Participant,
 } from './types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
@@ -156,6 +158,11 @@ export const planApi = {
     return response.data;
   },
 
+  deleteWhiteboard: async (whiteboardId: string, tripId: string): Promise<ApiResponse> => {
+    const response = await api.delete(`/plan/whiteboard?id=${whiteboardId}&trip_id=${tripId}`);
+    return response.data;
+  },
+
   addFriendsToPlan: async (data: AddFriendRequest): Promise<ApiResponse> => {
     const response = await api.post('/userTrip/', data);
     return response.data;
@@ -176,8 +183,43 @@ export const planApi = {
     return response.data;
   },
 
-  createPin: async (whiteboardId: string, pinData?: { name?: string; description?: string }): Promise<ApiResponse> => {
+  createPin: async (whiteboardId: string, pinData?: { 
+    name?: string; 
+    description?: string;
+    location?: number;
+    expenses?: Expense[];
+    participants?: string[];
+    parents?: string[];
+  }): Promise<ApiResponse> => {
     const response = await api.post(`/plan/pin?whiteboard_id=${whiteboardId}`, pinData || {});
+    return response.data;
+  },
+
+  updatePin: async (pinId: string, pinData: {
+    name?: string;
+    description?: string;
+    location?: number;
+    expenses?: Expense[];
+    participants?: string[];
+    parents?: string[];
+  }): Promise<ApiResponse> => {
+    const response = await api.put(`/plan/pin?id=${pinId}`, pinData);
+    return response.data;
+  },
+
+  uploadPinImage: async (pinId: string, imageFile: File): Promise<ApiResponse> => {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    
+    // Don't manually set Content-Type - let axios set it with the correct boundary
+    const response = await api.put(`/plan/pin/image?id=${pinId}`, formData);
+    return response.data;
+  },
+
+  deletePin: async (pinId: string, whiteboardId: string): Promise<ApiResponse> => {
+    const response = await api.delete(
+      `/plan/pin?id=${pinId}&whiteboard_id=${whiteboardId}`
+    );
     return response.data;
   },
 };

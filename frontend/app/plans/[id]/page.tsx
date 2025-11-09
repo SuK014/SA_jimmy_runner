@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { planApi } from '@/lib/api';
@@ -8,6 +8,7 @@ import type { PlanWithDetails, Pin, Participant } from '@/lib/types';
 import { AuthGuard } from '@/components/AuthGuard';
 import { AddFriendModal } from '@/components/AddFriendModal';
 import { PinCard } from '@/components/PinCard';
+import { CreatePinModal } from '@/components/CreatePinModal';
 
 export default function PlanDetailPage() {
   const params = useParams();
@@ -18,14 +19,21 @@ export default function PlanDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
+  const [showCreatePinModal, setShowCreatePinModal] = useState(false);
+  const [editingPin, setEditingPin] = useState<Pin | null>(null);
   const [selectedDay, setSelectedDay] = useState(1);
   const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
   const [viewMode, setViewMode] = useState<'day' | 'pin'>('day'); // 'day' or 'pin'
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [dayDates, setDayDates] = useState<Map<number, { date: Date; time: string }>>(new Map());
-  const [isEditingDates, setIsEditingDates] = useState(false); // Add this line
+  const [isEditingDates, setIsEditingDates] = useState(false);
+  const isCreatingWhiteboardsRef = useRef(false); // Add this ref
   const { user } = useAuth();
+  const [pinToDelete, setPinToDelete] = useState<Pin | null>(null);
+  const [isDeletingPin, setIsDeletingPin] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (planId) {
@@ -59,16 +67,78 @@ export default function PlanDetailPage() {
           }
         });
         
+        // Fetch full pin details for each whiteboard with better error handling
+        // Process in batches to avoid overwhelming the server
+        const batchSize = 5; // Process 5 pins at a time
+        const whiteboardsWithPins = await Promise.all(
+          whiteboardsData.map(async (wb: any, index: number) => {
+            const pinIds = wb.pins || [];
+            
+            // Process pins in batches
+            const pins: Pin[] = [];
+            for (let i = 0; i < pinIds.length; i += batchSize) {
+              const batch = pinIds.slice(i, i + batchSize);
+              const batchPins = await Promise.all(
+                batch.map(async (pinId: string) => {
+                  // Validate pinId is a valid ObjectID format (24 hex characters)
+                  if (!pinId || typeof pinId !== 'string' || pinId.length !== 24 || !/^[0-9a-fA-F]{24}$/.test(pinId)) {
+                    console.warn(`Invalid pin ID format: ${pinId}`, typeof pinId, pinId?.length);
+                    // Return null to filter out invalid pins
+                    return null;
+                  }
+                  
+                  try {
+                    const pinResponse = await planApi.getPinById(pinId);
+                    if (pinResponse.data) {
+                      const pinData = pinResponse.data as any;
+                      return {
+                        pin_id: pinId, // Use the pinId from the array
+                        name: pinData.name,
+                        description: pinData.description,
+                        image: pinData.image,
+                        location: pinData.location,
+                        expenses: pinData.expense || pinData.expenses,
+                        participants: pinData.participant || pinData.participants,
+                        parents: pinData.parents,
+                      } as Pin;
+                    }
+                  } catch (error: any) {
+                    console.error(`Failed to fetch pin ${pinId}:`, error);
+                    // Check if it's an auth error
+                    if (error.response?.status === 401 || error.response?.status === 403) {
+                      console.error('Authentication error when fetching pin. Token may be expired.');
+                    }
+                    // Return null to filter out failed pins
+                    return null;
+                  }
+                  // Fallback - return null
+                  return null;
+                })
+              );
+              // Filter out null values (invalid or failed pins)
+              const validPins = batchPins.filter((pin): pin is Pin => pin !== null);
+              pins.push(...validPins);
+              
+              // Small delay between batches to avoid overwhelming the server
+              if (i + batchSize < pinIds.length) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+              }
+            }
+            
+            return {
+              day: wb.day || index + 1,
+              pins: pins,
+              whiteboard_id: whiteboardIds[index] || '',
+            };
+          })
+        );
+        
         const transformedPlan: PlanWithDetails = {
           trip_id: data.trip?.trip_id || planId,
           name: data.trip?.name || '',
           description: data.trip?.description,
           image: data.trip?.image,
-          whiteboards: whiteboardsData.map((wb: any, index: number) => ({
-            day: wb.day || index + 1,
-            pins: wb.pins || [],
-            whiteboard_id: whiteboardIds[index] || '', // Store whiteboard ID
-          })),
+          whiteboards: whiteboardsWithPins,
         };
         setPlan(transformedPlan);
         if (transformedPlan.whiteboards.length > 0) {
@@ -150,24 +220,25 @@ export default function PlanDetailPage() {
   // Update start date and recalculate all days
   const updateStartDate = (day: number, month: number, year: number) => {
     const newStartDate = new Date(year, month - 1, day);
-    setStartDate(newStartDate);
     
-    if (endDate) {
-      // Ensure end date is after start date
-      if (newStartDate > endDate) {
-        const newEndDate = new Date(newStartDate);
-        newEndDate.setDate(newStartDate.getDate() + 1);
-        setEndDate(newEndDate);
-        initializeDayDates(newStartDate, newEndDate);
-      } else {
-        initializeDayDates(newStartDate, endDate);
-      }
+    if (endDate && newStartDate > endDate) {
+      // If start date is after end date, adjust end date to be start + 1 day minimum
+      const newEndDate = new Date(newStartDate);
+      newEndDate.setDate(newStartDate.getDate() + 1);
+      setEndDate(newEndDate);
+      setStartDate(newStartDate);
+      initializeDayDates(newStartDate, newEndDate);
     } else {
-      // If no end date, set it to start date + 1 day
-      const defaultEndDate = new Date(newStartDate);
-      defaultEndDate.setDate(newStartDate.getDate() + 1);
-      setEndDate(defaultEndDate);
-      initializeDayDates(newStartDate, defaultEndDate);
+      setStartDate(newStartDate);
+      if (endDate) {
+        initializeDayDates(newStartDate, endDate);
+      } else {
+        // If no end date, set it to start date + 1 day
+        const defaultEndDate = new Date(newStartDate);
+        defaultEndDate.setDate(newStartDate.getDate() + 1);
+        setEndDate(defaultEndDate);
+        initializeDayDates(newStartDate, defaultEndDate);
+      }
     }
   };
 
@@ -175,11 +246,20 @@ export default function PlanDetailPage() {
   const updateEndDate = (day: number, month: number, year: number) => {
     const newEndDate = new Date(year, month - 1, day);
     
-    // Ensure end date is after start date
+    // Ensure end date is not before start date
     if (startDate && newEndDate < startDate) {
-      // If end date is before start date, adjust start date
+      // If end date is before start date, adjust start date to be end - 1 day minimum
       const newStartDate = new Date(newEndDate);
       newStartDate.setDate(newEndDate.getDate() - 1);
+      // Ensure we don't go to a date before today (optional validation)
+      if (newStartDate < new Date(new Date().setHours(0, 0, 0, 0))) {
+        // If adjusted start would be in the past, set end to start + 1
+        const adjustedEndDate = new Date(startDate);
+        adjustedEndDate.setDate(startDate.getDate() + 1);
+        setEndDate(adjustedEndDate);
+        initializeDayDates(startDate, adjustedEndDate);
+        return;
+      }
       setStartDate(newStartDate);
       setEndDate(newEndDate);
       initializeDayDates(newStartDate, newEndDate);
@@ -241,6 +321,26 @@ export default function PlanDetailPage() {
   };
 
   const handlePinClick = async (pin: Pin) => {
+    // Validate pin has a pin_id
+    if (!pin.pin_id) {
+      console.error('Pin missing pin_id:', pin);
+      alert('Pin data is invalid. Please refresh the page.');
+      return;
+    }
+
+    // Validate pin_id format - but don't block if it's close (might be a display issue)
+    const pinIdRegex = /^[0-9a-fA-F]{24}$/;
+    if (!pinIdRegex.test(pin.pin_id)) {
+      console.warn('Pin ID format validation failed:', {
+        pin_id: pin.pin_id,
+        type: typeof pin.pin_id,
+        length: pin.pin_id?.length,
+        pin: pin
+      });
+      // Still allow clicking, but warn - the API call will fail if it's truly invalid
+      // This allows us to see what the actual value is
+    }
+
     setSelectedPin(pin);
     setViewMode('pin');
     // Optionally fetch full pin details
@@ -251,7 +351,7 @@ export default function PlanDetailPage() {
         // But backend response uses different field names, so cast to any
         const pinData = response.data as any;
         setSelectedPin({
-          pin_id: pinData.pin_id || pin.pin_id, // pinId not in response, use existing
+          pin_id: pin.pin_id, // Always use the original pin_id from the pin object
           name: pinData.name,
           description: pinData.description,
           image: pinData.image,
@@ -261,9 +361,15 @@ export default function PlanDetailPage() {
           parents: pinData.parents,
         } as Pin);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch pin details:', err);
-      // Keep the pin we already have
+      // If it's an invalid ID error, show a helpful message
+      if (err.response?.data?.message?.includes('invalid pinID') || 
+          err.response?.data?.message?.includes('ObjectID')) {
+        console.error('Invalid pin ID detected:', pin.pin_id);
+        alert(`Invalid pin ID format: ${pin.pin_id}. This pin may need to be recreated.`);
+      }
+      // Keep the pin we already have - it should have a valid pin_id
     }
   };
 
@@ -274,30 +380,63 @@ export default function PlanDetailPage() {
   };
 
   const handleAddPin = async () => {
-    try {
-      const whiteboard = getWhiteboardForDay(selectedDay);
-      if (!whiteboard) {
-        // Create whiteboard first if it doesn't exist
+    const whiteboard = getWhiteboardForDay(selectedDay);
+    if (!whiteboard) {
+      // Create whiteboard first if it doesn't exist
+      try {
         await planApi.createWhiteboard(planId, selectedDay);
+        // Add a small delay to ensure backend has processed
+        await new Promise(resolve => setTimeout(resolve, 300));
         // Refresh plan details
         await fetchPlanDetails();
+      } catch (error) {
+        console.error('Failed to create whiteboard:', error);
+        alert('Failed to create whiteboard. Please try again.');
         return;
       }
-      
-      // Get whiteboard ID from the whiteboard object
-      const whiteboardId = whiteboard.whiteboard_id;
-      if (!whiteboardId) {
-        // If whiteboard_id is not available, we need to get it from the trip
-        // For now, create a new whiteboard
-        await planApi.createWhiteboard(planId, selectedDay);
-        await fetchPlanDetails();
-        return;
-      }
-      
-      await planApi.createPin(whiteboardId, { name: 'New Pin' });
+    }
+    
+    // Verify whiteboard exists after creation
+    const updatedWhiteboard = getWhiteboardForDay(selectedDay);
+    if (!updatedWhiteboard || !updatedWhiteboard.whiteboard_id) {
+      console.error('Whiteboard not found or missing whiteboard_id');
+      alert('Whiteboard is not ready. Please try again.');
+      return;
+    }
+    
+    // Open create pin modal
+    setEditingPin(null);
+    setShowCreatePinModal(true);
+  };
+
+  const handleEditPin = (pin: Pin) => {
+    setEditingPin(pin);
+    setShowCreatePinModal(true);
+  };
+
+  const handleDeletePin = (pin: Pin) => {
+    setPinToDelete(pin);
+  };
+
+  const confirmDeletePin = async () => {
+    if (!pinToDelete || !selectedWhiteboard) return;
+
+    setIsDeletingPin(true);
+    try {
+      await planApi.deletePin(pinToDelete.pin_id, selectedWhiteboard.whiteboard_id || '');
+      // Refresh plan details to update the whiteboard
       await fetchPlanDetails();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create pin');
+      // Clear selected pin if it was deleted
+      if (selectedPin?.pin_id === pinToDelete.pin_id) {
+        setSelectedPin(null);
+        setViewMode('day');
+      }
+      setPinToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete pin:', error);
+      alert('Failed to delete pin. Please try again.');
+    } finally {
+      setIsDeletingPin(false);
     }
   };
 
@@ -318,22 +457,24 @@ export default function PlanDetailPage() {
     return colors[index % colors.length];
   };
 
-  // Calculate total days from whiteboards - use useMemo to recalculate when plan changes
+  // Calculate total days - prioritize date range when dates are set
   const calculateTotalDays = useMemo(() => {
-    // Primary: use whiteboards to determine number of days
+    // Primary: use date range if both dates are set
+    if (startDate && endDate) {
+      const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const totalDays = diffDays + 1; // Include both start and end days
+      console.log(`Calculating total days from date range: ${totalDays} (from ${startDate.toISOString()} to ${endDate.toISOString()})`);
+      return totalDays;
+    }
+    // Fallback: use whiteboards to determine number of days
     if (plan && plan.whiteboards && plan.whiteboards.length > 0) {
       const maxDay = Math.max(...plan.whiteboards.map(wb => wb.day));
       console.log(`Calculating total days from whiteboards: max day = ${maxDay}`);
       return maxDay;
     }
-    // Fallback: use date range if available
-    if (startDate && endDate) {
-      const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays + 1; // Include both start and end days
-    }
     return 1;
-  }, [plan, startDate, endDate]);
+  }, [startDate, endDate, plan]);
 
   // Generate array of day numbers from 1 to totalDays - use useMemo
   const dayTabs = useMemo(() => {
@@ -341,6 +482,110 @@ export default function PlanDetailPage() {
     console.log('Generating day tabs:', totalDays); // Debug log
     return Array.from({ length: totalDays }, (_, i) => i + 1);
   }, [calculateTotalDays]);
+
+  // Create/delete whiteboards when date range changes (only when dates actually change, not when toggling edit mode)
+  useEffect(() => {
+    if (!plan || !planId || !startDate || !endDate) {
+      return; // Don't manage whiteboards if dates aren't set
+    }
+
+    // Only manage whiteboards when in edit mode AND dates have actually changed
+    if (!isEditingDates) {
+      return; // Don't manage whiteboards when not editing
+    }
+
+    // Prevent multiple simultaneous whiteboard operations
+    if (isCreatingWhiteboardsRef.current) {
+      return;
+    }
+
+    const totalDays = calculateTotalDays;
+    const syncWhiteboards = async () => {
+      // Prevent concurrent executions
+      if (isCreatingWhiteboardsRef.current) {
+        return;
+      }
+      
+      isCreatingWhiteboardsRef.current = true;
+      
+      try {
+        // Re-fetch plan to get latest whiteboard state
+        const response = await planApi.getPlanById(planId);
+        if (!response.data) {
+          isCreatingWhiteboardsRef.current = false;
+          return;
+        }
+        
+        const data = response.data as any;
+        const whiteboardsData = data.whiteboards?.whiteboards || [];
+        const whiteboardIds = data.trip?.whiteboards || [];
+        
+        const currentWhiteboards = whiteboardsData.map((wb: any, index: number) => ({
+          day: wb.day || index + 1,
+          whiteboard_id: whiteboardIds[index] || '',
+        }));
+        
+        // Check which whiteboards exist
+        const existingDays = new Set(currentWhiteboards.map((wb: any) => wb.day));
+        
+        // Find missing days (need to create)
+        const missingDays = [];
+        for (let day = 1; day <= totalDays; day++) {
+          if (!existingDays.has(day)) {
+            missingDays.push(day);
+          }
+        }
+        
+        // Find extra days (need to delete) - whiteboards with day > totalDays
+        const extraWhiteboards = currentWhiteboards.filter((wb: any) => wb.day > totalDays);
+        
+        // Delete extra whiteboards first
+        for (const whiteboard of extraWhiteboards) {
+          if (whiteboard.whiteboard_id) {
+            try {
+              await planApi.deleteWhiteboard(whiteboard.whiteboard_id, planId);
+              console.log(`Deleted whiteboard for day ${whiteboard.day}`);
+            } catch (err) {
+              console.error(`Failed to delete whiteboard for day ${whiteboard.day}:`, err);
+              // Continue deleting other whiteboards even if one fails
+            }
+          }
+        }
+        
+        // Create missing whiteboards
+        for (const day of missingDays) {
+          try {
+            await planApi.createWhiteboard(planId, day);
+            console.log(`Created whiteboard for day ${day}`);
+          } catch (err) {
+            console.error(`Failed to create whiteboard for day ${day}:`, err);
+            // Continue creating other whiteboards even if one fails
+          }
+        }
+        
+        // Only refresh if we actually made changes
+        if (missingDays.length > 0 || extraWhiteboards.length > 0) {
+          // Refresh plan details to get updated whiteboards
+          await fetchPlanDetails();
+        }
+      } catch (err) {
+        console.error('Failed to sync whiteboards:', err);
+      } finally {
+        isCreatingWhiteboardsRef.current = false;
+      }
+    };
+
+    // Debounce to avoid creating/deleting whiteboards on every keystroke
+    // Use date timestamps to detect actual date changes
+    const timeoutId = setTimeout(() => {
+      syncWhiteboards();
+    }, 1500); // Wait 1.5 seconds after user stops typing
+
+    return () => {
+      clearTimeout(timeoutId);
+      isCreatingWhiteboardsRef.current = false;
+    };
+  }, [startDate?.getTime(), endDate?.getTime(), calculateTotalDays, planId, isEditingDates]); // Use getTime() to compare dates
 
   // Get whiteboard for a specific day
   const getWhiteboardForDay = (day: number) => {
@@ -371,6 +616,129 @@ export default function PlanDetailPage() {
   const selectedWhiteboard = getWhiteboardForDay(selectedDay);
   const selectedDayDate = getSelectedDayDate();
   const [hour, minute] = selectedDayDate.time.split(':').map(Number);
+
+  // Collect all participants from all pins in the selected day
+  const dayParticipants = useMemo(() => {
+    if (!selectedWhiteboard || !selectedWhiteboard.pins) {
+      return [];
+    }
+
+    const participantMap = new Map<string, Participant>();
+    
+    // Collect all participant IDs from all pins in the selected day
+    selectedWhiteboard.pins.forEach((pin) => {
+      if (pin.participants && Array.isArray(pin.participants)) {
+        pin.participants.forEach((participantId: string) => {
+          if (!participantMap.has(participantId)) {
+            // Try to find participant details from trip participants
+            const tripParticipant = participants.find(p => p.user_id === participantId);
+            if (tripParticipant) {
+              participantMap.set(participantId, tripParticipant);
+            } else {
+              // If not found in trip participants, create a basic entry
+              participantMap.set(participantId, {
+                user_id: participantId,
+                display_name: participantId,
+                profile: undefined,
+              });
+            }
+          }
+        });
+      }
+    });
+    
+    return Array.from(participantMap.values());
+  }, [selectedWhiteboard, participants]);
+
+  // Collect all images/photos from all pins in the selected day
+  const dayPhotos = useMemo(() => {
+    if (!selectedWhiteboard || !selectedWhiteboard.pins) {
+      return [];
+    }
+
+    const photos: string[] = [];
+    
+    selectedWhiteboard.pins.forEach((pin) => {
+      if (pin.image) {
+        let imageUrl: string;
+        if (typeof pin.image === 'string') {
+          imageUrl = pin.image.startsWith('data:') 
+            ? pin.image 
+            : `data:image/jpeg;base64,${pin.image}`;
+        } else {
+          imageUrl = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop';
+        }
+        photos.push(imageUrl);
+      }
+    });
+    
+    return photos;
+  }, [selectedWhiteboard]);
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!selectedPin || !event.target.files || event.target.files.length === 0) return;
+
+    // Validate pin_id before proceeding
+    if (!selectedPin.pin_id) {
+      alert('Pin ID is missing. Please refresh the page and try again.');
+      return;
+    }
+
+    // Validate pin_id is a valid MongoDB ObjectID format (24 hex characters)
+    const pinIdRegex = /^[0-9a-fA-F]{24}$/;
+    if (!pinIdRegex.test(selectedPin.pin_id)) {
+      console.error('Invalid pin ID format:', selectedPin.pin_id);
+      alert('Invalid pin ID. Please refresh the page and try again.');
+      return;
+    }
+
+    const file = event.target.files[0];
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Check file size (e.g., max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('Image file is too large. Please select an image smaller than 10MB.');
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      console.log('Uploading image for pin:', selectedPin.pin_id, 'File:', file.name, 'Size:', file.size);
+      await planApi.uploadPinImage(selectedPin.pin_id, file);
+      
+      // Refresh pin details to show the new image
+      await handlePinClick(selectedPin);
+      
+      // Reset file input
+      if (imageInputRef.current) {
+        imageInputRef.current.value = '';
+      }
+    } catch (error: any) {
+      console.error('Failed to upload image:', error);
+      
+      // Provide more specific error message
+      let errorMessage = 'Failed to upload image. Please try again.';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleAddImageClick = () => {
+    if (imageInputRef.current) {
+      imageInputRef.current.click();
+    }
+  };
 
   return (
     <AuthGuard>
@@ -412,7 +780,7 @@ export default function PlanDetailPage() {
             <div className="w-80 bg-amber-50 border-r-2 border-gray-300 overflow-y-auto flex-shrink-0">
               <div className="p-6 space-y-6">
                 {viewMode === 'pin' && selectedPin ? (
-                  /* Pin Details View */
+                  /* Pin Details View - Same structure as Day View */
                   <>
                     <button
                       onClick={() => setViewMode('day')}
@@ -421,44 +789,55 @@ export default function PlanDetailPage() {
                       ← Back to Day {selectedDay}
                     </button>
                     
-                    {selectedPin.image && (
-                      <div className="w-full h-64 rounded-lg overflow-hidden">
-                        <img
-                          src={typeof selectedPin.image === 'string' 
+                    {/* Main Image */}
+                    <div className="w-full h-64 rounded-lg overflow-hidden shadow-md">
+                      <img
+                        src={selectedPin.image 
+                          ? (typeof selectedPin.image === 'string' 
                             ? selectedPin.image.startsWith('data:') 
                               ? selectedPin.image 
                               : `data:image/jpeg;base64,${selectedPin.image}`
-                            : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'}
-                          alt={selectedPin.name || 'Pin'}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    
+                            : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop')
+                          : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'}
+                        alt={selectedPin.name || 'Pin'}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop';
+                        }}
+                      />
+                    </div>
+
+                    {/* Pin Name with Edit Icon */}
                     <div className="flex items-center gap-2">
                       <h1 className="text-2xl font-bold text-gray-800 flex-1">
                         {selectedPin.name || 'Unnamed Pin'}
                       </h1>
-                      <button className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors">
+                      <button 
+                        onClick={() => handleEditPin(selectedPin)}
+                        className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                      >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
                     </div>
-                    
-                    {selectedPin.description && (
-                      <div>
-                        <p className="text-gray-600 text-sm">{selectedPin.description}</p>
-                      </div>
-                    )}
-                    
+
+                    {/* Description */}
+                    <div>
+                      <p className="text-gray-600 text-sm">
+                        {selectedPin.description || 'description'}
+                      </p>
+                    </div>
+
+                    {/* Location */}
                     {selectedPin.location && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Location</label>
                         <p className="text-gray-600 text-sm">{selectedPin.location}</p>
                       </div>
                     )}
-                    
+
+                    {/* Expenses */}
                     {selectedPin.expenses && selectedPin.expenses.length > 0 && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Expenses</label>
@@ -472,6 +851,96 @@ export default function PlanDetailPage() {
                         </div>
                       </div>
                     )}
+
+                    {/* Participants - Only show in Pin view WITH add button */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                        Participate
+                      </label>
+                      <div className="flex flex-wrap gap-2 items-center">
+                        {/* Show participants from this pin */}
+                        {selectedPin.participants && selectedPin.participants.length > 0 ? (
+                          selectedPin.participants.map((participantId: string, index: number) => {
+                            const participant = participants.find(p => p.user_id === participantId) || {
+                              user_id: participantId,
+                              display_name: participantId,
+                            };
+                            return (
+                              <span
+                                key={participantId}
+                                className={`px-3 py-1.5 rounded-full text-sm font-medium ${
+                                  participant.user_id === user?.user_id
+                                    ? 'bg-purple-200 text-purple-800 border-2 border-purple-400'
+                                    : getParticipantColor(index)
+                                }`}
+                              >
+                                {participant.user_id === user?.user_id && '👤 '}
+                                {participant.display_name || participantId}
+                              </span>
+                            );
+                          })
+                        ) : (
+                          <span className="text-sm text-gray-500">No participants</span>
+                        )}
+                        <button
+                          onClick={() => setShowAddFriendModal(true)}
+                          className="w-10 h-10 rounded-full bg-blue-200 text-blue-700 flex items-center justify-center hover:bg-blue-300 transition-colors shadow-sm"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Photo & Log - Only show in Pin view WITH add button */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                        Photo & log
+                      </label>
+                      <div className="flex flex-wrap gap-3">
+                        {selectedPin.image && (
+                          <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 shadow-sm relative group">
+                            <img
+                              src={typeof selectedPin.image === 'string' 
+                                ? selectedPin.image.startsWith('data:') 
+                                  ? selectedPin.image 
+                                  : `data:image/jpeg;base64,${selectedPin.image}`
+                                : 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop'}
+                              alt="Pin photo"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop';
+                              }}
+                            />
+                          </div>
+                        )}
+                        <input
+                          ref={imageInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          disabled={isUploadingImage}
+                        />
+                        <button 
+                          onClick={handleAddImageClick}
+                          disabled={isUploadingImage}
+                          className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center hover:bg-gray-100 hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isUploadingImage ? (
+                            <svg className="animate-spin h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          ) : (
+                            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </div>
                   </>
                 ) : (
                   /* Day Details View */
@@ -494,7 +963,14 @@ export default function PlanDetailPage() {
                         {plan.name || 'Place Name'}
                       </h1>
                       <button 
-                        onClick={() => setIsEditingDates(!isEditingDates)}
+                        onClick={() => {
+                          if (isEditingDates && startDate) {
+                            // Save start date when exiting edit mode
+                            localStorage.setItem(`trip_start_date_${planId}`, startDate.toISOString().split('T')[0]);
+                            console.log(`Saved start date: ${startDate.toISOString().split('T')[0]}`);
+                          }
+                          setIsEditingDates(!isEditingDates);
+                        }}
                         className={`p-1.5 rounded transition-colors ${
                           isEditingDates 
                             ? 'text-green-600 hover:text-green-800 hover:bg-green-50' 
@@ -602,7 +1078,7 @@ export default function PlanDetailPage() {
                                 ? 'border-blue-300 bg-blue-50' 
                                 : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
                             }`}
-                            min="1"
+                            min={startDate ? startDate.getDate() : 1}
                             max="31"
                           />
                           <span className="text-gray-600">/</span>
@@ -621,7 +1097,7 @@ export default function PlanDetailPage() {
                                 ? 'border-blue-300 bg-blue-50' 
                                 : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
                             }`}
-                            min="1"
+                            min={startDate ? startDate.getMonth() + 1 : 1}
                             max="12"
                           />
                           <span className="text-gray-600">/</span>
@@ -640,10 +1116,16 @@ export default function PlanDetailPage() {
                                 ? 'border-blue-300 bg-blue-50' 
                                 : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
                             }`}
-                            min="2020"
+                            min={startDate ? startDate.getFullYear() : 2020}
                             max="2100"
                           />
                         </div>
+                        {/* Show validation message if end < start */}
+                        {startDate && endDate && endDate < startDate && (
+                          <p className="mt-1 text-xs text-red-500">
+                            End date must be after start date
+                          </p>
+                        )}
                       </div>
                       
                       {/* Debug: Show calculated days */}
@@ -665,7 +1147,19 @@ export default function PlanDetailPage() {
                                 const day = parseInt(e.target.value) || 1;
                                 const month = selectedDayDate.month;
                                 const year = selectedDayDate.year;
-                                updateStartDate(day, month, year);
+                                // Update the specific day's date, which will recalculate from start date
+                                const newDayDate = new Date(year, month - 1, day);
+                                const dayData = dayDates.get(selectedDay);
+                                if (dayData) {
+                                  const newDates = new Map(dayDates);
+                                  newDates.set(selectedDay, { ...dayData, date: newDayDate });
+                                  setDayDates(newDates);
+                                  
+                                  // If this is day 1, update start date
+                                  if (selectedDay === 1) {
+                                    updateStartDate(day, month, year);
+                                  }
+                                }
                               }}
                               disabled={!isEditingDates}
                               className={`w-12 px-2 py-1.5 text-sm border-2 rounded text-center focus:outline-none ${
@@ -684,7 +1178,18 @@ export default function PlanDetailPage() {
                                 const month = parseInt(e.target.value) || 1;
                                 const day = selectedDayDate.day;
                                 const year = selectedDayDate.year;
-                                updateStartDate(day, month, year);
+                                const newDayDate = new Date(year, month - 1, day);
+                                const dayData = dayDates.get(selectedDay);
+                                if (dayData) {
+                                  const newDates = new Map(dayDates);
+                                  newDates.set(selectedDay, { ...dayData, date: newDayDate });
+                                  setDayDates(newDates);
+                                  
+                                  // If this is day 1, update start date
+                                  if (selectedDay === 1) {
+                                    updateStartDate(day, month, year);
+                                  }
+                                }
                               }}
                               disabled={!isEditingDates}
                               className={`w-12 px-2 py-1.5 text-sm border-2 rounded text-center focus:outline-none ${
@@ -703,7 +1208,18 @@ export default function PlanDetailPage() {
                                 const year = parseInt(e.target.value) || 2026;
                                 const day = selectedDayDate.day;
                                 const month = selectedDayDate.month;
-                                updateStartDate(day, month, year);
+                                const newDayDate = new Date(year, month - 1, day);
+                                const dayData = dayDates.get(selectedDay);
+                                if (dayData) {
+                                  const newDates = new Map(dayDates);
+                                  newDates.set(selectedDay, { ...dayData, date: newDayDate });
+                                  setDayDates(newDates);
+                                  
+                                  // If this is day 1, update start date
+                                  if (selectedDay === 1) {
+                                    updateStartDate(day, month, year);
+                                  }
+                                }
                               }}
                               disabled={!isEditingDates}
                               className={`w-16 px-2 py-1.5 text-sm border-2 rounded text-center focus:outline-none ${
@@ -774,56 +1290,66 @@ export default function PlanDetailPage() {
                       </div>
                     </div>
 
-                    {/* Participants */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        Participate
-                      </label>
-                      <div className="flex flex-wrap gap-2 items-center">
-                        {participants.map((participant, index) => (
-                          <span
-                            key={participant.user_id}
-                            className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-                              participant.user_id === user?.user_id
-                                ? 'bg-purple-200 text-purple-800 border-2 border-purple-400' // Highlight owner
-                                : getParticipantColor(index)
-                            }`}
-                          >
-                            {participant.user_id === user?.user_id && '👤 '}
-                            {participant.display_name || participant.user_id}
-                          </span>
-                        ))}
-                        <button
-                          onClick={() => setShowAddFriendModal(true)}
-                          className="w-10 h-10 rounded-full bg-blue-200 text-blue-700 flex items-center justify-center hover:bg-blue-300 transition-colors shadow-sm"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Photo & Log */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        Photo & log
-                      </label>
-                      <div className="flex gap-3">
-                        <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 shadow-sm">
-                          <img
-                            src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop"
-                            alt="Photo"
-                            className="w-full h-full object-cover"
-                          />
+                    {/* Participants from all pins in this day - Read-only (no add button) */}
+                    {(dayParticipants.length > 0 || participants.length > 0) && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                          Participate
+                        </label>
+                        <div className="flex flex-wrap gap-2 items-center">
+                          {/* Show trip participants first */}
+                          {participants.map((participant, index) => (
+                            <span
+                              key={participant.user_id}
+                              className={`px-3 py-1.5 rounded-full text-sm font-medium ${
+                                participant.user_id === user?.user_id
+                                  ? 'bg-purple-200 text-purple-800 border-2 border-purple-400'
+                                  : getParticipantColor(index)
+                              }`}
+                            >
+                              {participant.user_id === user?.user_id && '👤 '}
+                              {participant.display_name || participant.user_id}
+                            </span>
+                          ))}
+                          {/* Show pin participants that aren't already in trip participants */}
+                          {dayParticipants
+                            .filter(p => !participants.some(tp => tp.user_id === p.user_id))
+                            .map((participant, index) => (
+                              <span
+                                key={participant.user_id}
+                                className={`px-3 py-1.5 rounded-full text-sm font-medium ${getParticipantColor(index + participants.length)}`}
+                              >
+                                {participant.display_name || participant.user_id}
+                              </span>
+                            ))}
+                          {/* No add button in day view */}
                         </div>
-                        <button className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center hover:bg-gray-100 hover:border-gray-400 transition-colors">
-                          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                          </svg>
-                        </button>
                       </div>
-                    </div>
+                    )}
+
+                    {/* Photos from all pins in this day - Read-only (no add button) */}
+                    {dayPhotos.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                          Photo & log
+                        </label>
+                        <div className="flex flex-wrap gap-3">
+                          {dayPhotos.map((photo, index) => (
+                            <div key={index} className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 shadow-sm">
+                              <img
+                                src={photo}
+                                alt={`Photo ${index + 1}`}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.src = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop';
+                                }}
+                              />
+                            </div>
+                          ))}
+                          {/* No add button in day view */}
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -893,7 +1419,7 @@ export default function PlanDetailPage() {
                                 </div>
                               )}
                               <div 
-                                className={`flex-1 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                                className={`flex-1 p-4 rounded-lg border-2 cursor-pointer transition-all relative ${
                                   selectedPin?.pin_id === pin.pin_id
                                     ? 'border-blue-500 bg-blue-100 shadow-md'
                                     : index === selectedWhiteboard.pins.length - 1 
@@ -902,7 +1428,7 @@ export default function PlanDetailPage() {
                                 }`}
                                 onClick={() => handlePinClick(pin)}
                               >
-                                <PinCard pin={pin} />
+                                <PinCard pin={pin} onDelete={handleDeletePin} />
                               </div>
                             </div>
                           ))}
@@ -972,6 +1498,80 @@ export default function PlanDetailPage() {
               fetchParticipants();
             }}
           />
+        )}
+
+        {showCreatePinModal && selectedWhiteboard && (
+          <CreatePinModal
+            whiteboardId={selectedWhiteboard.whiteboard_id || ''}
+            onClose={() => {
+              setShowCreatePinModal(false);
+              setEditingPin(null);
+            }}
+            onSuccess={async () => {
+              setShowCreatePinModal(false);
+              setEditingPin(null);
+              // Add a small delay to ensure backend has processed the pin creation
+              await new Promise(resolve => setTimeout(resolve, 500));
+              // Refresh plan details to show the new pin
+              await fetchPlanDetails();
+            }}
+            existingPin={editingPin}
+          />
+        )}
+
+        {/* Delete Pin Confirmation Modal */}
+        {pinToDelete && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <div className="flex items-center mb-4">
+                <div className="flex-shrink-0 mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                  <svg
+                    className="h-6 w-6 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              
+              <h3 className="text-lg font-medium text-gray-900 mb-2 text-center">
+                Delete Pin
+              </h3>
+              
+              <div className="mb-4">
+                <p className="text-sm text-gray-500 text-center">
+                  Are you sure you want to delete <span className="font-semibold text-gray-900">"{pinToDelete.name || 'this pin'}"</span>? 
+                  This action cannot be undone.
+                </p>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setPinToDelete(null)}
+                  disabled={isDeletingPin}
+                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmDeletePin}
+                  disabled={isDeletingPin}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDeletingPin ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </AuthGuard>
