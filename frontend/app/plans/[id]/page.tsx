@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { planApi } from '@/lib/api';
 import type { PlanWithDetails, Pin, Participant } from '@/lib/types';
 import { AuthGuard } from '@/components/AuthGuard';
 import { AddFriendModal } from '@/components/AddFriendModal';
-import { PinCard } from '@/components/PinCard';
 import { CreatePinModal } from '@/components/CreatePinModal';
+import { DayDetailsView } from '@/components/DayDetailsView';
+import { PinDetailsView } from '@/components/PinDetailsView';
+import { WhiteboardView } from '@/components/WhiteboardView';
+import { DayTabs } from '@/components/DayTabs';
 
 export default function PlanDetailPage() {
   const params = useParams();
@@ -34,6 +37,7 @@ export default function PlanDetailPage() {
   const [isDeletingPin, setIsDeletingPin] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const [isWhiteboardLoading, setIsWhiteboardLoading] = useState(false);
 
   useEffect(() => {
     if (planId) {
@@ -72,7 +76,20 @@ export default function PlanDetailPage() {
         const batchSize = 5; // Process 5 pins at a time
         const whiteboardsWithPins = await Promise.all(
           whiteboardsData.map(async (wb: any, index: number) => {
-            const pinIds = wb.pins || [];
+            // Handle both cases: pins as array of objects (GetPinResponse) or array of strings (pin IDs)
+            let pinIds: string[] = [];
+            if (wb.pins && Array.isArray(wb.pins)) {
+              if (wb.pins.length > 0) {
+                // Check if first element is an object (GetPinResponse) or a string (pin ID)
+                if (typeof wb.pins[0] === 'object' && wb.pins[0] !== null) {
+                  // Extract pin IDs from GetPinResponse objects
+                  pinIds = wb.pins.map((pin: any) => pin.pinId || pin.pin_id || pin.PinId || '').filter((id: string) => id);
+                } else {
+                  // Already an array of pin ID strings
+                  pinIds = wb.pins;
+                }
+              }
+            }
             
             // Process pins in batches
             const pins: Pin[] = [];
@@ -125,9 +142,13 @@ export default function PlanDetailPage() {
               }
             }
             
+            // Sort pins based on parent relationships
+            // Pins are ordered: first pin has no parent, each subsequent pin has the previous pin as parent
+            const sortedPins = sortPinsByParents(pins);
+            
             return {
               day: wb.day || index + 1,
-              pins: pins,
+              pins: sortedPins,
               whiteboard_id: whiteboardIds[index] || '',
             };
           })
@@ -414,6 +435,125 @@ export default function PlanDetailPage() {
     setShowCreatePinModal(true);
   };
 
+  // Helper function to get the last pin in the whiteboard
+  const getLastPinId = useCallback((whiteboard: ReturnType<typeof getWhiteboardForDay>): string | undefined => {
+    if (!whiteboard || !whiteboard.pins || whiteboard.pins.length === 0) {
+      return undefined;
+    }
+    // The last pin in the array is the last pin
+    return whiteboard.pins[whiteboard.pins.length - 1]?.pin_id;
+  }, []);
+
+  // Function to reorder pins and update parent relationships
+  const handlePinReorder = useCallback(async (newOrder: Pin[]) => {
+    const whiteboard = getWhiteboardForDay(selectedDay);
+    if (!whiteboard) return;
+
+    setIsWhiteboardLoading(true);
+    try {
+      // Update parent relationships based on new order
+      // Each pin's parent should be the previous pin in the order
+      const updatePromises = newOrder.map((pin, index) => {
+        const parentId = index > 0 ? newOrder[index - 1].pin_id : undefined;
+        const parents = parentId ? [parentId] : undefined;
+        
+        return planApi.updatePin(pin.pin_id, {
+          parents: parents,
+        });
+      });
+
+      await Promise.all(updatePromises);
+      
+      // Update local state with new parent relationships without showing loading
+      if (plan) {
+        const updatedPlan = { ...plan };
+        const whiteboardIndex = updatedPlan.whiteboards.findIndex(wb => wb.day === selectedDay);
+        if (whiteboardIndex !== -1) {
+          // Update pins with new parent relationships
+          const updatedPins = newOrder.map((pin, index) => ({
+            ...pin,
+            parents: index > 0 ? [newOrder[index - 1].pin_id] : undefined,
+          }));
+          
+          updatedPlan.whiteboards[whiteboardIndex] = {
+            ...updatedPlan.whiteboards[whiteboardIndex],
+            pins: updatedPins,
+          };
+          setPlan(updatedPlan);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to reorder pins:', error);
+      alert('Failed to reorder pins. Please try again.');
+      // Revert by refreshing if update fails
+      await fetchPlanDetails();
+    } finally {
+      setIsWhiteboardLoading(false);
+    }
+  }, [selectedDay, plan]);
+
+  // Drag and drop state
+  const [draggedPin, setDraggedPin] = useState<Pin | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const handleDragStart = (pin: Pin) => {
+    setDraggedPin(pin);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    setDragOverIndex(null);
+
+    if (!draggedPin) return;
+    
+    const whiteboard = getWhiteboardForDay(selectedDay);
+    if (!whiteboard) return;
+
+    const currentPins = [...whiteboard.pins];
+    const draggedIndex = currentPins.findIndex(p => p.pin_id === draggedPin.pin_id);
+
+    if (draggedIndex === -1 || draggedIndex === dropIndex) {
+      setDraggedPin(null);
+      return;
+    }
+
+    // Reorder pins array
+    const [removed] = currentPins.splice(draggedIndex, 1);
+    currentPins.splice(dropIndex, 0, removed);
+
+    // Optimistically update the plan state for immediate visual feedback
+    if (plan) {
+      const updatedPlan = { ...plan };
+      const whiteboardIndex = updatedPlan.whiteboards.findIndex(wb => wb.day === selectedDay);
+      if (whiteboardIndex !== -1) {
+        updatedPlan.whiteboards[whiteboardIndex] = {
+          ...updatedPlan.whiteboards[whiteboardIndex],
+          pins: currentPins,
+        };
+        setPlan(updatedPlan);
+      }
+    }
+
+    // Update parent relationships in the background
+    try {
+      await handlePinReorder(currentPins);
+    } catch (error) {
+      // If update fails, revert by refreshing
+      await fetchPlanDetails();
+    }
+    
+    setDraggedPin(null);
+  };
+
   const handleDeletePin = (pin: Pin) => {
     setPinToDelete(pin);
   };
@@ -422,21 +562,40 @@ export default function PlanDetailPage() {
     if (!pinToDelete || !selectedWhiteboard) return;
 
     setIsDeletingPin(true);
+    setIsWhiteboardLoading(true);
+    
+    // Optimistically remove pin from local state
+    if (plan) {
+      const updatedPlan = { ...plan };
+      const whiteboardIndex = updatedPlan.whiteboards.findIndex(wb => wb.day === selectedDay);
+      if (whiteboardIndex !== -1) {
+        updatedPlan.whiteboards[whiteboardIndex] = {
+          ...updatedPlan.whiteboards[whiteboardIndex],
+          pins: updatedPlan.whiteboards[whiteboardIndex].pins.filter(
+            p => p.pin_id !== pinToDelete.pin_id
+          ),
+        };
+        setPlan(updatedPlan);
+      }
+    }
+    
+    // Clear selected pin if it was deleted
+    if (selectedPin?.pin_id === pinToDelete.pin_id) {
+      setSelectedPin(null);
+      setViewMode('day');
+    }
+    
     try {
       await planApi.deletePin(pinToDelete.pin_id, selectedWhiteboard.whiteboard_id || '');
-      // Refresh plan details to update the whiteboard
-      await fetchPlanDetails();
-      // Clear selected pin if it was deleted
-      if (selectedPin?.pin_id === pinToDelete.pin_id) {
-        setSelectedPin(null);
-        setViewMode('day');
-      }
       setPinToDelete(null);
     } catch (error) {
       console.error('Failed to delete pin:', error);
       alert('Failed to delete pin. Please try again.');
+      // Revert by refreshing if delete fails
+      await fetchPlanDetails();
     } finally {
       setIsDeletingPin(false);
+      setIsWhiteboardLoading(false);
     }
   };
 
@@ -740,6 +899,57 @@ export default function PlanDetailPage() {
     }
   };
 
+  // Helper function to sort pins based on parent relationships
+  const sortPinsByParents = (pins: Pin[]): Pin[] => {
+    if (pins.length <= 1) return pins;
+    
+    // Create a map of pin_id -> pin for quick lookup
+    const pinMap = new Map<string, Pin>();
+    pins.forEach(pin => {
+      pinMap.set(pin.pin_id, pin);
+    });
+    
+    // Find the root pin (pin with no parents or empty parents array)
+    const rootPin = pins.find(pin => 
+      !pin.parents || pin.parents.length === 0
+    );
+    
+    if (!rootPin) {
+      // If no root pin found, return original order
+      console.warn('No root pin found, returning original order');
+      return pins;
+    }
+    
+    // Build ordered array by following parent chain
+    const ordered: Pin[] = [rootPin];
+    const visited = new Set<string>([rootPin.pin_id]);
+    
+    // Follow the chain: each pin's parent should be the previous pin
+    let currentPin = rootPin;
+    while (ordered.length < pins.length) {
+      // Find the next pin that has currentPin as parent
+      const nextPin = pins.find(pin => 
+        !visited.has(pin.pin_id) && 
+        pin.parents && 
+        pin.parents.length > 0 && 
+        pin.parents[0] === currentPin.pin_id
+      );
+      
+      if (!nextPin) {
+        // No more pins in chain, add remaining pins
+        const remaining = pins.filter(pin => !visited.has(pin.pin_id));
+        ordered.push(...remaining);
+        break;
+      }
+      
+      ordered.push(nextPin);
+      visited.add(nextPin.pin_id);
+      currentPin = nextPin;
+    }
+    
+    return ordered;
+  };
+
   return (
     <AuthGuard>
       <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -776,673 +986,86 @@ export default function PlanDetailPage() {
           </div>
         ) : plan ? (
           <div className="flex-1 flex overflow-hidden">
-            {/* PART 1: Left Sidebar - Shows Day Details or Pin Details */}
+            {/* PART 1: Left Sidebar */}
             <div className="w-80 bg-amber-50 border-r-2 border-gray-300 overflow-y-auto flex-shrink-0">
               <div className="p-6 space-y-6">
                 {viewMode === 'pin' && selectedPin ? (
-                  /* Pin Details View - Same structure as Day View */
-                  <>
-                    <button
-                      onClick={() => setViewMode('day')}
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-4"
-                    >
-                      ← Back to Day {selectedDay}
-                    </button>
-                    
-                    {/* Main Image */}
-                    <div className="w-full h-64 rounded-lg overflow-hidden shadow-md">
-                      <img
-                        src={selectedPin.image 
-                          ? (typeof selectedPin.image === 'string' 
-                            ? selectedPin.image.startsWith('data:') 
-                              ? selectedPin.image 
-                              : `data:image/jpeg;base64,${selectedPin.image}`
-                            : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop')
-                          : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'}
-                        alt={selectedPin.name || 'Pin'}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop';
-                        }}
-                      />
-                    </div>
-
-                    {/* Pin Name with Edit Icon */}
-                    <div className="flex items-center gap-2">
-                      <h1 className="text-2xl font-bold text-gray-800 flex-1">
-                        {selectedPin.name || 'Unnamed Pin'}
-                      </h1>
-                      <button 
-                        onClick={() => handleEditPin(selectedPin)}
-                        className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    {/* Description */}
-                    <div>
-                      <p className="text-gray-600 text-sm">
-                        {selectedPin.description || 'description'}
-                      </p>
-                    </div>
-
-                    {/* Location */}
-                    {selectedPin.location && (
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Location</label>
-                        <p className="text-gray-600 text-sm">{selectedPin.location}</p>
-                      </div>
-                    )}
-
-                    {/* Expenses */}
-                    {selectedPin.expenses && selectedPin.expenses.length > 0 && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Expenses</label>
-                        <div className="space-y-2">
-                          {selectedPin.expenses.map((expense, idx) => (
-                            <div key={idx} className="flex justify-between text-sm">
-                              <span className="text-gray-700">{expense.name}</span>
-                              <span className="text-gray-600">${expense.expense?.toFixed(2)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Participants - Only show in Pin view WITH add button */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        Participate
-                      </label>
-                      <div className="flex flex-wrap gap-2 items-center">
-                        {/* Show participants from this pin */}
-                        {selectedPin.participants && selectedPin.participants.length > 0 ? (
-                          selectedPin.participants.map((participantId: string, index: number) => {
-                            const participant = participants.find(p => p.user_id === participantId) || {
-                              user_id: participantId,
-                              display_name: participantId,
-                            };
-                            return (
-                              <span
-                                key={participantId}
-                                className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-                                  participant.user_id === user?.user_id
-                                    ? 'bg-purple-200 text-purple-800 border-2 border-purple-400'
-                                    : getParticipantColor(index)
-                                }`}
-                              >
-                                {participant.user_id === user?.user_id && '👤 '}
-                                {participant.display_name || participantId}
-                              </span>
-                            );
-                          })
-                        ) : (
-                          <span className="text-sm text-gray-500">No participants</span>
-                        )}
-                        <button
-                          onClick={() => setShowAddFriendModal(true)}
-                          className="w-10 h-10 rounded-full bg-blue-200 text-blue-700 flex items-center justify-center hover:bg-blue-300 transition-colors shadow-sm"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Photo & Log - Only show in Pin view WITH add button */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        Photo & log
-                      </label>
-                      <div className="flex flex-wrap gap-3">
-                        {selectedPin.image && (
-                          <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 shadow-sm relative group">
-                            <img
-                              src={typeof selectedPin.image === 'string' 
-                                ? selectedPin.image.startsWith('data:') 
-                                  ? selectedPin.image 
-                                  : `data:image/jpeg;base64,${selectedPin.image}`
-                                : 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop'}
-                              alt="Pin photo"
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.currentTarget.src = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop';
-                              }}
-                            />
-                          </div>
-                        )}
-                        <input
-                          ref={imageInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                          disabled={isUploadingImage}
-                        />
-                        <button 
-                          onClick={handleAddImageClick}
-                          disabled={isUploadingImage}
-                          className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center hover:bg-gray-100 hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isUploadingImage ? (
-                            <svg className="animate-spin h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                          ) : (
-                            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </>
+                  <PinDetailsView
+                    selectedPin={selectedPin}
+                    selectedDay={selectedDay}
+                    participants={participants}
+                    user={user}
+                    getParticipantColor={getParticipantColor}
+                    onBack={() => setViewMode('day')}
+                    onEdit={handleEditPin}
+                    onAddFriend={() => setShowAddFriendModal(true)}
+                    onImageUpload={handleImageUpload}
+                    imageInputRef={imageInputRef}
+                    isUploadingImage={isUploadingImage}
+                  />
                 ) : (
-                  /* Day Details View */
-                  <>
-                    {/* Main Image */}
-                    <div className="w-full h-64 rounded-lg overflow-hidden shadow-md">
-                      <img
-                        src={getImageSrc()}
-                        alt={plan.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop';
-                        }}
-                      />
-                    </div>
-
-                    {/* Place Name with Edit Icon */}
-                    <div className="flex items-center gap-2">
-                      <h1 className="text-2xl font-bold text-gray-800 flex-1">
-                        {plan.name || 'Place Name'}
-                      </h1>
-                      <button 
-                        onClick={() => {
-                          if (isEditingDates && startDate) {
-                            // Save start date when exiting edit mode
-                            localStorage.setItem(`trip_start_date_${planId}`, startDate.toISOString().split('T')[0]);
-                            console.log(`Saved start date: ${startDate.toISOString().split('T')[0]}`);
-                          }
-                          setIsEditingDates(!isEditingDates);
-                        }}
-                        className={`p-1.5 rounded transition-colors ${
-                          isEditingDates 
-                            ? 'text-green-600 hover:text-green-800 hover:bg-green-50' 
-                            : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
-                        }`}
-                        title={isEditingDates ? 'Save changes' : 'Edit dates'}
-                      >
-                        {isEditingDates ? (
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        ) : (
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-
-                    {/* Description */}
-                    <div>
-                      <p className="text-gray-600 text-sm">
-                        {plan.description || 'description'}
-                      </p>
-                    </div>
-
-                    {/* Date Range Inputs */}
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Start Date</label>
-                        <div className="flex gap-1 items-center">
-                          <input
-                            type="number"
-                            value={startDate ? startDate.getDate() : 1}
-                            onChange={(e) => {
-                              const day = parseInt(e.target.value) || 1;
-                              const month = startDate ? startDate.getMonth() + 1 : 1;
-                              const year = startDate ? startDate.getFullYear() : 2026;
-                              updateStartDate(day, month, year);
-                            }}
-                            disabled={!isEditingDates}
-                            className={`w-12 px-2 py-1.5 text-sm border-2 rounded text-center ${
-                              isEditingDates 
-                                ? 'border-blue-300 bg-blue-50' 
-                                : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
-                            }`}
-                            min="1"
-                            max="31"
-                          />
-                          <span className="text-gray-600">/</span>
-                          <input
-                            type="number"
-                            value={startDate ? startDate.getMonth() + 1 : 1}
-                            onChange={(e) => {
-                              const month = parseInt(e.target.value) || 1;
-                              const day = startDate ? startDate.getDate() : 1;
-                              const year = startDate ? startDate.getFullYear() : 2026;
-                              updateStartDate(day, month, year);
-                            }}
-                            disabled={!isEditingDates}
-                            className={`w-12 px-2 py-1.5 text-sm border-2 rounded text-center ${
-                              isEditingDates 
-                                ? 'border-blue-300 bg-blue-50' 
-                                : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
-                            }`}
-                            min="1"
-                            max="12"
-                          />
-                          <span className="text-gray-600">/</span>
-                          <input
-                            type="number"
-                            value={startDate ? startDate.getFullYear() : 2026}
-                            onChange={(e) => {
-                              const year = parseInt(e.target.value) || 2026;
-                              const day = startDate ? startDate.getDate() : 1;
-                              const month = startDate ? startDate.getMonth() + 1 : 1;
-                              updateStartDate(day, month, year);
-                            }}
-                            disabled={!isEditingDates}
-                            className={`w-16 px-2 py-1.5 text-sm border-2 rounded text-center ${
-                              isEditingDates 
-                                ? 'border-blue-300 bg-blue-50' 
-                                : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
-                            }`}
-                            min="2020"
-                            max="2100"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">End Date</label>
-                        <div className="flex gap-1 items-center">
-                          <input
-                            type="number"
-                            value={endDate ? endDate.getDate() : 1}
-                            onChange={(e) => {
-                              const day = parseInt(e.target.value) || 1;
-                              const month = endDate ? endDate.getMonth() + 1 : 1;
-                              const year = endDate ? endDate.getFullYear() : 2026;
-                              updateEndDate(day, month, year);
-                            }}
-                            disabled={!isEditingDates}
-                            className={`w-12 px-2 py-1.5 text-sm border-2 rounded text-center ${
-                              isEditingDates 
-                                ? 'border-blue-300 bg-blue-50' 
-                                : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
-                            }`}
-                            min={startDate ? startDate.getDate() : 1}
-                            max="31"
-                          />
-                          <span className="text-gray-600">/</span>
-                          <input
-                            type="number"
-                            value={endDate ? endDate.getMonth() + 1 : 1}
-                            onChange={(e) => {
-                              const month = parseInt(e.target.value) || 1;
-                              const day = endDate ? endDate.getDate() : 1;
-                              const year = endDate ? endDate.getFullYear() : 2026;
-                              updateEndDate(day, month, year);
-                            }}
-                            disabled={!isEditingDates}
-                            className={`w-12 px-2 py-1.5 text-sm border-2 rounded text-center ${
-                              isEditingDates 
-                                ? 'border-blue-300 bg-blue-50' 
-                                : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
-                            }`}
-                            min={startDate ? startDate.getMonth() + 1 : 1}
-                            max="12"
-                          />
-                          <span className="text-gray-600">/</span>
-                          <input
-                            type="number"
-                            value={endDate ? endDate.getFullYear() : 2026}
-                            onChange={(e) => {
-                              const year = parseInt(e.target.value) || 2026;
-                              const day = endDate ? endDate.getDate() : 1;
-                              const month = endDate ? endDate.getMonth() + 1 : 1;
-                              updateEndDate(day, month, year);
-                            }}
-                            disabled={!isEditingDates}
-                            className={`w-16 px-2 py-1.5 text-sm border-2 rounded text-center ${
-                              isEditingDates 
-                                ? 'border-blue-300 bg-blue-50' 
-                                : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
-                            }`}
-                            min={startDate ? startDate.getFullYear() : 2020}
-                            max="2100"
-                          />
-                        </div>
-                        {/* Show validation message if end < start */}
-                        {startDate && endDate && endDate < startDate && (
-                          <p className="mt-1 text-xs text-red-500">
-                            End date must be after start date
-                          </p>
-                        )}
-                      </div>
-                      
-                      {/* Debug: Show calculated days */}
-                      {startDate && endDate && (
-                        <div className="text-xs text-gray-500 pt-2 border-t border-gray-200">
-                          Total days: {calculateTotalDays} (from {startDate.toLocaleDateString()} to {endDate.toLocaleDateString()})
-                        </div>
-                      )}
-                      
-                      {/* Selected Day Date & Time */}
-                      <div className="pt-3 border-t border-gray-300">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-sm font-medium text-gray-700">Day {selectedDay} :</span>
-                          <div className="flex gap-1 items-center">
-                            <input
-                              type="number"
-                              value={selectedDayDate.day}
-                              onChange={(e) => {
-                                const day = parseInt(e.target.value) || 1;
-                                const month = selectedDayDate.month;
-                                const year = selectedDayDate.year;
-                                // Update the specific day's date, which will recalculate from start date
-                                const newDayDate = new Date(year, month - 1, day);
-                                const dayData = dayDates.get(selectedDay);
-                                if (dayData) {
-                                  const newDates = new Map(dayDates);
-                                  newDates.set(selectedDay, { ...dayData, date: newDayDate });
-                                  setDayDates(newDates);
-                                  
-                                  // If this is day 1, update start date
-                                  if (selectedDay === 1) {
-                                    updateStartDate(day, month, year);
-                                  }
-                                }
-                              }}
-                              disabled={!isEditingDates}
-                              className={`w-12 px-2 py-1.5 text-sm border-2 rounded text-center focus:outline-none ${
-                                isEditingDates 
-                                  ? 'border-blue-300 bg-blue-50 focus:border-blue-500' 
-                                  : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
-                              }`}
-                              min="1"
-                              max="31"
-                            />
-                            <span className="text-gray-600">/</span>
-                            <input
-                              type="number"
-                              value={selectedDayDate.month}
-                              onChange={(e) => {
-                                const month = parseInt(e.target.value) || 1;
-                                const day = selectedDayDate.day;
-                                const year = selectedDayDate.year;
-                                const newDayDate = new Date(year, month - 1, day);
-                                const dayData = dayDates.get(selectedDay);
-                                if (dayData) {
-                                  const newDates = new Map(dayDates);
-                                  newDates.set(selectedDay, { ...dayData, date: newDayDate });
-                                  setDayDates(newDates);
-                                  
-                                  // If this is day 1, update start date
-                                  if (selectedDay === 1) {
-                                    updateStartDate(day, month, year);
-                                  }
-                                }
-                              }}
-                              disabled={!isEditingDates}
-                              className={`w-12 px-2 py-1.5 text-sm border-2 rounded text-center focus:outline-none ${
-                                isEditingDates 
-                                  ? 'border-blue-300 bg-blue-50 focus:border-blue-500' 
-                                  : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
-                              }`}
-                              min="1"
-                              max="12"
-                            />
-                            <span className="text-gray-600">/</span>
-                            <input
-                              type="number"
-                              value={selectedDayDate.year}
-                              onChange={(e) => {
-                                const year = parseInt(e.target.value) || 2026;
-                                const day = selectedDayDate.day;
-                                const month = selectedDayDate.month;
-                                const newDayDate = new Date(year, month - 1, day);
-                                const dayData = dayDates.get(selectedDay);
-                                if (dayData) {
-                                  const newDates = new Map(dayDates);
-                                  newDates.set(selectedDay, { ...dayData, date: newDayDate });
-                                  setDayDates(newDates);
-                                  
-                                  // If this is day 1, update start date
-                                  if (selectedDay === 1) {
-                                    updateStartDate(day, month, year);
-                                  }
-                                }
-                              }}
-                              disabled={!isEditingDates}
-                              className={`w-16 px-2 py-1.5 text-sm border-2 rounded text-center focus:outline-none ${
-                                isEditingDates 
-                                  ? 'border-blue-300 bg-blue-50 focus:border-blue-500' 
-                                  : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
-                              }`}
-                              min="2020"
-                              max="2100"
-                            />
-                          </div>
-                        </div>
-                        {/* Only show time input when viewing a pin, not when viewing day details */}
-                        {viewMode === 'pin' && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-700">Day {selectedDay} :</span>
-                            <div className="flex gap-1 items-center">
-                              <input
-                                type="number"
-                                value={hour}
-                                onChange={(e) => {
-                                  const newHour = parseInt(e.target.value) || 0;
-                                  const dayData = dayDates.get(selectedDay);
-                                  if (dayData) {
-                                    const [_, min] = dayData.time.split(':').map(Number);
-                                    const newTime = `${newHour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
-                                    const newDates = new Map(dayDates);
-                                    newDates.set(selectedDay, { ...dayData, time: newTime });
-                                    setDayDates(newDates);
-                                  }
-                                }}
-                                disabled={!isEditingDates}
-                                className={`w-12 px-2 py-1.5 text-sm border-2 rounded text-center focus:outline-none ${
-                                  isEditingDates 
-                                    ? 'border-blue-300 bg-blue-50 focus:border-blue-500' 
-                                    : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
-                                }`}
-                                min="0"
-                                max="23"
-                              />
-                              <span className="text-gray-600">:</span>
-                              <input
-                                type="number"
-                                value={minute}
-                                onChange={(e) => {
-                                  const newMinute = parseInt(e.target.value) || 0;
-                                  const dayData = dayDates.get(selectedDay);
-                                  if (dayData) {
-                                    const [hr] = dayData.time.split(':').map(Number);
-                                    const newTime = `${hr.toString().padStart(2, '0')}:${newMinute.toString().padStart(2, '0')}`;
-                                    const newDates = new Map(dayDates);
-                                    newDates.set(selectedDay, { ...dayData, time: newTime });
-                                    setDayDates(newDates);
-                                  }
-                                }}
-                                disabled={!isEditingDates}
-                                className={`w-12 px-2 py-1.5 text-sm border-2 rounded text-center focus:outline-none ${
-                                  isEditingDates 
-                                    ? 'border-blue-300 bg-blue-50 focus:border-blue-500' 
-                                    : 'border-gray-200 bg-gray-100 text-gray-600 cursor-not-allowed'
-                                }`}
-                                min="0"
-                                max="59"
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Participants from all pins in this day - Read-only (no add button) */}
-                    {(dayParticipants.length > 0 || participants.length > 0) && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
-                          Participate
-                        </label>
-                        <div className="flex flex-wrap gap-2 items-center">
-                          {/* Show trip participants first */}
-                          {participants.map((participant, index) => (
-                            <span
-                              key={participant.user_id}
-                              className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-                                participant.user_id === user?.user_id
-                                  ? 'bg-purple-200 text-purple-800 border-2 border-purple-400'
-                                  : getParticipantColor(index)
-                              }`}
-                            >
-                              {participant.user_id === user?.user_id && '👤 '}
-                              {participant.display_name || participant.user_id}
-                            </span>
-                          ))}
-                          {/* Show pin participants that aren't already in trip participants */}
-                          {dayParticipants
-                            .filter(p => !participants.some(tp => tp.user_id === p.user_id))
-                            .map((participant, index) => (
-                              <span
-                                key={participant.user_id}
-                                className={`px-3 py-1.5 rounded-full text-sm font-medium ${getParticipantColor(index + participants.length)}`}
-                              >
-                                {participant.display_name || participant.user_id}
-                              </span>
-                            ))}
-                          {/* No add button in day view */}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Photos from all pins in this day - Read-only (no add button) */}
-                    {dayPhotos.length > 0 && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
-                          Photo & log
-                        </label>
-                        <div className="flex flex-wrap gap-3">
-                          {dayPhotos.map((photo, index) => (
-                            <div key={index} className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 shadow-sm">
-                              <img
-                                src={photo}
-                                alt={`Photo ${index + 1}`}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  e.currentTarget.src = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop';
-                                }}
-                              />
-                            </div>
-                          ))}
-                          {/* No add button in day view */}
-                        </div>
-                      </div>
-                    )}
-                  </>
+                  <DayDetailsView
+                    plan={plan}
+                    selectedDay={selectedDay}
+                    startDate={startDate}
+                    endDate={endDate}
+                    dayDates={dayDates}
+                    isEditingDates={isEditingDates}
+                    participants={participants}
+                    dayParticipants={dayParticipants}
+                    dayPhotos={dayPhotos}
+                    user={user}
+                    getParticipantColor={getParticipantColor}
+                    getImageSrc={getImageSrc}
+                    updateStartDate={updateStartDate}
+                    updateEndDate={updateEndDate}
+                    getSelectedDayDate={getSelectedDayDate}
+                    setIsEditingDates={setIsEditingDates}
+                    planId={planId}
+                  />
                 )}
               </div>
             </div>
 
-            {/* PART 2: Right Column - Whiteboard (top) and Map (bottom) */}
+            {/* PART 2: Right Column */}
             <div className="flex-1 flex flex-col overflow-hidden">
-              {/* Whiteboard Section */}
               <div className="flex-1 flex flex-col bg-white overflow-hidden">
-                {/* Day Tabs */}
-                <div className="border-b-2 border-gray-200 bg-white flex-shrink-0">
-                  <div className="flex gap-1 px-4 py-3 overflow-x-auto">
-                    {dayTabs.map((day) => {
-                      const hasWhiteboard = !!getWhiteboardForDay(day);
-                      return (
-                        <button
-                          key={day}
-                          onClick={() => handleDayClick(day)}
-                          className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap border-2 ${
-                            selectedDay === day
-                              ? 'bg-green-100 text-green-800 border-black shadow-sm'
-                              : hasWhiteboard
-                              ? 'text-gray-700 hover:bg-gray-50 border-transparent'
-                              : 'text-gray-400 hover:bg-gray-50 border-transparent'
-                          }`}
-                        >
-                          Day {day}
-                          {selectedDay === day && (
-                            <svg className="w-4 h-4 inline-block ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                <DayTabs
+                  days={dayTabs}
+                  selectedDay={selectedDay}
+                  onDayClick={handleDayClick}
+                  hasWhiteboard={(day) => !!getWhiteboardForDay(day)}
+                />
 
                 {/* Whiteboard Content */}
-                <div className="flex-1 p-6 overflow-y-auto bg-white border-l-4 border-green-200">
+                <div className="flex-1 p-6 overflow-y-auto bg-white border-l-4 border-green-200 relative">
+                  {isWhiteboardLoading && (
+                    <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+                      <div className="flex flex-col items-center">
+                        <svg className="animate-spin h-8 w-8 text-blue-600 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p className="text-sm text-gray-600">Updating...</p>
+                      </div>
+                    </div>
+                  )}
                   {selectedWhiteboard ? (
                     <div className="space-y-4">
-                      {selectedWhiteboard.pins.length === 0 ? (
-                        <div className="flex items-center justify-center h-full min-h-[200px]">
-                          <div className="text-center">
-                            <div className="w-24 h-24 rounded-lg border-2 border-blue-300 bg-blue-50 flex items-center justify-center mx-auto mb-4">
-                              <p className="text-blue-600 font-medium">Unnamed Pin</p>
-                            </div>
-                            <p className="text-gray-500 mb-4">No pins for Day {selectedDay}</p>
-                            <button
-                              onClick={handleAddPin}
-                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                            >
-                              + Add Pin
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          {selectedWhiteboard.pins.map((pin, index) => (
-                            <div key={pin.pin_id} className="flex items-start gap-4">
-                              {index > 0 && (
-                                <div className="flex flex-col items-center pt-2">
-                                  <div className="w-0.5 h-8 bg-gray-300"></div>
-                                  <div className="w-3 h-3 border-2 border-gray-300 rounded-full bg-white"></div>
-                                  <div className="w-0.5 h-8 bg-gray-300"></div>
-                                </div>
-                              )}
-                              <div 
-                                className={`flex-1 p-4 rounded-lg border-2 cursor-pointer transition-all relative ${
-                                  selectedPin?.pin_id === pin.pin_id
-                                    ? 'border-blue-500 bg-blue-100 shadow-md'
-                                    : index === selectedWhiteboard.pins.length - 1 
-                                    ? 'border-blue-400 bg-blue-50 shadow-sm hover:border-blue-500'
-                                    : 'border-gray-200 bg-gray-50 hover:border-gray-300'
-                                }`}
-                                onClick={() => handlePinClick(pin)}
-                              >
-                                <PinCard pin={pin} onDelete={handleDeletePin} />
-                              </div>
-                            </div>
-                          ))}
-                          <button
-                            onClick={handleAddPin}
-                            className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 hover:border-gray-400 transition-colors flex items-center justify-center gap-2 text-gray-600"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                            <span className="font-medium">Add Pin</span>
-                          </button>
-                        </>
-                      )}
+                      <WhiteboardView
+                        pins={selectedWhiteboard.pins}
+                        selectedPin={selectedPin}
+                        selectedDay={selectedDay}
+                        draggedPin={draggedPin}
+                        dragOverIndex={dragOverIndex}
+                        onPinClick={handlePinClick}
+                        onDeletePin={handleDeletePin}
+                        onAddPin={handleAddPin}
+                        onDragStart={handleDragStart}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                      />
                     </div>
                   ) : (
                     <div className="flex items-center justify-center h-full">
@@ -1463,7 +1086,7 @@ export default function PlanDetailPage() {
                 </div>
               </div>
 
-              {/* Map Section */}
+              {/* Map Section - keep as is */}
               <div className="h-64 bg-blue-900 flex-shrink-0 border-t-4 border-blue-800">
                 <div className="flex-1 flex items-center justify-between px-8 py-6 h-full">
                   <h2 className="text-5xl font-bold text-white">location</h2>
@@ -1503,17 +1126,120 @@ export default function PlanDetailPage() {
         {showCreatePinModal && selectedWhiteboard && (
           <CreatePinModal
             whiteboardId={selectedWhiteboard.whiteboard_id || ''}
+            lastPinId={getLastPinId(selectedWhiteboard)}
             onClose={() => {
               setShowCreatePinModal(false);
               setEditingPin(null);
             }}
             onSuccess={async () => {
               setShowCreatePinModal(false);
+              const wasEditing = !!editingPin;
+              const editedPinId = editingPin?.pin_id;
               setEditingPin(null);
-              // Add a small delay to ensure backend has processed the pin creation
-              await new Promise(resolve => setTimeout(resolve, 500));
-              // Refresh plan details to show the new pin
-              await fetchPlanDetails();
+              
+              setIsWhiteboardLoading(true);
+              
+              if (wasEditing && editedPinId) {
+                // For edits, just refresh the specific pin
+                try {
+                  const response = await planApi.getPinById(editedPinId);
+                  if (response.data) {
+                    const pinData = response.data as any;
+                    const updatedPin = {
+                      pin_id: editedPinId,
+                      name: pinData.name,
+                      description: pinData.description,
+                      image: pinData.image,
+                      location: pinData.location,
+                      expenses: pinData.expense || pinData.expenses,
+                      participants: pinData.participant || pinData.participants,
+                      parents: pinData.parents,
+                    } as Pin;
+                    
+                    // Update local state
+                    if (plan) {
+                      const updatedPlan = { ...plan };
+                      const whiteboardIndex = updatedPlan.whiteboards.findIndex(wb => wb.day === selectedDay);
+                      if (whiteboardIndex !== -1) {
+                        const pinIndex = updatedPlan.whiteboards[whiteboardIndex].pins.findIndex(
+                          p => p.pin_id === editedPinId
+                        );
+                        if (pinIndex !== -1) {
+                          updatedPlan.whiteboards[whiteboardIndex].pins[pinIndex] = updatedPin;
+                          setPlan(updatedPlan);
+                        }
+                      }
+                    }
+                    
+                    // Update selectedPin if viewing this pin
+                    if (selectedPin?.pin_id === editedPinId) {
+                      setSelectedPin(updatedPin);
+                    }
+                  }
+                } catch (err) {
+                  console.error('Failed to refresh edited pin:', err);
+                  // Fallback to full refresh
+                  await fetchPlanDetails();
+                }
+              } else {
+                // For new pins, fetch the created pin and add it to local state
+                try {
+                  // Wait a bit for backend to process
+                  await new Promise(resolve => setTimeout(resolve, 300));
+                  
+                  // Fetch the latest whiteboard to get the new pin
+                  const response = await planApi.getPlanById(planId);
+                  if (response.data) {
+                    const data = response.data as any;
+                    const whiteboardsData = data.whiteboards?.whiteboards || [];
+                    const whiteboardIds = data.trip?.whiteboards || [];
+                    const currentWhiteboardData = whiteboardsData.find((wb: any) => wb.day === selectedDay);
+                    
+                    if (currentWhiteboardData) {
+                      const pinIds = currentWhiteboardData.pins || [];
+                      // Get the last pin ID (the newly created one)
+                      const newPinId = pinIds[pinIds.length - 1];
+                      
+                      if (newPinId) {
+                        // Fetch the new pin details
+                        const pinResponse = await planApi.getPinById(newPinId);
+                        if (pinResponse.data) {
+                          const pinData = pinResponse.data as any;
+                          const newPin = {
+                            pin_id: newPinId,
+                            name: pinData.name,
+                            description: pinData.description,
+                            image: pinData.image,
+                            location: pinData.location,
+                            expenses: pinData.expense || pinData.expenses,
+                            participants: pinData.participant || pinData.participants,
+                            parents: pinData.parents,
+                          } as Pin;
+                          
+                          // Update local state - add new pin to the end
+                          if (plan) {
+                            const updatedPlan = { ...plan };
+                            const whiteboardIndex = updatedPlan.whiteboards.findIndex(wb => wb.day === selectedDay);
+                            if (whiteboardIndex !== -1) {
+                              updatedPlan.whiteboards[whiteboardIndex] = {
+                                ...updatedPlan.whiteboards[whiteboardIndex],
+                                pins: [...updatedPlan.whiteboards[whiteboardIndex].pins, newPin],
+                              };
+                              setPlan(updatedPlan);
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                } catch (err) {
+                  console.error('Failed to fetch new pin:', err);
+                  // Fallback to full refresh
+                  await fetchPlanDetails();
+                }
+              }
+              
+              setIsWhiteboardLoading(false);
             }}
             existingPin={editingPin}
           />

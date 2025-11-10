@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { planApi } from '@/lib/api';
+import { planApi, authApi } from '@/lib/api';
 
 interface AddFriendModalProps {
   planId: string;
@@ -41,44 +41,79 @@ export function AddFriendModal({ planId, onClose, onSuccess }: AddFriendModalPro
         return;
       }
 
-      // TODO: Convert emails to user IDs
-      // For now, we'll need to add a backend API endpoint to get user IDs from emails
-      // Or modify the backend to accept emails directly
-      // For now, assuming we have an API to get user by email
-      // This is a placeholder - you'll need to implement getUserByEmail API
+      // Convert emails to user IDs
       const userIdArray: string[] = [];
+      const notFoundEmails: string[] = [];
+      
       for (const email of emailArray) {
         try {
-          // This would need a new API endpoint: getUserByEmail
-          // For now, we'll need to add this to the backend
-          // const user = await authApi.getUserByEmail(email);
-          // userIdArray.push(user.user_id);
+          console.log(`Looking up user with email: ${email}`);
+          const user = await authApi.getUserByEmail(email);
+          console.log(`User found:`, user);
           
-          // Temporary: If backend accepts emails, we can modify AddFriendRequest
-          // For now, showing error that this needs backend support
-          setError('Email lookup not yet implemented. Please use user IDs for now, or add getUserByEmail API endpoint.');
-          setLoading(false);
-          return;
+          // Handle different response formats
+          const userId = user?.user_id || (user as any)?.userId || (user as any)?.UserID;
+          
+          if (userId) {
+            userIdArray.push(userId);
+            console.log(`Added user ID: ${userId} for email: ${email}`);
+          } else {
+            console.warn(`User found but no user_id field:`, user);
+            notFoundEmails.push(email);
+          }
         } catch (err: any) {
-          setError(`User not found for email: ${email}`);
-          setLoading(false);
-          return;
+          console.error(`Failed to find user for email ${email}:`, err);
+          console.error('Error details:', {
+            message: err.message,
+            response: err.response?.data,
+            status: err.response?.status,
+          });
+          
+          // Check if it's a 404 or user not found
+          if (err.response?.status === 404 || err.response?.status === 400) {
+            notFoundEmails.push(email);
+          } else {
+            // For other errors, show the actual error message
+            setError(`Error looking up ${email}: ${err.response?.data?.message || err.message}`);
+            setLoading(false);
+            return;
+          }
         }
       }
 
+      // Check if we found any users
       if (userIdArray.length === 0) {
-        setError('No valid users found');
+        setError(`No users found for the provided email${emailArray.length > 1 ? 's' : ''}. Please make sure the users are registered.`);
         setLoading(false);
         return;
       }
 
+      // Show warning if some emails weren't found
+      if (notFoundEmails.length > 0 && userIdArray.length > 0) {
+        setError(`Warning: Could not find users for: ${notFoundEmails.join(', ')}. Adding the users that were found.`);
+        // Continue with adding the found users
+      }
+
+      // Add friends to plan
+      console.log('Adding friends to plan:', { user_ids: userIdArray, trip_id: planId });
       await planApi.addFriendsToPlan({
         user_ids: userIdArray,
         trip_id: planId,
       });
+
+      console.log('Successfully added friends to plan');
+      
+      // Success - close modal and refresh
       onSuccess();
+      onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to add friends');
+      console.error('Failed to add friends:', err);
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+      });
+      setError(err.response?.data?.message || err.message || 'Failed to add friends. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -90,7 +125,11 @@ export function AddFriendModal({ planId, onClose, onSuccess }: AddFriendModalPro
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Add Friends to Plan</h2>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className={`mb-4 p-3 border rounded ${
+            error.includes('Warning:') 
+              ? 'bg-yellow-100 border-yellow-400 text-yellow-700' 
+              : 'bg-red-100 border-red-400 text-red-700'
+          }`}>
             {error}
           </div>
         )}
@@ -110,7 +149,7 @@ export function AddFriendModal({ planId, onClose, onSuccess }: AddFriendModalPro
               placeholder="user1@example.com, user2@example.com"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Enter email addresses separated by commas
+              Enter email addresses separated by commas. Users must be registered to be added.
             </p>
           </div>
 

@@ -17,12 +17,17 @@ interface CreatePinModalProps {
     expenses?: Expense[];
     participants?: string[];
   } | null;
+  lastPinId?: string; // Add this prop to pass the last pin ID
 }
 
-export function CreatePinModal({ whiteboardId, onClose, onSuccess, existingPin }: CreatePinModalProps) {
+export function CreatePinModal({ whiteboardId, onClose, onSuccess, existingPin, lastPinId }: CreatePinModalProps) {
   const [name, setName] = useState(existingPin?.name || '');
   const [description, setDescription] = useState(existingPin?.description || '');
-  const [location, setLocation] = useState(existingPin?.location?.toString() || '');
+  const [location, setLocation] = useState(
+    existingPin?.location !== undefined && existingPin.location !== null 
+      ? existingPin.location.toString() 
+      : ''
+  );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(existingPin?.image || null);
   const [expenses, setExpenses] = useState<Expense[]>(existingPin?.expenses || []);
@@ -99,14 +104,10 @@ export function CreatePinModal({ whiteboardId, onClose, onSuccess, existingPin }
     setLoading(true);
 
     try {
-      console.log('=== PIN CREATION START ===');
+      console.log('=== PIN CREATION/UPDATE START ===');
       console.log('Whiteboard ID:', whiteboardId);
+      console.log('Existing Pin:', existingPin);
       
-      // Validate whiteboard ID
-      if (!whiteboardId || whiteboardId.trim() === '') {
-        throw new Error('Whiteboard ID is required');
-      }
-
       const pinData = {
         name: name || undefined,
         description: description || undefined,
@@ -117,6 +118,8 @@ export function CreatePinModal({ whiteboardId, onClose, onSuccess, existingPin }
           expense: e.expense,
         })),
         participants: selectedParticipants.length > 0 ? selectedParticipants : undefined,
+        // Set parent to last pin if creating a new pin
+        parents: existingPin ? undefined : (lastPinId ? [lastPinId] : undefined),
       };
 
       console.log('Pin data to send:', JSON.stringify(pinData, null, 2));
@@ -125,9 +128,22 @@ export function CreatePinModal({ whiteboardId, onClose, onSuccess, existingPin }
       
       if (existingPin) {
         // Update existing pin
-        // TODO: Add updatePin API method
-        throw new Error('Update pin not yet implemented');
+        if (!existingPin.pin_id) {
+          throw new Error('Pin ID is required for update');
+        }
+        
+        console.log('Calling planApi.updatePin for pin:', existingPin.pin_id);
+        const response = await planApi.updatePin(existingPin.pin_id, pinData);
+        console.log('Update response:', response);
+        
+        pinId = existingPin.pin_id;
+        console.log('✅ Pin updated successfully with ID:', pinId);
       } else {
+        // Validate whiteboard ID for new pins
+        if (!whiteboardId || whiteboardId.trim() === '') {
+          throw new Error('Whiteboard ID is required');
+        }
+
         // Create new pin
         console.log('Calling planApi.createPin...');
         const response = await planApi.createPin(whiteboardId, pinData);
@@ -167,7 +183,7 @@ export function CreatePinModal({ whiteboardId, onClose, onSuccess, existingPin }
         console.log('✅ Pin created successfully with ID:', pinId);
       }
 
-      // Upload image if provided
+      // Upload image if provided (works for both create and update)
       if (imageFile) {
         try {
           console.log('Uploading image for pin:', pinId);
@@ -175,17 +191,17 @@ export function CreatePinModal({ whiteboardId, onClose, onSuccess, existingPin }
           console.log('✅ Image uploaded successfully');
         } catch (imgError: any) {
           console.error('❌ Failed to upload image:', imgError);
-          // Don't throw - pin was created successfully, just image upload failed
-          setError('Pin created but image upload failed: ' + (imgError.response?.data?.message || imgError.message || 'Unknown error'));
-          // Still call onSuccess since pin was created
+          // Don't throw - pin was created/updated successfully, just image upload failed
+          setError('Pin ' + (existingPin ? 'updated' : 'created') + ' but image upload failed: ' + (imgError.response?.data?.message || imgError.message || 'Unknown error'));
+          // Still call onSuccess since pin was created/updated
         }
       }
 
-      console.log('=== PIN CREATION SUCCESS - Calling onSuccess ===');
-      // Only call onSuccess if pin was created successfully
+      console.log('=== PIN ' + (existingPin ? 'UPDATE' : 'CREATION') + ' SUCCESS - Calling onSuccess ===');
+      // Only call onSuccess if pin was created/updated successfully
       onSuccess();
     } catch (err: any) {
-      console.error('=== PIN CREATION ERROR ===');
+      console.error('=== PIN ' + (existingPin ? 'UPDATE' : 'CREATION') + ' ERROR ===');
       console.error('Error object:', err);
       console.error('Error message:', err.message);
       console.error('Error response:', err.response);
@@ -193,7 +209,7 @@ export function CreatePinModal({ whiteboardId, onClose, onSuccess, existingPin }
         console.error('Error response data:', err.response.data);
         console.error('Error response status:', err.response.status);
       }
-      setError(err.response?.data?.message || err.message || 'Failed to create pin');
+      setError(err.response?.data?.message || err.message || `Failed to ${existingPin ? 'update' : 'create'} pin`);
     } finally {
       setLoading(false);
     }
