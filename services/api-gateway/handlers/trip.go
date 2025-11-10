@@ -70,12 +70,27 @@ func (h *HTTPHandler) CreateTrip(ctx *fiber.Ctx) error {
 }
 
 func (h *HTTPHandler) GetTripByID(ctx *fiber.Ctx) error {
+	token, err := middlewares.DecodeJWTToken(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
+	}
+	
 	id := ctx.Query("id")
 	if id == "" {
 		return ctx.Status(fiber.StatusBadRequest).JSON(
 			entities.ResponseMessage{Message: "missing or empty 'id' query parameter"},
 		)
 	}
+	
+	// ADD THIS: Check if user has access to this trip
+	userTripReq := &userPb.UserTripRequest{
+		UserId: token.UserID,
+		TripId:  id,
+	}
+	if res, err := h.userClient.CheckAuthUserTrip(context.Background(), userTripReq); err != nil || !res.GetSuccess() {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "don't have access to trip."})
+	}
+	
 	tripReq := &pb.TripIDRequest{
 		TripId: id,
 	}
