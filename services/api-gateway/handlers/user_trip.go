@@ -17,19 +17,19 @@ func (h *HTTPHandler) AddUsersToTrip(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
 	}
-	bodyData := entities.UsersTripModel{}
+	bodyData := entities.AddUserModel{}
 	if err := ctx.BodyParser(&bodyData); err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(
 			entities.ResponseMessage{Message: "invalid json body"},
 		)
 	}
 
-	req := &pb.UsersTripRequest{
-		UserIds: bodyData.UserID,
-		TripId:  bodyData.TripID,
+	req := &pb.AddUserToTripRequest{
+		Email:  bodyData.Email,
+		TripId: bodyData.TripID,
 	}
 
-	res, err := h.userClient.CreateUsersTrip(context.Background(), req)
+	res, err := h.userClient.AddUserToTrip(context.Background(), req)
 	if err != nil {
 		return ctx.Status(fiber.StatusForbidden).JSON(
 			entities.ResponseMessage{Message: "cannot insert new user trip: " + err.Error()},

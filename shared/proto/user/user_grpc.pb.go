@@ -24,6 +24,7 @@ const (
 	UserService_UpdateUser_FullMethodName          = "/user.UserService/UpdateUser"
 	UserService_GetUser_FullMethodName             = "/user.UserService/GetUser"
 	UserService_DeleteUser_FullMethodName          = "/user.UserService/DeleteUser"
+	UserService_AddUserToTrip_FullMethodName       = "/user.UserService/AddUserToTrip"
 	UserService_CreateUsersTrip_FullMethodName     = "/user.UserService/CreateUsersTrip"
 	UserService_UpdateUsername_FullMethodName      = "/user.UserService/UpdateUsername"
 	UserService_GetUsersAvatar_FullMethodName      = "/user.UserService/GetUsersAvatar"
@@ -45,6 +46,7 @@ type UserServiceClient interface {
 	GetUser(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	DeleteUser(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	// user_trip
+	AddUserToTrip(ctx context.Context, in *AddUserToTripRequest, opts ...grpc.CallOption) (*UserTripResponse, error)
 	CreateUsersTrip(ctx context.Context, in *UsersTripRequest, opts ...grpc.CallOption) (*UsersTripResponse, error)
 	UpdateUsername(ctx context.Context, in *UserTripModel, opts ...grpc.CallOption) (*UserTripResponse, error)
 	GetUsersAvatar(ctx context.Context, in *UsersAvatarRequest, opts ...grpc.CallOption) (*UsersAvatarResponse, error)
@@ -107,6 +109,16 @@ func (c *userServiceClient) DeleteUser(ctx context.Context, in *UserIDRequest, o
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, UserService_DeleteUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AddUserToTrip(ctx context.Context, in *AddUserToTripRequest, opts ...grpc.CallOption) (*UserTripResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserTripResponse)
+	err := c.cc.Invoke(ctx, UserService_AddUserToTrip_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -204,6 +216,7 @@ type UserServiceServer interface {
 	GetUser(context.Context, *UserIDRequest) (*UserResponse, error)
 	DeleteUser(context.Context, *UserIDRequest) (*UserResponse, error)
 	// user_trip
+	AddUserToTrip(context.Context, *AddUserToTripRequest) (*UserTripResponse, error)
 	CreateUsersTrip(context.Context, *UsersTripRequest) (*UsersTripResponse, error)
 	UpdateUsername(context.Context, *UserTripModel) (*UserTripResponse, error)
 	GetUsersAvatar(context.Context, *UsersAvatarRequest) (*UsersAvatarResponse, error)
@@ -236,6 +249,9 @@ func (UnimplementedUserServiceServer) GetUser(context.Context, *UserIDRequest) (
 }
 func (UnimplementedUserServiceServer) DeleteUser(context.Context, *UserIDRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedUserServiceServer) AddUserToTrip(context.Context, *AddUserToTripRequest) (*UserTripResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUserToTrip not implemented")
 }
 func (UnimplementedUserServiceServer) CreateUsersTrip(context.Context, *UsersTripRequest) (*UsersTripResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUsersTrip not implemented")
@@ -368,6 +384,24 @@ func _UserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).DeleteUser(ctx, req.(*UserIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AddUserToTrip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddUserToTripRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddUserToTrip(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_AddUserToTrip_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddUserToTrip(ctx, req.(*AddUserToTripRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -542,6 +576,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteUser",
 			Handler:    _UserService_DeleteUser_Handler,
+		},
+		{
+			MethodName: "AddUserToTrip",
+			Handler:    _UserService_AddUserToTrip_Handler,
 		},
 		{
 			MethodName: "CreateUsersTrip",

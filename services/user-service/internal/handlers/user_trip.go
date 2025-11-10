@@ -8,6 +8,28 @@ import (
 	"context"
 )
 
+func (h *gRPCHandler) AddUserToTrip(ctx context.Context, req *pb.AddUserToTripRequest) (*pb.UserTripResponse, error) {
+
+	userIdRes, err := h.userService.FindByEmail(req.GetEmail())
+	if err != nil {
+		fmt.Println("AddUserToTrip at user-service failed:", err.Error())
+		return nil, err
+	}
+
+	res, err := h.userTripService.InsertUser(req.GetTripId(), userIdRes.UserID)
+	if err != nil {
+		fmt.Println("AddUserToTrip at user-service failed:", err.Error())
+		return nil, err
+	}
+
+	fmt.Println("AddUserToTrip at user-service success")
+	return &pb.UserTripResponse{
+		Success: true,
+		UserId:  res.UserID,
+		TripId:  res.TripID,
+	}, nil
+}
+
 func (h *gRPCHandler) CreateUsersTrip(ctx context.Context, req *pb.UsersTripRequest) (*pb.UsersTripResponse, error) {
 
 	res, err := h.userTripService.InsertManyUsers(req.GetTripId(), req.GetUserIds())

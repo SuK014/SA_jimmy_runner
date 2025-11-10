@@ -17,6 +17,7 @@ type usersService struct {
 
 type IUsersService interface {
 	GetAllUsers() (*[]entities.UserDataModel, error)
+	FindByEmail(email string) (*entities.UserDataModel, error)
 	InsertNewUser(data entities.CreatedUserModel) (*entities.UserDataModel, error)
 	GetByID(userID string) (*entities.UserDataModel, error)
 	FindManyUsersByID(userID []string) (*[]entities.UserDataModel, error)
@@ -39,6 +40,10 @@ func (sv *usersService) GetAllUsers() (*[]entities.UserDataModel, error) {
 	}
 
 	return data, nil
+}
+
+func (sv *usersService) FindByEmail(email string) (*entities.UserDataModel, error) {
+	return sv.UsersRepository.FindByEmail(email)
 }
 
 func (sv *usersService) GetByID(userID string) (*entities.UserDataModel, error) {

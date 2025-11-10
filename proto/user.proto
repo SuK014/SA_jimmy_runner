@@ -13,6 +13,7 @@ service UserService {
   rpc DeleteUser(UserIDRequest) returns (UserResponse);
 
   // user_trip
+  rpc AddUserToTrip(AddUserToTripRequest) returns (UserTripResponse);
   rpc CreateUsersTrip(UsersTripRequest) returns (UsersTripResponse);
   rpc UpdateUsername(UserTripModel) returns (UserTripResponse);
   rpc GetUsersAvatar(UsersAvatarRequest) returns (UsersAvatarResponse);
@@ -83,6 +84,11 @@ message UsersAvatarResponse {
 
 
 // user_trip
+message AddUserToTripRequest {
+  string email = 1;
+  string tripId = 2;
+}
+
 message UsersTripRequest {
   repeated string userIds = 1;
   string tripId = 2;

@@ -65,6 +65,10 @@ func (ds *UserServiceClient) GetUsersAvatar(ctx context.Context, req *pb.UsersAv
 	return ds.Client.GetUsersAvatar(ctx, req)
 }
 
+func (ds *UserServiceClient) AddUserToTrip(ctx context.Context, req *pb.AddUserToTripRequest) (*pb.UserTripResponse, error) {
+	return ds.Client.AddUserToTrip(ctx, req)
+}
+
 func (ds *UserServiceClient) CreateUsersTrip(ctx context.Context, req *pb.UsersTripRequest) (*pb.UsersTripResponse, error) {
 	return ds.Client.CreateUsersTrip(ctx, req)
 }
