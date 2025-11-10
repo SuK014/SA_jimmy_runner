@@ -173,23 +173,37 @@ func (h *HTTPHandler) UpdatePinImageByID(ctx *fiber.Ctx) error {
 	}
 
 	fileHeader, err := ctx.FormFile("image")
-	var imageBytes []byte
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "missing or invalid 'image' file in form data"},
+		)
+	}
 
-	if err == nil && fileHeader != nil {
-		file, err := fileHeader.Open()
-		if err != nil {
-			return ctx.Status(fiber.StatusBadRequest).JSON(
-				entities.ResponseMessage{Message: "failed to open uploaded file"},
-			)
-		}
-		defer file.Close()
+	if fileHeader == nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "no file provided"},
+		)
+	}
 
-		imageBytes, err = io.ReadAll(file)
-		if err != nil {
-			return ctx.Status(fiber.StatusBadRequest).JSON(
-				entities.ResponseMessage{Message: "failed to read uploaded file"},
-			)
-		}
+	file, err := fileHeader.Open()
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "failed to open uploaded file"},
+		)
+	}
+	defer file.Close()
+
+	imageBytes, err := io.ReadAll(file)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "failed to read uploaded file"},
+		)
+	}
+
+	if len(imageBytes) == 0 {
+		return ctx.Status(fiber.StatusBadRequest).JSON(
+			entities.ResponseMessage{Message: "uploaded file is empty"},
+		)
 	}
 
 	req := &pb.UpdatePinImageRequest{
@@ -206,7 +220,6 @@ func (h *HTTPHandler) UpdatePinImageByID(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(res)
 }
-
 func (h *HTTPHandler) DeletePinByID(ctx *fiber.Ctx) error {
 	id := ctx.Query("id")
 	if id == "" {

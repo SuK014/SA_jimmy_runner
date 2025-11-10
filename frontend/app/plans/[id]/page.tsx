@@ -37,6 +37,8 @@ export default function PlanDetailPage() {
   const [isDeletingPin, setIsDeletingPin] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingTripImage, setIsUploadingTripImage] = useState(false);
+  const tripImageInputRef = useRef<HTMLInputElement>(null);
   const [isWhiteboardLoading, setIsWhiteboardLoading] = useState(false);
 
   useEffect(() => {
@@ -300,41 +302,46 @@ export default function PlanDetailPage() {
 
   const fetchParticipants = async () => {
     try {
-      // Add owner (current user) immediately
-      const ownerParticipant: Participant = {
-        user_id: user?.user_id || '',
-        display_name: user?.name || user?.email || 'You',
-        profile: user?.profile,
-      };
-      
       const response = await planApi.getTripParticipants(planId);
+      console.log('Participants response:', response); // Debug log
+      
       if (response.data?.data?.users) {
-        const otherParticipants = response.data.data.users.map((u: any) => ({
-          user_id: u.userId || u.user_id,
-          display_name: u.displayName || u.name,
-          profile: u.profile,
+        // Map all users from userTrip response
+        // Proto uses snake_case: user_id, display_name, profile
+        const allParticipants = response.data.data.users.map((u: any) => ({
+          user_id: u.user_id || u.userId || u.UserId,
+          display_name: u.display_name || u.displayName || u.DisplayName || u.name || u.Name,
+          profile: u.profile || u.Profile,
         }));
         
-        // Combine owner with other participants, avoiding duplicates
-        const allParticipants = [ownerParticipant];
-        otherParticipants.forEach((p: Participant) => {
-          if (p.user_id !== ownerParticipant.user_id) {
-            allParticipants.push(p);
-          }
-        });
+        console.log('Mapped participants:', allParticipants); // Debug log
+        setParticipants(allParticipants);
+      } else if (response.data?.users) {
+        // Alternative response format
+        const allParticipants = response.data.users.map((u: any) => ({
+          user_id: u.user_id || u.userId || u.UserId,
+          display_name: u.display_name || u.displayName || u.DisplayName || u.name || u.Name,
+          profile: u.profile || u.Profile,
+        }));
         
         setParticipants(allParticipants);
       } else {
-        // If no other participants, still show owner
-        setParticipants([ownerParticipant]);
+        // Fallback: if no participants found, at least show current user
+        if (user) {
+          setParticipants([{
+            user_id: user.user_id || '',
+            display_name: user.name || user.email || '',
+            profile: user.profile,
+          }]);
+        }
       }
     } catch (err: any) {
       console.error('Failed to fetch participants:', err);
-      // Even if fetch fails, show owner
+      // Fallback: show current user if fetch fails
       if (user) {
         setParticipants([{
           user_id: user.user_id || '',
-          display_name: user.name || user.email || 'You',
+          display_name: user.name || user.email || '',
           profile: user.profile,
         }]);
       }
@@ -868,9 +875,35 @@ export default function PlanDetailPage() {
     try {
       console.log('Uploading image for pin:', selectedPin.pin_id, 'File:', file.name, 'Size:', file.size);
       await planApi.uploadPinImage(selectedPin.pin_id, file);
+      console.log('Image upload successful, refreshing pin data...');
       
       // Refresh pin details to show the new image
-      await handlePinClick(selectedPin);
+      const response = await planApi.getPinById(selectedPin.pin_id);
+      if (response.data) {
+        const pinData = response.data as any;
+        const updatedPin = {
+          ...selectedPin,
+          image: pinData.image, // Update the image field
+        };
+        
+        // Update selectedPin state
+        setSelectedPin(updatedPin);
+        
+        // Also update in plan state
+        if (plan) {
+          const updatedPlan = { ...plan };
+          const whiteboardIndex = updatedPlan.whiteboards.findIndex(wb => wb.day === selectedDay);
+          if (whiteboardIndex !== -1) {
+            const pinIndex = updatedPlan.whiteboards[whiteboardIndex].pins.findIndex(
+              p => p.pin_id === selectedPin.pin_id
+            );
+            if (pinIndex !== -1) {
+              updatedPlan.whiteboards[whiteboardIndex].pins[pinIndex] = updatedPin;
+              setPlan(updatedPlan);
+            }
+          }
+        }
+      }
       
       // Reset file input
       if (imageInputRef.current) {
@@ -896,6 +929,55 @@ export default function PlanDetailPage() {
   const handleAddImageClick = () => {
     if (imageInputRef.current) {
       imageInputRef.current.click();
+    }
+  };
+
+  const onTripImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!planId || !event.target.files || event.target.files.length === 0) return;
+
+    const file = event.target.files[0];
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Check file size (e.g., max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('Image file is too large. Please select an image smaller than 10MB.');
+      return;
+    }
+
+    setIsUploadingTripImage(true);
+    try {
+      console.log('Uploading image for trip:', planId, 'File:', file.name, 'Size:', file.size);
+      await planApi.uploadTripImage(planId, file);
+      console.log('Trip image upload successful, refreshing plan data...');
+      
+      // Refresh plan details to show the new image
+      const response = await planApi.getPlanById(planId);
+      if (response.data) {
+        setPlan(response.data as PlanWithDetails);
+      }
+      
+      // Reset file input
+      if (tripImageInputRef.current) {
+        tripImageInputRef.current.value = '';
+      }
+    } catch (error: any) {
+      console.error('Failed to upload trip image:', error);
+      
+      // Provide more specific error message
+      let errorMessage = 'Failed to upload image. Please try again.';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setIsUploadingTripImage(false);
     }
   };
 
@@ -953,10 +1035,10 @@ export default function PlanDetailPage() {
   return (
     <AuthGuard>
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Header */}
-        <nav className="bg-white shadow-sm border-b z-10">
+                {/* Header */}
+                <nav className="bg-white shadow-sm border-b z-10">
           <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
+            <div className="flex justify-between h-16 items-center">
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => router.push('/plans')}
@@ -968,6 +1050,17 @@ export default function PlanDetailPage() {
                   </svg>
                 </button>
               </div>
+              {plan && !loading && (
+                <button 
+                  onClick={() => setShowAddFriendModal(true)}
+                  className="px-3 py-1.5 text-sm bg-blue-200 text-blue-700 rounded-md hover:bg-blue-300 transition-colors shadow-sm flex items-center gap-1.5"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Invite your friend
+                </button>
+              )}
             </div>
           </div>
         </nav>
@@ -990,7 +1083,7 @@ export default function PlanDetailPage() {
             <div className="w-80 bg-amber-50 border-r-2 border-gray-300 overflow-y-auto flex-shrink-0">
               <div className="p-6 space-y-6">
                 {viewMode === 'pin' && selectedPin ? (
-                  <PinDetailsView
+                    <PinDetailsView
                     selectedPin={selectedPin}
                     selectedDay={selectedDay}
                     participants={participants}
@@ -998,7 +1091,6 @@ export default function PlanDetailPage() {
                     getParticipantColor={getParticipantColor}
                     onBack={() => setViewMode('day')}
                     onEdit={handleEditPin}
-                    onAddFriend={() => setShowAddFriendModal(true)}
                     onImageUpload={handleImageUpload}
                     imageInputRef={imageInputRef}
                     isUploadingImage={isUploadingImage}
@@ -1022,6 +1114,9 @@ export default function PlanDetailPage() {
                     getSelectedDayDate={getSelectedDayDate}
                     setIsEditingDates={setIsEditingDates}
                     planId={planId}
+                    onTripImageUpload={onTripImageUpload}
+                    tripImageInputRef={tripImageInputRef}
+                    isUploadingTripImage={isUploadingTripImage}
                   />
                 )}
               </div>
