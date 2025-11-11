@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { planApi, authApi } from '@/lib/api';
+import { planApi } from '@/lib/api';
 
 interface AddFriendModalProps {
   planId: string;
@@ -41,78 +41,107 @@ export function AddFriendModal({ planId, onClose, onSuccess }: AddFriendModalPro
         return;
       }
 
-      // Convert emails to user IDs
-      const userIdArray: string[] = [];
-      const notFoundEmails: string[] = [];
+      // Add each friend to the plan (backend accepts one email at a time)
+      const results: { email: string; success: boolean; error?: string }[] = [];
       
       for (const email of emailArray) {
         try {
-          console.log(`Looking up user with email: ${email}`);
-          const user = await authApi.getUserByEmail(email);
-          console.log(`User found:`, user);
+          console.log('Adding friend:', { email, trip_id: planId });
+          const requestData = {
+            email: email,
+            trip_id: planId,
+          };
+          console.log('Request data:', JSON.stringify(requestData));
           
-          // Handle different response formats
-          const userId = user?.user_id || (user as any)?.userId || (user as any)?.UserID;
-          
-          if (userId) {
-            userIdArray.push(userId);
-            console.log(`Added user ID: ${userId} for email: ${email}`);
-          } else {
-            console.warn(`User found but no user_id field:`, user);
-            notFoundEmails.push(email);
-          }
+          await planApi.addFriendsToPlan(requestData);
+          console.log(`Successfully added ${email}`);
+          results.push({ email, success: true });
         } catch (err: any) {
-          console.error(`Failed to find user for email ${email}:`, err);
-          console.error('Error details:', {
-            message: err.message,
-            response: err.response?.data,
-            status: err.response?.status,
-          });
+          console.error(`Failed to add ${email}:`, err);
+          console.error('Error response:', err.response?.data);
+          console.error('Error status:', err.response?.status);
           
-          // Check if it's a 404 or user not found
-          if (err.response?.status === 404 || err.response?.status === 400) {
-            notFoundEmails.push(email);
+          // Parse error message to provide better user feedback
+          let errorMessage = err.response?.data?.message || err.message || 'Unknown error';
+          
+          // Check if user is already in the trip (unique constraint violation)
+          if (errorMessage.includes('Unique constraint') || 
+              errorMessage.includes('unique constraint') ||
+              errorMessage.includes('already exists') ||
+              errorMessage.includes('user_id') && errorMessage.includes('trip_id')) {
+            errorMessage = `Your friend ${email} is already in the trip.`;
+            // Treat as success since the user is already added
+            results.push({ email, success: true, error: errorMessage });
+          } else if (errorMessage.includes('FindByID') || 
+                     errorMessage.includes('ErrNotFound') || 
+                     errorMessage.includes('not found')) {
+            // User not found
+            errorMessage = `User with email ${email} not found. Please make sure the user is registered.`;
+            results.push({ 
+              email, 
+              success: false, 
+              error: errorMessage
+            });
           } else {
-            // For other errors, show the actual error message
-            setError(`Error looking up ${email}: ${err.response?.data?.message || err.message}`);
-            setLoading(false);
-            return;
+            // Other errors
+            results.push({ 
+              email, 
+              success: false, 
+              error: errorMessage
+            });
           }
         }
       }
 
-      // Check if we found any users
-      if (userIdArray.length === 0) {
-        setError(`No users found for the provided email${emailArray.length > 1 ? 's' : ''}. Please make sure the users are registered.`);
+      // Check results
+      const successful = results.filter(r => r.success);
+      const failed = results.filter(r => !r.success);
+      const alreadyAdded = results.filter(r => r.success && r.error?.includes('already in the trip'));
+
+      if (successful.length === 0) {
+        // All failed
+        const errorMessages = failed.map(r => `${r.email}: ${r.error}`).join('; ');
+        setError(`Failed to add all friends: ${errorMessages}`);
         setLoading(false);
         return;
       }
 
-      // Show warning if some emails weren't found
-      if (notFoundEmails.length > 0 && userIdArray.length > 0) {
-        setError(`Warning: Could not find users for: ${notFoundEmails.join(', ')}. Adding the users that were found.`);
-        // Continue with adding the found users
+      // Build success/warning message
+      const messages: string[] = [];
+      const newlyAdded = successful.length - alreadyAdded.length;
+      
+      if (newlyAdded > 0) {
+        messages.push(`Successfully added ${newlyAdded} friend${newlyAdded > 1 ? 's' : ''}`);
+      }
+      
+      if (alreadyAdded.length > 0) {
+        const alreadyAddedEmails = alreadyAdded.map(r => r.email).join(', ');
+        messages.push(`${alreadyAdded.length} friend${alreadyAdded.length > 1 ? 's are' : ' is'} already in the trip: ${alreadyAddedEmails}`);
       }
 
-      // Add friends to plan
-      console.log('Adding friends to plan:', { user_ids: userIdArray, trip_id: planId });
-      await planApi.addFriendsToPlan({
-        user_ids: userIdArray,
-        trip_id: planId,
-      });
+      if (failed.length > 0) {
+        const failedEmails = failed.map(r => r.email).join(', ');
+        messages.push(`Failed to add: ${failedEmails}`);
+      }
 
-      console.log('Successfully added friends to plan');
-      
-      // Success - close modal and refresh
-      onSuccess();
-      onClose();
+      if (messages.length > 0) {
+        setError(messages.join('. ') + '.');
+      }
+
+      // If we have any success, refresh and close
+      if (successful.length > 0) {
+        onSuccess();
+        // Only close if all were successful or already added (no real failures)
+        if (failed.length === 0) {
+          onClose();
+        }
+      } else {
+        // All failed - don't close, let user see the error
+        setLoading(false);
+        return;
+      }
     } catch (err: any) {
       console.error('Failed to add friends:', err);
-      console.error('Error details:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
-      });
       setError(err.response?.data?.message || err.message || 'Failed to add friends. Please try again.');
     } finally {
       setLoading(false);
@@ -126,7 +155,9 @@ export function AddFriendModal({ planId, onClose, onSuccess }: AddFriendModalPro
 
         {error && (
           <div className={`mb-4 p-3 border rounded ${
-            error.includes('Warning:') 
+            error.includes('Successfully') || error.includes('already in the trip')
+              ? 'bg-green-100 border-green-400 text-green-700' 
+              : error.includes('Warning:') 
               ? 'bg-yellow-100 border-yellow-400 text-yellow-700' 
               : 'bg-red-100 border-red-400 text-red-700'
           }`}>

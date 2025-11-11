@@ -69,7 +69,7 @@ export interface User {
   }
   
   export interface AddFriendRequest {
-    user_ids: string[];
+    email: string;
     trip_id: string;
   }
   

@@ -143,9 +143,10 @@ export const planApi = {
     const formData = new FormData();
     formData.append('image', imageFile);
     
+    // Remove Content-Type header to let browser set it with boundary for multipart/form-data
     const response = await api.put(`/plan/trip/image?id=${tripId}`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': undefined, // Let axios/browser set the correct Content-Type with boundary
       },
     });
     return response.data;
@@ -211,8 +212,12 @@ export const planApi = {
     const formData = new FormData();
     formData.append('image', imageFile);
     
-    // Don't manually set Content-Type - let axios set it with the correct boundary
-    const response = await api.put(`/plan/pin/image?id=${pinId}`, formData);
+    // Remove Content-Type header to let browser set it with boundary for multipart/form-data
+    const response = await api.put(`/plan/pin/image?id=${pinId}`, formData, {
+      headers: {
+        'Content-Type': undefined, // Let axios/browser set the correct Content-Type with boundary
+      },
+    });
     return response.data;
   },
 

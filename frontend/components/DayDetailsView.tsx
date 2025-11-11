@@ -3,58 +3,106 @@
 import type { PlanWithDetails, Participant } from '@/lib/types';
 
 interface DayDetailsViewProps {
-  plan: PlanWithDetails;
-  selectedDay: number;
-  startDate: Date | null;
-  endDate: Date | null;
-  dayDates: Map<number, { date: Date; time: string }>;
-  isEditingDates: boolean;
-  participants: Participant[];
-  dayParticipants: Participant[];
-  dayPhotos: string[];
-  user: any;
-  getParticipantColor: (index: number) => string;
-  getImageSrc: () => string;
-  updateStartDate: (day: number, month: number, year: number) => void;
-  updateEndDate: (day: number, month: number, year: number) => void;
-  getSelectedDayDate: () => { day: number; month: number; year: number; time: string };
-  setIsEditingDates: (value: boolean) => void;
-  planId: string;
-}
+    plan: PlanWithDetails;
+    selectedDay: number;
+    startDate: Date | null;
+    endDate: Date | null;
+    dayDates: Map<number, { date: Date; time: string }>;
+    isEditingDates: boolean;
+    participants: Participant[];
+    dayParticipants: Participant[];
+    dayPhotos: string[];
+    user: any;
+    getParticipantColor: (index: number) => string;
+    getImageSrc: () => string;
+    updateStartDate: (day: number, month: number, year: number) => void;
+    updateEndDate: (day: number, month: number, year: number) => void;
+    getSelectedDayDate: () => { day: number; month: number; year: number; time: string };
+    setIsEditingDates: (value: boolean) => void;
+    planId: string;
+    onTripImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    tripImageInputRef: React.RefObject<HTMLInputElement>;
+    isUploadingTripImage: boolean;
+  }
 
-export function DayDetailsView({
-  plan,
-  selectedDay,
-  startDate,
-  endDate,
-  dayDates,
-  isEditingDates,
-  participants,
-  dayParticipants,
-  dayPhotos,
-  user,
-  getParticipantColor,
-  getImageSrc,
-  updateStartDate,
-  updateEndDate,
-  getSelectedDayDate,
-  setIsEditingDates,
-  planId,
-}: DayDetailsViewProps) {
+  export function DayDetailsView({
+    plan,
+    selectedDay,
+    startDate,
+    endDate,
+    dayDates,
+    isEditingDates,
+    participants,
+    dayParticipants,
+    dayPhotos,
+    user,
+    getParticipantColor,
+    getImageSrc,
+    updateStartDate,
+    updateEndDate,
+    getSelectedDayDate,
+    setIsEditingDates,
+    planId,
+    onTripImageUpload,
+    tripImageInputRef,
+    isUploadingTripImage,
+  }: DayDetailsViewProps) {
   const selectedDayDate = getSelectedDayDate();
 
   return (
     <>
-      {/* Main Image */}
-      <div className="w-full h-64 rounded-lg overflow-hidden shadow-md">
-        <img
-          src={getImageSrc()}
-          alt={plan.name}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop';
-          }}
+       {/* Main Image */}
+       <div 
+        className="w-full h-64 rounded-lg overflow-hidden shadow-md bg-gray-100 flex items-center justify-center relative group cursor-pointer"
+        onClick={() => !isUploadingTripImage && tripImageInputRef.current?.click()}
+      >
+        <input
+          ref={tripImageInputRef}
+          type="file"
+          accept="image/*"
+          onChange={onTripImageUpload}
+          className="hidden"
+          disabled={isUploadingTripImage}
         />
+        {plan.image ? (
+          <>
+            <img
+              src={getImageSrc()}
+              alt={plan.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            {/* Edit overlay on hover */}
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center">
+                <svg className="w-12 h-12 text-white mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p className="text-white text-sm font-medium">Click to change image</p>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center w-full h-full text-gray-400">
+            <svg className="w-24 h-24 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p className="text-sm text-gray-500">Click to add image</p>
+          </div>
+        )}
+        {isUploadingTripImage && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
+            <div className="flex flex-col items-center">
+              <svg className="animate-spin h-8 w-8 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p className="text-white text-sm">Uploading...</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Place Name with Edit Icon */}
