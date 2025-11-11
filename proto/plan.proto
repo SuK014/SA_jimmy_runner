@@ -26,6 +26,7 @@ service PlansService {
   // trip
   rpc CreateTrip(CreateTripRequest) returns (CreateTripResponse);
   rpc GetTripByID(TripIDRequest) returns (GetTripByIDResponse);
+  rpc GetManyTripsByID(ManyTripIDRequest) returns (GetTripsResponse);
   rpc UpdateTrip(UpdateTripRequest) returns (SuccessResponse);
   rpc UpdateTripImage(UpdateTripImageRequest) returns (SuccessResponse);
   rpc DeleteTripByID(TripIDRequest) returns (SuccessResponse);
@@ -164,6 +165,22 @@ message CreateTripResponse {
 
 message TripIDRequest { // for getWhiteboardByID and DeleteWhiteboardByID
   string TripId = 1;
+}
+
+message ManyTripIDRequest { // for GetPinsByWhiteboard and DeletePinByWhiteboard
+  repeated string trips = 1;
+}
+
+message GetTripsResponse { // for GetPinByParticipant and GetPinByParticipant
+  repeated GetTripResponse trips = 1;
+}
+
+message GetTripResponse { // for GetPinsResponse
+  string tripId = 1;
+  string name = 2;
+  string description = 3;
+  bytes image = 4;
+  repeated string whiteboards = 5;
 }
 
 message GetTripByIDResponse {

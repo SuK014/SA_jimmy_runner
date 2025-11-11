@@ -48,6 +48,30 @@ func (h *gRPCHandler) GetTripByID(ctx context.Context, req *pb.TripIDRequest) (*
 	}, nil
 }
 
+func (h *gRPCHandler) GetManyTripsByID(ctx context.Context, req *pb.ManyTripIDRequest) (*pb.GetTripsResponse, error) {
+
+	res, err := h.TripService.FindManyByID(req.GetTrips())
+	if err != nil {
+		fmt.Println("GetManyTripsByID at plan-service failed:", err.Error())
+		return nil, err
+	}
+
+	var trips []*pb.GetTripResponse
+	for _, tripData := range *res {
+		trips = append(trips, &pb.GetTripResponse{
+			TripId:      tripData.TripID,
+			Name:        tripData.Name,
+			Description: tripData.Description,
+			Image:       tripData.Image,
+		})
+	}
+
+	fmt.Println("GetManyTripsByID at plan-service success")
+	return &pb.GetTripsResponse{
+		Trips: trips,
+	}, nil
+}
+
 func (h *gRPCHandler) UpdateTrip(ctx context.Context, req *pb.UpdateTripRequest) (*pb.SuccessResponse, error) {
 	trip := entities.UpdatedTripModel{
 		Name:                  req.GetName(),

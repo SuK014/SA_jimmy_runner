@@ -17,3 +17,8 @@ type UserTripsModel struct {
 	TripID []string `json:"trip_ids"`
 	Name   string   `json:"name,omitempty"`
 }
+
+type AddUserModel struct {
+	Email  string `json:"email"`
+	TripID string `json:"trip_id"`
+}

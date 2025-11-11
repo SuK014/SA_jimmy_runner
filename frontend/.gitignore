@@ -37,19 +37,3 @@ next-env.d.ts
 # Test Reports
 /coverage
 /.nyc_output
-
-# --- User's Merged Rules ---
-
-# General .env files
-.env
-**/.env
-**/env/**
-
-# Temporary files and folders
-tmp/
-**/tmp/
-**/tmp/**
-
-# Executables
-main.exe
-**/main.exe

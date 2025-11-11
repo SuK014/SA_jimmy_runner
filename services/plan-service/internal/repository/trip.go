@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type tripsRepository struct {
@@ -23,6 +24,7 @@ type tripsRepository struct {
 type ITripsRepository interface {
 	InsertTrip(data entities.CreatedTripModel) (string, error)
 	FindByID(tripID primitive.ObjectID) (*entities.TripDataModel, error)
+	FindManyByID(tripIDs []primitive.ObjectID) (*[]entities.TripDataModel, error)
 	UpdateTrip(tripID primitive.ObjectID, data entities.UpdatedTripModel) error
 	UpdateTripImage(tripID primitive.ObjectID, image []byte) error
 	DeleteTripByID(tripID primitive.ObjectID) error
@@ -53,6 +55,30 @@ func (repo *tripsRepository) FindByID(tripID primitive.ObjectID) (*entities.Trip
 		return &trip, err
 	}
 	return &trip, nil
+}
+
+func (repo *tripsRepository) FindManyByID(tripIDs []primitive.ObjectID) (*[]entities.TripDataModel, error) {
+	filter := bson.M{"_id": bson.M{"$in": tripIDs}}
+	opts := options.Find().SetProjection(bson.M{
+		"whiteboards": 0, // exclude this field
+	})
+
+	cursor, err := repo.Collection.Find(repo.Context, filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(repo.Context)
+
+	var trips []entities.TripDataModel
+	if err := cursor.All(repo.Context, &trips); err != nil {
+		return nil, err
+	}
+
+	for i := range trips {
+		trips[i].TripID = trips[i].ID.Hex()
+	}
+
+	return &trips, nil
 }
 
 func (repo *tripsRepository) UpdateTrip(tripID primitive.ObjectID, data entities.UpdatedTripModel) error {

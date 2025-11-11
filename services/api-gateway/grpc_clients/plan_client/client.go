@@ -42,7 +42,7 @@ func (ds *PlansServiceClient) Close() {
 }
 
 // pins
-func (ds *PlansServiceClient) CreateUser(ctx context.Context, req *pb.CreatePinRequest) (*pb.CreatePinResponse, error) {
+func (ds *PlansServiceClient) CreatePin(ctx context.Context, req *pb.CreatePinRequest) (*pb.CreatePinResponse, error) {
 	return ds.Client.CreatePin(ctx, req)
 }
 
@@ -70,6 +70,10 @@ func (ds *PlansServiceClient) DeletePinByID(ctx context.Context, req *pb.PinIDRe
 	return ds.Client.DeletePinByID(ctx, req)
 }
 
+func (ds *PlansServiceClient) DeletePinByWhiteboard(ctx context.Context, req *pb.ManyPinIDRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.DeletePinByWhiteboard(ctx, req)
+}
+
 // whiteboards
 func (ds *PlansServiceClient) CreateWhiteboard(ctx context.Context, req *pb.CreateWhiteboardRequest) (*pb.CreateWhiteboardResponse, error) {
 	return ds.Client.CreateWhiteboard(ctx, req)
@@ -79,12 +83,20 @@ func (ds *PlansServiceClient) GetWhiteboardByID(ctx context.Context, req *pb.Whi
 	return ds.Client.GetWhiteboardByID(ctx, req)
 }
 
+func (ds *PlansServiceClient) GetWhiteboardsByTrip(ctx context.Context, req *pb.ManyWhiteboardIDRequest) (*pb.GetWhiteboardsResponse, error) {
+	return ds.Client.GetWhiteboardsByTrip(ctx, req)
+}
+
 func (ds *PlansServiceClient) UpdateWhiteboard(ctx context.Context, req *pb.UpdateWhiteboardRequest) (*pb.SuccessResponse, error) {
 	return ds.Client.UpdateWhiteboard(ctx, req)
 }
 
 func (ds *PlansServiceClient) DeleteWhiteboardByID(ctx context.Context, req *pb.WhiteboardIDRequest) (*pb.SuccessResponse, error) {
 	return ds.Client.DeleteWhiteboardByID(ctx, req)
+}
+
+func (ds *PlansServiceClient) DeleteWhiteboardByTrip(ctx context.Context, req *pb.ManyWhiteboardIDRequest) (*pb.SuccessResponse, error) {
+	return ds.Client.DeleteWhiteboardByTrip(ctx, req)
 }
 
 // trips
@@ -96,8 +108,8 @@ func (ds *PlansServiceClient) GetTripByID(ctx context.Context, req *pb.TripIDReq
 	return ds.Client.GetTripByID(ctx, req)
 }
 
-func (ds *PlansServiceClient) GetWhiteboardsByTrip(ctx context.Context, req *pb.ManyWhiteboardIDRequest) (*pb.GetWhiteboardsResponse, error) {
-	return ds.Client.GetWhiteboardsByTrip(ctx, req)
+func (ds *PlansServiceClient) GetManyTripsByID(ctx context.Context, req *pb.ManyTripIDRequest) (*pb.GetTripsResponse, error) {
+	return ds.Client.GetManyTripsByID(ctx, req)
 }
 
 func (ds *PlansServiceClient) UpdateTrip(ctx context.Context, req *pb.UpdateTripRequest) (*pb.SuccessResponse, error) {

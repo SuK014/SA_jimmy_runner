@@ -12,6 +12,7 @@ type userTripService struct {
 }
 
 type IUserTripService interface {
+	InsertUser(tripID, userID string) (*entities.UserTripModel, error)
 	InsertManyUsers(tripID string, userIDs []string) (*entities.UsersTripModel, error)
 	FindManyUsersByTripID(tripID string) (*[]entities.UserTripModel, error)
 	FindManyTripsByUserID(userID string) (*entities.UserTripsModel, error)
@@ -27,6 +28,10 @@ func NewUserTripService(repo0 repositories.IUserTripRepository) IUserTripService
 	return &userTripService{
 		UserTripRepository: repo0,
 	}
+}
+
+func (sv *userTripService) InsertUser(tripID, userID string) (*entities.UserTripModel, error) {
+	return sv.UserTripRepository.Insert(tripID, userID, "")
 }
 
 func (sv *userTripService) InsertManyUsers(tripID string, userIDs []string) (*entities.UsersTripModel, error) {
