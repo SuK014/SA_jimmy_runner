@@ -27,4 +27,6 @@ COPY --from=builder /noti-service .
 # Copy shared env (optional, better to use ConfigMap/Secrets)
 COPY --from=builder /app/shared/env/.env ./shared/env/.env
 
+EXPOSE 50053
+
 CMD ["./noti-service"]

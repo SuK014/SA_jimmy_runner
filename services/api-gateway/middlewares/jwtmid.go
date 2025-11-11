@@ -22,6 +22,8 @@ func SetJWtHeaderHandler() fiber.Handler {
 			//algorithm ที่เลือกใช้
 			JWTAlg: jwtware.HS256,
 		},
+		// Extract token from cookie named "cookies"
+		TokenLookup: "cookie:cookies",
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			return c.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "Unauthorization Token."})
 		},

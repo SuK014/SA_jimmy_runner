@@ -61,6 +61,7 @@ docker_build(
 )
 k8s_resource(
     'noti-service',
+    port_forwards='50053:50053',
     labels=['backend'],
 )
 

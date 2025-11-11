@@ -60,7 +60,7 @@ func (h *HTTPHandler) CreateUser(ctx *fiber.Ctx) error {
 		Value:    *tokenDetail.Token,
 		Expires:  time.Now().Add(24 * time.Hour), // expires in 1 day
 		HTTPOnly: true,                           // not accessible via JavaScript
-		Secure:   true,                           // only sent over HTTPS
+		Secure:   false,                          // set to true in production with HTTPS
 		Path:     "/",
 	})
 
@@ -106,7 +106,7 @@ func (h *HTTPHandler) Login(ctx *fiber.Ctx) error {
 		Value:    *tokenDetail.Token,
 		Expires:  time.Now().Add(24 * time.Hour), // expires in 1 day
 		HTTPOnly: true,                           // not accessible via JavaScript
-		Secure:   true,                           // only sent over HTTPS
+		Secure:   false,                          // set to true in production with HTTPS
 		Path:     "/",
 	})
 
